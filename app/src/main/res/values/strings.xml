@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Zoa</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="bLogin">ACCEDER</string>
+    <string name="nomCompe">ZOA</string>
+    <string name="title_activity_mapa">Map</string>
+    <string name="title_activity_general">GeneralActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="menuProfile">Mi Perfil</string>
+    <string name="menuAll">Todas</string>
+    <string name="menuMyCompetition">Mis Competiciones</string>
+</resources>

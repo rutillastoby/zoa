@@ -1,0 +1,85 @@
+{
+  "project_info": {
+    "project_number": "110097188364",
+    "firebase_url": "https://zoria-rutillastoby.firebaseio.com",
+    "project_id": "zoria-rutillastoby",
+    "storage_bucket": "zoria-rutillastoby.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110097188364:android:44cf57d5b4646afc",
+        "android_client_info": {
+          "package_name": "com.rutillastoby.zoaadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "110097188364-fhh1khl4m01sm86htisfn967n8domku7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rutillastoby.zoaadmin",
+            "certificate_hash": "f3587474dd5dd6cf4dc7501f96e3d7a942d8be60"
+          }
+        },
+        {
+          "client_id": "110097188364-7qm6b45ukjtev4088sfu67vqf6drae9o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMoqwnjowkRaqFZjBHgSSWYKWMv8qynDo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "110097188364-7qm6b45ukjtev4088sfu67vqf6drae9o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110097188364:android:e422b0b2df1b1cec",
+        "android_client_info": {
+          "package_name": "com.rutillastoby.zoria"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "110097188364-rscsjhffe55ome691mor1bngbsdnqtjp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rutillastoby.zoria",
+            "certificate_hash": "3187b8f98bae4d93d7584ee0ba89026f4d60803e"
+          }
+        },
+        {
+          "client_id": "110097188364-7qm6b45ukjtev4088sfu67vqf6drae9o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMoqwnjowkRaqFZjBHgSSWYKWMv8qynDo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "110097188364-7qm6b45ukjtev4088sfu67vqf6drae9o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
