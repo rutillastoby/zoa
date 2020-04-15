@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#000000</color>
     <color name="fondo">#fffe00</color>
+    <color name="background">#FDFDFD</color>
+    <color name="grayLight">#E1E1E1</color>
+    <color name="error">#FF0000</color>
 </resources>

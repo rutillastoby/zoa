@@ -47,8 +47,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'me.dm7.barcodescanner:zxing:1.9.13'
+
+    //Obtener una imagen de una URL y asignarla a un imageView
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.mikhaellopez:circularimageview:4.0.1'
+
+    implementation 'com.mikhaellopez:circularimageview:4.0.1' //ELIMINAR!!!!
     implementation 'com.android.support:multidex:1.0.3'
 
 

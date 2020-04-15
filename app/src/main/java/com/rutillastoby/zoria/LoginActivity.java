@@ -11,11 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -39,7 +37,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
-
     // Autenticacion ============================================
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
@@ -48,8 +45,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public static final int SIGN_IN_CODE = 777;
     public static Activity inicio;
     private boolean permisos=true;
-
-
 
     // Base de datos ============================================
     private FirebaseDatabase baseDatos;
@@ -61,9 +56,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private Button bAcceder;
 
     //private MediaPlayer mpLogin;
-
-
-
 
     //----------------------------------------------------------------------------------------------
 
@@ -78,7 +70,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         inicio = this;
 
         //Comprobar permisos
-
         int PERMISSION_ALL = 333;
         String[] PERMISSIONS = {
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -131,8 +122,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 }
             }
 
-
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
@@ -167,8 +156,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-
 
         //Boton Iniciar sesion, programar accion al pulsarlo
         bAcceder.setOnClickListener(new View.OnClickListener() {
@@ -261,7 +248,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 //Cargamos el intent segun si es un usuario nuevo o no
                 if(registrado){
                     //Abrir activity principal
-                    Intent i = new Intent(context, ActivityCompeticiones.class);
+                    Intent i = new Intent(context, GeneralActivity.class);
                     startActivity(i);
 
                 }else{
