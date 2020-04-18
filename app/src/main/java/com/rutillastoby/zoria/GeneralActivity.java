@@ -2,9 +2,12 @@ package com.rutillastoby.zoria;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -21,6 +24,10 @@ public class GeneralActivity extends AppCompatActivity {
     final Fragment profileFrag = new ProfileFragment();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active = currentFrag;
+
+    //Referencias
+    Toolbar toolbar;
+    ImageView ivLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,22 +46,12 @@ public class GeneralActivity extends AppCompatActivity {
         fm.beginTransaction().add(R.id.container_fragment, competitionsFrag, "2").hide(competitionsFrag).commit();
         fm.beginTransaction().add(R.id.container_fragment,currentFrag, "1").commit();
 
-/*
+        //Establecer barra personalizada
+        toolbar = findViewById(R.id.custom_toolbar);
+        setSupportActionBar(toolbar);
 
-        setContentView(R.layout.activity_general);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);*/
-
-
+        //Referencias
+        ivLogout = findViewById(R.id.ivLogout);
     }
 
     /**
@@ -67,23 +64,39 @@ public class GeneralActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_competitions:
-
                     fm.beginTransaction().hide(active).show(competitionsFrag).commit();
                     active = competitionsFrag;
+                    //Ocultar boton cerrar sesion
+                    ivLogout.setVisibility(View.GONE);
                     return true;
 
                 case R.id.navigation_current:
                     fm.beginTransaction().hide(active).show(currentFrag).commit();
                     active = currentFrag;
+                    //Ocultar boton cerrar sesison
+                    ivLogout.setVisibility(View.GONE);
                     return true;
 
                 case R.id.navigation_profile:
                     fm.beginTransaction().hide(active).show(profileFrag).commit();
                     active = profileFrag;
+                    //Mostrar boton cerrar sesion
+                    ivLogout.setVisibility(View.VISIBLE);
                     return true;
             }
             return false;
         }
     };
 
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * SOBREESCRITURA DEL METODO QUE SE ACCIONA AL PULSAR EN EL BOTON DE VOLVER.
+     * CIERRA LA APLICACIÓN EN LUGAR DE VOLVER A CARGAR LA ACTIVITY DE LOGIN
+     */
+    @Override
+    public void onBackPressed() {
+        finishAffinity(); //Cerrar aplicacion directamente
+        super.onBackPressed();
+    }
 }

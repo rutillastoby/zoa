@@ -1,6 +1,8 @@
 package com.rutillastoby.zoria.ui.profile;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,8 +34,10 @@ import java.util.ArrayList;
 
 public class ProfileFragment extends Fragment {
     //Referencias
-    private ImageView ivProfile;
+    private ImageView ivProfile, ivLogout;
     private EditText etNickNameProfile, etEmailProfile;
+    private ProgressBar pbNickProfile;
+
     //Firebase
     private FirebaseAuth firebaseAuth;
     private FirebaseUser user;
@@ -50,25 +55,34 @@ public class ProfileFragment extends Fragment {
         //Cargar informacion del usuario
         loadInformation(view);
 
-
         return view;
     }
 
-
-
+    //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA INICIALIZAR VARIABLES
+     * METODO PARA INICIALIZAR VARIABLES Y REFERENCIAS
      */
-    private void initVar(View view){
+    private void initVar(View v){
+        final View view = v;
         //Obtener usuario y base de datos
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
         db = FirebaseDatabase.getInstance();
-        
+        //Referencias
         ivProfile = view.findViewById(R.id.ivPhotoProfile);
         etNickNameProfile = view.findViewById(R.id.etNickName);
         etEmailProfile = view.findViewById(R.id.etEmailProfile);
+        pbNickProfile = view.findViewById(R.id.pbNickProfile);
+        ivLogout = getActivity().findViewById(R.id.ivLogout);
+
+        //Onclick boton cerrar sesion
+        ivLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout(view);
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -100,10 +114,12 @@ public class ProfileFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-
                     //Si es diferente que el actual lo cambiamos
-                    final String newNick = etNickNameProfile.getText().toString().replaceAll("\\s+", "");
+                    final String newNick = etNickNameProfile.getText().toString().trim();
+
                     if (!newNick.equals(nickUser)) {
+                        pbNickProfile.setVisibility(View.VISIBLE);//Activar la barra de progreso
+                        //Obtener los nombre de usuario
                         db.getReference("usuarios").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -121,12 +137,13 @@ public class ProfileFragment extends Fragment {
 
                                 //Comprobar si el usuario es valido
                                 if(GenericFuntions.checkNick(newNick, nombresUsados)=="true"){
-                                    updateName(view);
+                                    updateName(view, newNick);
                                 }else{
                                     GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick, nombresUsados));
+                                    //Ocultar barra de progreso
+                                    pbNickProfile.setVisibility(View.GONE);
                                 }
                             }
-
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
                             }
@@ -140,11 +157,11 @@ public class ProfileFragment extends Fragment {
 
     //----------------------------------------------------------------------------------------------
 
-    private void updateName(View v){
+    private void updateName(View v, final String newNick){
         final View view = v;
         //Guardar el nuevo valor
         db.getReference("usuarios/"+user.getUid()+"/nombre")
-                .setValue(etNickNameProfile.getText().toString(), new DatabaseReference.CompletionListener() {
+                .setValue(newNick, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError != null) {
@@ -155,11 +172,44 @@ public class ProfileFragment extends Fragment {
                     GenericFuntions.snack(view, "Nombre actualizado");
                     //Cerrar teclado
                     final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    nickUser = newNick;
                     imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
                     etNickNameProfile.clearFocus();
-
                 }
+
+                //Ocultar barra de progreso
+                pbNickProfile.setVisibility(View.GONE);
             }
         });
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA CERRAR SESIÓN Y LA APLICACIÓN
+     * @param view
+     */
+    private void logout(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setCancelable(true);
+        builder.setTitle(R.string.logoutText);
+        //builder.setMessage("Message");
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                firebaseAuth.signOut();
+                getActivity().finishAffinity();
+            }
+        });
+
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

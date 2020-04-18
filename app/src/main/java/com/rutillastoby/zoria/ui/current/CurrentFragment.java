@@ -17,6 +17,7 @@ public class CurrentFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
+
         return root;
     }
 }

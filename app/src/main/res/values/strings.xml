@@ -5,12 +5,12 @@
     <string name="nomCompe">ZOA</string>
     <string name="title_activity_mapa">Map</string>
     <string name="title_activity_general">GeneralActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="menuProfile">Mi Perfil</string>
+    <string name="menuProfile">Perfil</string>
     <string name="menuAll">Todas</string>
-    <string name="menuMyCompetition">Mis Competiciones</string>
+    <string name="menuMyCompetition">Competición</string>
+    <string name="competitionsTitle">COMPETICIONES</string>
     <string name="profileHistory">Mi historia</string>
     <string name="profileNotHistory">Vaya! Parece que aun no has participado en ninguna competición...</string>
+    <string name="logoutText">¿Desea cerrar la sesión?</string>
+    <string name="competitionFinishText">Finalizado</string>
 </resources>

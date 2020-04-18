@@ -130,7 +130,7 @@ public class ActivityCompeticiones extends AppCompatActivity implements DialogoC
                 }
 
                 //Asignar listado al recyclerview
-                adaptador = new ElementoCompeticion(listCompeticiones);
+                //////////////adaptador = new CompetitionElement(listCompeticiones);
                 rvCompeticiones.setLayoutManager(layoutCompeticiones);
                 rvCompeticiones.setAdapter(adaptador);
 

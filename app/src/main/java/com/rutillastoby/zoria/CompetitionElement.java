@@ -10,18 +10,19 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class ElementoCompeticion extends RecyclerView.Adapter<ElementoCompeticion.InstanciaCompeticion>{
-    private ArrayList<Competicion> listCompeticiones;
+public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.InstanciaCompeticion>{
+    private ArrayList<CompeticionDao> competitionsList;
 
     /**
      * CONSTRUCTOR PARAMETRIZADO
      */
-    public ElementoCompeticion(ArrayList<Competicion> c){
-        listCompeticiones=c;
+    public CompetitionElement(ArrayList<CompeticionDao> c){
+        competitionsList =c;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ public class ElementoCompeticion extends RecyclerView.Adapter<ElementoCompeticio
     @Override
     public InstanciaCompeticion onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         //Crear la vista con el layout correspondiente a la plantilla de paquete
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.elemento_competicion, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.competition_element, viewGroup, false);
         //Crear objeto de tipo viewHolder de la clase interna con la vista creada anteriormente
         InstanciaCompeticion ejemplo = new InstanciaCompeticion(view);
         //Devolver el objeto de la fila creado
@@ -55,14 +56,14 @@ public class ElementoCompeticion extends RecyclerView.Adapter<ElementoCompeticio
     public void onBindViewHolder(@NonNull final InstanciaCompeticion instancia, final int i) {
         //Obtener los datos del array y agregarlos a los elementos de la fila que se mostrará
         //instancia.ivCompe.setText(listadoPaquetes.get(i).getCodigo());
-        instancia.tvNombre.setText(listCompeticiones.get(i).getNombre());
-        Picasso.get().load(listCompeticiones.get(i).getUrlImage()).error(R.color.colorPrimaryDark).into(instancia.ivCompe);
+        instancia.tvNombre.setText(competitionsList.get(i).getNombre());
+        Picasso.get().load(competitionsList.get(i).getFoto()).error(R.color.colorPrimaryDark).into(instancia.ivCompe);
 
             //Accion al presionar la competicion
             instancia.layoutElemCompe.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                   ActivityCompeticiones.comprobarAccesoCompeticion(listCompeticiones.get(i).getIdentificador());
+                   ActivityCompeticiones.comprobarAccesoCompeticion(competitionsList.get(i).getId());
                 }
             });
 
@@ -77,7 +78,7 @@ public class ElementoCompeticion extends RecyclerView.Adapter<ElementoCompeticio
      */
     @Override
     public int getItemCount() {
-        return listCompeticiones.size();
+        return competitionsList.size();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +95,7 @@ public class ElementoCompeticion extends RecyclerView.Adapter<ElementoCompeticio
             super(itemView);
             //Referencias
             tvNombre = (TextView) itemView.findViewById(R.id.tvTituloComp);
-            ivCompe = (ImageView) itemView.findViewById(R.id.ivCompe);
+            ivCompe = (ImageView) itemView.findViewById(R.id.ivBackCompeElement);
             layoutElemCompe = (ConstraintLayout) itemView.findViewById(R.id.LayoutEleCompe);
         }
     }

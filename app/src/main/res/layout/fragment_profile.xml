@@ -52,9 +52,9 @@
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:src="@drawable/googleg_standard_color_18"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_google"
         app:layout_constraintBottom_toBottomOf="@+id/ivPhotoProfile"
         app:layout_constraintEnd_toEndOf="@+id/ivPhotoProfile"
         app:layout_constraintHorizontal_bias="0.95"
@@ -129,6 +129,17 @@
         app:layout_constraintHorizontal_bias="0.466"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitleHistory" />
+
+    <ProgressBar
+        android:id="@+id/pbNickProfile"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="25dp"
+        android:layout_height="29dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/etNickName"
+        app:layout_constraintTop_toTopOf="@+id/etNickName" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
