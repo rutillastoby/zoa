@@ -9,7 +9,7 @@
     <item
         android:id="@+id/navigation_current"
         android:icon="@drawable/ic_current24dp"
-        android:title="@string/menuMyCompetition" />
+        android:title="@string/menuMyCompetition"/>
 
     <item
         android:id="@+id/navigation_profile"

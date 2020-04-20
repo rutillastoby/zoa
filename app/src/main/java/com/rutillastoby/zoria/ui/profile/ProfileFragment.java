@@ -139,7 +139,7 @@ public class ProfileFragment extends Fragment {
                                 if(GenericFuntions.checkNick(newNick, nombresUsados)=="true"){
                                     updateName(view, newNick);
                                 }else{
-                                    GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick, nombresUsados));
+                                    GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick, nombresUsados),getContext());
                                     //Ocultar barra de progreso
                                     pbNickProfile.setVisibility(View.GONE);
                                 }
@@ -166,7 +166,7 @@ public class ProfileFragment extends Fragment {
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError != null) {
                     //Error al guardar
-                    GenericFuntions.errorSnack(view,"Error al guardar");
+                    GenericFuntions.errorSnack(view,"Error al guardar", getContext());
                 } else {
                     //Cambios guardados
                     GenericFuntions.snack(view, "Nombre actualizado");
@@ -194,13 +194,13 @@ public class ProfileFragment extends Fragment {
         builder.setCancelable(true);
         builder.setTitle(R.string.logoutText);
         //builder.setMessage("Message");
-        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
             }
         });
-        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 firebaseAuth.signOut();

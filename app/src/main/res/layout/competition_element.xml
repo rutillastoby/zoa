@@ -21,6 +21,7 @@
             android:id="@+id/ivBackCompeElement"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/gray"
             android:scaleType="centerCrop"
             android:src="@drawable/portada"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -39,13 +40,13 @@
             android:textColor="#FFFFFF"
             android:textSize="28sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/clDate"
+            app:layout_constraintBottom_toTopOf="@+id/clDateCompe"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clDate"
+            android:id="@+id/clDateCompe"
             android:layout_width="0dp"
             android:layout_height="30dp"
             android:background="#000000"
@@ -67,13 +68,13 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/imageView8"
+                    android:id="@+id/icDateCompe"
                     android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:src="@drawable/ic_eventok24dp" />
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/tvDateCompe"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="3dp"
@@ -95,13 +96,13 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/imageView9"
+                    android:id="@+id/icDateFinishCompe"
                     android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:src="@drawable/ic_eventno24dp" />
 
                 <TextView
-                    android:id="@+id/textView3"
+                    android:id="@+id/tvFinishCompe"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="3dp"

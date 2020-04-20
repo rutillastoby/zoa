@@ -1,6 +1,10 @@
 package com.rutillastoby.zoria;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -45,15 +49,26 @@ public class GenericFuntions {
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA MOSTRAR UN ERROR MEDIANTE UN SNACKBAR DE COLOR
+     * METODO PARA MOSTRAR UN ERROR MEDIANTE UN SNACKBAR DE COLOR + VIBRACION
      * @param view
      * @param text
      */
-    public static void errorSnack(View view, String text){
+    public static void errorSnack(View view, String text, Context context){
+        //Creación del snackbar
         Snackbar snackbar = Snackbar.make(view, text, Snackbar.LENGTH_LONG);
         View snackBarView = snackbar.getView();
         snackBarView.setBackgroundColor(view.getResources().getColor(R.color.error));
         snackbar.show();
+
+        //Vibrar
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //Duraciones vibraciones en milisegundos, fuerza de la vibracion para cada intervalo, repeticion en bucle
+            v.vibrate(VibrationEffect.createWaveform(new long[]{100,20,450},new int[]{30,0,200},-1 ));
+        } else {
+            //Antiguas versiones //deprecated in API 26
+            v.vibrate(500);
+        }
     }
 
     //----------------------------------------------------------------------------------------------

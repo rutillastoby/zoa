@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_competitions">
+    app:startDestination="@+id/navigation_current">
 
     <fragment
         android:id="@+id/navigation_competitions"
@@ -15,7 +15,7 @@
         android:id="@+id/navigation_current"
         android:name="com.rutillastoby.zoria.ui.current.CurrentFragment"
         android:label="@string/menuMyCompetition"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_current" />
 
     <fragment
         android:id="@+id/navigation_profile"

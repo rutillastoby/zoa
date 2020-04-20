@@ -17,9 +17,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,7 +33,7 @@ import com.instacart.library.truetime.TrueTime;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class ActivityCompeticiones extends AppCompatActivity implements DialogoContrasenaCompe.onDialogoRecord{
+public class ActivityCompeticiones extends AppCompatActivity {
 
     // RecyclerView =============================================
     private RecyclerView rvCompeticiones;
@@ -152,7 +149,6 @@ public class ActivityCompeticiones extends AppCompatActivity implements DialogoC
         escuchador2 = misCompeticiones.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("Hola", "jejejeje");
                 //Reiniciar listado
                 competicionesConAcceso = new ArrayList<Integer>();
 
@@ -218,14 +214,13 @@ public class ActivityCompeticiones extends AppCompatActivity implements DialogoC
         }else{
             /////////////// PEDIR CONTRASEÑA //////////////////////////
             //Solicitar Contraseña con una ventana emergente
-            FragmentManager ft = ((FragmentActivity)context).getSupportFragmentManager();
-            DialogFragment newFragment = DialogoContrasenaCompe.newInstance(id);
-            newFragment.show(ft, "DCC");
+           // FragmentManager ft = ((FragmentActivity)context).getSupportFragmentManager();
+           // DialogFragment newFragment = RegisterDialogCompe.newInstance(id);
+           // newFragment.show(ft, "DCC");
         }
     }
 
 
-    @Override
     public void onAceptarDialogo(int pwd, int id) {
         for(int i=0; i<listCompeticiones.size();i++){
             if(listCompeticiones.get(i).getIdentificador() == id){
@@ -281,5 +276,7 @@ public class ActivityCompeticiones extends AppCompatActivity implements DialogoC
         firebaseAuth.signOut();
         finishAffinity();
     }
+
+
 }
 

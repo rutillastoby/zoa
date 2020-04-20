@@ -15,9 +15,18 @@ public class CurrentFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        View root = inflater.inflate(R.layout.fragment_current, container, false);
 
 
         return root;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ESTABLECER LA COMPETICION ACTIVA SOBRE EL FRAGMENTO
+     */
+    public void setCompetition(){
+
     }
 }

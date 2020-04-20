@@ -13,4 +13,7 @@
     <string name="profileNotHistory">Vaya! Parece que aun no has participado en ninguna competición...</string>
     <string name="logoutText">¿Desea cerrar la sesión?</string>
     <string name="competitionFinishText">Finalizado</string>
+    <string name="titleDialogRegister">Acceso a la competición:</string>
+    <string name="pwdFail">Contraseña incorrecta :(</string>
+    <string name="myPointsCurrent">Mi puntuación</string>
 </resources>

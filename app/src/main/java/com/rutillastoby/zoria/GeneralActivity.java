@@ -1,6 +1,7 @@
 package com.rutillastoby.zoria;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,7 +24,7 @@ public class GeneralActivity extends AppCompatActivity {
     final Fragment currentFrag = new CurrentFragment();
     final Fragment profileFrag = new ProfileFragment();
     final FragmentManager fm = getSupportFragmentManager();
-    Fragment active = currentFrag;
+    Fragment active;
 
     //Referencias
     Toolbar toolbar;
@@ -44,7 +45,9 @@ public class GeneralActivity extends AppCompatActivity {
         //Ocultar fragmentos inicialmente
         fm.beginTransaction().add(R.id.container_fragment, profileFrag, "3").hide(profileFrag).commit();
         fm.beginTransaction().add(R.id.container_fragment, competitionsFrag, "2").hide(competitionsFrag).commit();
-        fm.beginTransaction().add(R.id.container_fragment,currentFrag, "1").commit();
+        fm.beginTransaction().add(R.id.container_fragment, currentFrag, "1").commit();
+        active=currentFrag;
+        navigation.getMenu().findItem(R.id.navigation_current).setChecked(true);
 
         //Establecer barra personalizada
         toolbar = findViewById(R.id.custom_toolbar);
@@ -53,6 +56,8 @@ public class GeneralActivity extends AppCompatActivity {
         //Referencias
         ivLogout = findViewById(R.id.ivLogout);
     }
+
+    //----------------------------------------------------------------------------------------------
 
     /**
      * METODO PARA ACTUAR EN FUNCION DE LA OPCIÓN DEL MENU PULSADA
@@ -68,6 +73,7 @@ public class GeneralActivity extends AppCompatActivity {
                     active = competitionsFrag;
                     //Ocultar boton cerrar sesion
                     ivLogout.setVisibility(View.GONE);
+                    Log.d("aaa" ,"competitions");
                     return true;
 
                 case R.id.navigation_current:
@@ -75,6 +81,7 @@ public class GeneralActivity extends AppCompatActivity {
                     active = currentFrag;
                     //Ocultar boton cerrar sesison
                     ivLogout.setVisibility(View.GONE);
+                    Log.d("aaa" ,"current");
                     return true;
 
                 case R.id.navigation_profile:
@@ -87,6 +94,16 @@ public class GeneralActivity extends AppCompatActivity {
             return false;
         }
     };
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    public void setFragmentCurrent(){
+        fm.beginTransaction().hide(active).show(profileFrag).commit();
+        active=profileFrag;
+    }
 
     //----------------------------------------------------------------------------------------------
 
