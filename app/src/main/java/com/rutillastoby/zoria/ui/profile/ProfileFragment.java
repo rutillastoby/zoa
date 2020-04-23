@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rutillastoby.zoria.GenericFuntions;
 import com.rutillastoby.zoria.R;
+import com.rutillastoby.zoria.dao.UsuarioDao;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -43,7 +44,9 @@ public class ProfileFragment extends Fragment {
     private FirebaseUser user;
     private FirebaseDatabase db;
     //Variables
+    private UsuarioDao myUser;
     private String nickUser;
+
 
     @Nullable
     @Override
@@ -97,18 +100,6 @@ public class ProfileFragment extends Fragment {
         Picasso.get().load(user.getPhotoUrl()).into(ivProfile);
         etEmailProfile.setText(user.getEmail());
 
-        ////// Obtener el nombre usuario
-        db.getReference("usuarios/"+user.getUid()+"/nombre").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                nickUser = dataSnapshot.getValue().toString();
-                etNickNameProfile.setText(nickUser);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
         ////// Funcionalidad para cambiar nombre de usuario al pulsar done del teclado
         etNickNameProfile.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
@@ -157,6 +148,9 @@ public class ProfileFragment extends Fragment {
 
     //----------------------------------------------------------------------------------------------
 
+    /**
+     * METODO PARA ALMACENAR EN LA BASE DE DATOS EL NUEVO NOMBRE DE USUARIO
+     */
     private void updateName(View v, final String newNick){
         final View view = v;
         //Guardar el nuevo valor
@@ -211,5 +205,18 @@ public class ProfileFragment extends Fragment {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ESTABLECER LA INFORMACION ALMACENADA EN LA BASE DE DATOS SOBRE MI USUARIO
+     * @param myUser
+     */
+    public void setMyUser(UsuarioDao myUser) {
+        this.myUser = myUser;
+        //Establecer el nombre en el campo de texto
+        nickUser = myUser.getNombre();
+        etNickNameProfile.setText(nickUser);
     }
 }

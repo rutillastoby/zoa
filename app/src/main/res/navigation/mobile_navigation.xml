@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/navigation_current"
-        android:name="com.rutillastoby.zoria.ui.current.CurrentFragment"
+        android:name="com.rutillastoby.zoria.ui.principal.PrincipalFragment"
         android:label="@string/menuMyCompetition"
-        tools:layout="@layout/fragment_current" />
+        tools:layout="@layout/fragment_principal" />
 
     <fragment
         android:id="@+id/navigation_profile"

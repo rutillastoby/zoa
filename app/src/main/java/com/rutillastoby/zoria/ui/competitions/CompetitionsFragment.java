@@ -13,15 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.rutillastoby.zoria.CompetitionElement;
-import com.rutillastoby.zoria.GeneralActivity;
 import com.rutillastoby.zoria.GenericFuntions;
 import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.dao.CompeticionDao;
@@ -31,30 +23,19 @@ import java.util.Collections;
 
 public class CompetitionsFragment extends Fragment{
 
-    //Firebase
-    private FirebaseAuth firebaseAuth;
-    private FirebaseUser user;
-    private FirebaseDatabase db;
-
     //Referencias
     private RecyclerView rvCompetitions;
 
     //Variables
-    private static ArrayList<CompeticionDao> competitionsList;
-    private static ArrayList<Integer> competitionsRegisteredList;
+    private ArrayList<CompeticionDao> competitionsList;
+    private ArrayList<Integer> competitionsRegisteredList=null;
     private RecyclerView.Adapter adapter; //Crear un contenedor de vistas de cada competicion
-    private static CompetitionsFragment thisClass;
-
+    private CompetitionsFragment thisClass;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_competitions, container, false);
-
         //Iniciar variables
         initVar(view);
-        //Obtener datos
-        loadCompetitions();
-        loadRegisteredCompetitions();
-
         return view;
     }
 
@@ -65,10 +46,7 @@ public class CompetitionsFragment extends Fragment{
      */
     private void initVar(View view){
         thisClass = this;
-        //Obtener usuario y base de datos
-        firebaseAuth = FirebaseAuth.getInstance();
-        user = firebaseAuth.getCurrentUser();
-        db = FirebaseDatabase.getInstance();
+
         //Referencias
         rvCompetitions = view.findViewById(R.id.rvCompetitions);
     }
@@ -76,61 +54,18 @@ public class CompetitionsFragment extends Fragment{
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA CARGAR TODAS LAS COMPETICIONES DE LA BASE DE DATOS
+     * METODO PARA CARGAR INICIALMENTE TODAS LAS COMPETICIONES DE LA BASE DE DATOS
      */
     private void loadCompetitions(){
-        final DatabaseReference competitions = db.getReference("competiciones");
+        //Ordenar listado poniendo el tutorial en la primera posicion
+        Collections.reverse(competitionsList);
+        competitionsList.add(0, competitionsList.get(competitionsList.size()-1));
+        competitionsList.remove(competitionsList.size()-1);
 
-        competitions.orderByKey().addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                //Reiniciar listado
-                competitionsList = new ArrayList<CompeticionDao>();
-
-                //Obtener los datos de las competiciones
-                for (DataSnapshot compe : dataSnapshot.getChildren()) {
-                    CompeticionDao c = compe.getValue(CompeticionDao.class); //Rellenar objeto de tipo competicion
-                    c.setId(Integer.parseInt(compe.getKey()));
-                    competitionsList.add(c); //Agregamos a la lista de competiciones
-                }
-                //Ordenar listado poniendo el tutorial en la primera posicion
-                Collections.reverse(competitionsList);
-                competitionsList.add(0, competitionsList.get(competitionsList.size()-1));
-                competitionsList.remove(competitionsList.size()-1);
-
-                //Asignar listado al recyclerview
-                adapter = new CompetitionElement(competitionsList, thisClass);
-                rvCompetitions.setLayoutManager(new LinearLayoutManager(getContext()));
-                rvCompetitions.setAdapter(adapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {}
-        });
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
-     * METODO PARA OBTENER LAS COMPETICIONES EN LAS QUE EL USUARIO ESTA REGISTRADO
-     */
-    public void loadRegisteredCompetitions(){
-        DatabaseReference competitions = db.getReference("usuarios/"+user.getUid()+"/competiciones");
-        competitions.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                //Reiniciar listado
-                competitionsRegisteredList = new ArrayList<Integer>();
-                //Obtener los valores
-                for (DataSnapshot compe : dataSnapshot.getChildren()) {
-                    competitionsRegisteredList.add(Integer.parseInt(compe.getKey()));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+        //Asignar listado al recyclerview
+        adapter = new CompetitionElement(competitionsList, thisClass);
+        rvCompetitions.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvCompetitions.setAdapter(adapter);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -140,24 +75,27 @@ public class CompetitionsFragment extends Fragment{
      * @param id
      */
     public void checkAccess(int id){
-        boolean access = false;
-        //Comprobar si estamos registrados en esa competicion
-        for(int i=0; i<competitionsRegisteredList.size(); i++){
-            if(competitionsRegisteredList.get(i)==id){
-                access = true;
+        //Seguridad para evitar problemas de inicialización
+        if(competitionsRegisteredList!=null) {
+            boolean access = false;
+            //Comprobar si estamos registrados en esa competicion
+            for (int i = 0; i < competitionsRegisteredList.size(); i++) {
+                if (competitionsRegisteredList.get(i) == id) {
+                    access = true;
+                }
             }
-        }
 
-        //Segun si tenemos accesso o no
-        if(access){
-            ///////////// ACCEDER A COMPETICION ////////////////
-            openCompetition();
-        }else{
-            ///////////// SOLICITAR ACCESO /////////////////
-            //Solicitar Contraseña con una ventana emergente
-            for(int i=0; i<competitionsList.size(); i++){
-                if(competitionsList.get(i).getId()==id){
-                    inputPwd(competitionsList.get(i).getPwd(), id);
+            //Segun si tenemos accesso o no
+            if (access) {
+                ///////////// ACCEDER A COMPETICION ////////////////
+                openCompetition();
+            } else {
+                ///////////// SOLICITAR ACCESO /////////////////
+                //Solicitar Contraseña con una ventana emergente
+                for (int i = 0; i < competitionsList.size(); i++) {
+                    if (competitionsList.get(i).getId() == id) {
+                        inputPwd(competitionsList.get(i).getPwd(), id);
+                    }
                 }
             }
         }
@@ -186,9 +124,10 @@ public class CompetitionsFragment extends Fragment{
                         if(input.getText().length()!=0){
                             answer = Integer.parseInt(input.getText().toString());
                         }
+
                         //Comprobar si la contrasenna introducida es correcta
                         if(answer==pwd){
-                            //Marcar como competicion activa
+                            //Marcar como competicion activa en base de datos
 
                             //Abrir la competicion
                             openCompetition();
@@ -210,9 +149,52 @@ public class CompetitionsFragment extends Fragment{
     //----------------------------------------------------------------------------------------------
 
     /**
+     * METODO PARA ESTABLECER EL VALOR DE LA LISTA DE COMPETICIONES
+     * @param competitionsList
+     */
+    public void setCompetitionsList(ArrayList<CompeticionDao> competitionsList) {
+        this.competitionsList = competitionsList;
+        loadCompetitions();
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ESTABLECER EL LISTADO DE COMPETICIONES A LOS QUE SE ESTÁ REGISTRADO
+     * @param competitionsRegisteredList
+     */
+    public void setCompetitionsRegisteredList(ArrayList<Integer> competitionsRegisteredList) {
+        this.competitionsRegisteredList = competitionsRegisteredList;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
      * METODO PARA ABRIR UNA COMPETICION
      */
     public void openCompetition(){
-        ((GeneralActivity)getActivity()).setFragmentCurrent();
+        //((GeneralActivity)getActivity()).setFragmentCurrent();
     }
+
+
+
 }

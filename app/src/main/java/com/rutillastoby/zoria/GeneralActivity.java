@@ -13,22 +13,48 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.rutillastoby.zoria.dao.CompeticionDao;
+import com.rutillastoby.zoria.dao.UsuarioDao;
 import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
-import com.rutillastoby.zoria.ui.current.CurrentFragment;
+import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
 import com.rutillastoby.zoria.ui.profile.ProfileFragment;
+
+import java.util.ArrayList;
 
 public class GeneralActivity extends AppCompatActivity {
 
     //Fragmentos para mostrar con el menu
     final Fragment competitionsFrag = new CompetitionsFragment();
-    final Fragment currentFrag = new CurrentFragment();
+    final Fragment principalFrag = new PrincipalFragment();
     final Fragment profileFrag = new ProfileFragment();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active;
 
+    //Firebase
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser user;
+    private FirebaseDatabase db;
+
     //Referencias
+    BottomNavigationView navigation;
     Toolbar toolbar;
     ImageView ivLogout;
+    CompetitionsFragment compF;
+    ProfileFragment profF;
+    PrincipalFragment prinF;
+
+    //Variables
+    private static ArrayList<CompeticionDao> competitionsList;
+    private static ArrayList<UsuarioDao> usersList;
+    private int currentCompeId=-1; //Id de la competicion que esta como activa para el usuario (Accesible desde el boton current del menu inferior)
+    private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +64,15 @@ public class GeneralActivity extends AppCompatActivity {
         setContentView(R.layout.activity_general);
 
         //Obtener menu inferior
-        BottomNavigationView navigation = findViewById(R.id.nav_view);
+        navigation = findViewById(R.id.nav_view);
         //Escucha para los botones del menu
         navigation.setOnNavigationItemSelectedListener(onClickMenuItem);
 
         //Ocultar fragmentos inicialmente
         fm.beginTransaction().add(R.id.container_fragment, profileFrag, "3").hide(profileFrag).commit();
         fm.beginTransaction().add(R.id.container_fragment, competitionsFrag, "2").hide(competitionsFrag).commit();
-        fm.beginTransaction().add(R.id.container_fragment, currentFrag, "1").commit();
-        active=currentFrag;
+        fm.beginTransaction().add(R.id.container_fragment, principalFrag, "1").commit();
+        active= principalFrag;
         navigation.getMenu().findItem(R.id.navigation_current).setChecked(true);
 
         //Establecer barra personalizada
@@ -55,6 +81,18 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Referencias
         ivLogout = findViewById(R.id.ivLogout);
+        compF = (CompetitionsFragment) competitionsFrag;
+        profF = (ProfileFragment) profileFrag;
+        prinF = (PrincipalFragment) principalFrag;
+
+        //Obtener usuario y base de datos
+        firebaseAuth = FirebaseAuth.getInstance();
+        user = firebaseAuth.getCurrentUser();
+        db = FirebaseDatabase.getInstance();
+
+        //Inicializar escucha de datos
+        getCompetitions();
+        getUsers();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -77,11 +115,10 @@ public class GeneralActivity extends AppCompatActivity {
                     return true;
 
                 case R.id.navigation_current:
-                    fm.beginTransaction().hide(active).show(currentFrag).commit();
-                    active = currentFrag;
                     //Ocultar boton cerrar sesison
                     ivLogout.setVisibility(View.GONE);
-                    Log.d("aaa" ,"current");
+                    //Llamada al metodo que mostrará el fragmento current
+                    setFragmentCurrent();
                     return true;
 
                 case R.id.navigation_profile:
@@ -98,11 +135,29 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
-     *
+     *  METODO PARA MOSTRAR LA COMPETICIÓN QUE SE ESTÁ DISPUTANDO
+     *  SE EJECUTA AL HACER CLIC EN LA OPCION CURRENT DEL MENU INFERIOR
      */
     public void setFragmentCurrent(){
-        fm.beginTransaction().hide(active).show(profileFrag).commit();
-        active=profileFrag;
+        //Marcar opcion del menu como activa
+        navigation.getMenu().findItem(R.id.navigation_current).setChecked(true);
+        //Mostrar la vista de la competicion activa
+        showMainViewCompetition(currentCompeId);
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA MOSTRAR LA VISTA PRINCIPAL DE UNA COMPETICION DETERMINADA
+     */
+    public void showMainViewCompetition(int id){
+        //Actualizar la variable de marca de la competicion para la que se deben enviar actualizaciones
+        showingCompeId=id;
+        //Mostrar el fragmento principal de la competicion
+        fm.beginTransaction().hide(active).show(principalFrag).commit();
+        active = principalFrag;
+        //Enviar los datos de la competicion
+        prinF.setDataCompetition(null);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -115,5 +170,79 @@ public class GeneralActivity extends AppCompatActivity {
     public void onBackPressed() {
         finishAffinity(); //Cerrar aplicacion directamente
         super.onBackPressed();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                         OBTENER INFORMACION DE LA BASE DE DATOS                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * METODO PARA OBTENER DATOS DE LAS COMPETICIONES
+     */
+    private void getCompetitions(){
+        final DatabaseReference competitions = db.getReference("competiciones");
+
+        competitions.orderByKey().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //Reiniciar listado
+                competitionsList = new ArrayList<CompeticionDao>();
+
+                //Obtener los datos de las competiciones
+                for (DataSnapshot compe : dataSnapshot.getChildren()) {
+                    CompeticionDao c = compe.getValue(CompeticionDao.class); //Rellenar objeto de tipo competicion
+                    c.setId(Integer.parseInt(compe.getKey()));
+                    competitionsList.add(c); //Agregamos a la lista de competiciones
+                }
+
+                //Establecer el nuevos valores para el fragmento del listado de competiciones
+                compF.setCompetitionsList(competitionsList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
+        });
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER LOS DATOS DE LOS USUARIOS
+     */
+    public void getUsers(){
+        final DatabaseReference users = db.getReference("usuarios");
+
+        users.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //Reiniciar listado
+                usersList = new ArrayList<UsuarioDao>();
+
+                //Obtener los datos de las competiciones
+                for (DataSnapshot userRead : dataSnapshot.getChildren()) {
+                    UsuarioDao u = userRead.getValue(UsuarioDao.class); //Rellenar objeto de tipo usuario
+                    u.setUid(userRead.getKey());
+                    usersList.add(u); //Agregamos a la lista de usuarios
+
+                    //Si es mi propio usuario, actumamos
+                    if(u.getUid().equals(user.getUid())){
+                        //Obtener compecion marcada como activa
+                        currentCompeId = u.getCompeActiva();
+
+                        //Llamada al metodo para establecer las competiciones en las que el usuario esta registrado.
+                        // Dentro del fragmento de competicions
+                        if(u.getCompeticiones()!=null) {
+                            compF.setCompetitionsRegisteredList(new ArrayList<>(u.getCompeticiones().values()));
+                        }
+                        //Guardar usuario en la variable del fragmento profile
+                        profF.setMyUser(u);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 }
