@@ -1,6 +1,7 @@
 package com.rutillastoby.zoria;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +56,7 @@ public class GeneralActivity extends AppCompatActivity {
     private static ArrayList<UsuarioDao> usersList;
     private int currentCompeId=-1; //Id de la competicion que esta como activa para el usuario (Accesible desde el boton current del menu inferior)
     private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
+    private long currentMilliseconds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,10 @@ public class GeneralActivity extends AppCompatActivity {
         profF = (ProfileFragment) profileFrag;
         prinF = (PrincipalFragment) principalFrag;
 
+        //Obtener hora actual del intent
+        currentMilliseconds = getIntent().getLongExtra("currentTime", 0);
+        if(currentMilliseconds==0) onBackPressed(); //Cerrar si no se obtiene correctamente
+
         //Obtener usuario y base de datos
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
@@ -93,6 +99,7 @@ public class GeneralActivity extends AppCompatActivity {
         //Inicializar escucha de datos
         getCompetitions();
         getUsers();
+        currentTimer();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -157,7 +164,10 @@ public class GeneralActivity extends AppCompatActivity {
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
         //Enviar los datos de la competicion
-        prinF.setDataCompetition(null);
+        for(int i=0; i<competitionsList.size();i++){
+            if(competitionsList.get(i).getId() == id)
+                prinF.setDataCompetition(competitionsList.get(i));
+        }
     }
 
     //----------------------------------------------------------------------------------------------
@@ -170,6 +180,24 @@ public class GeneralActivity extends AppCompatActivity {
     public void onBackPressed() {
         finishAffinity(); //Cerrar aplicacion directamente
         super.onBackPressed();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                              OBTENER HORA DEL SERVIDOR                                     //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * METODO PARA MANTENER LA HORA ACTUAL ACTUALIZADA
+     */
+    private void currentTimer(){
+        new CountDownTimer(Long.MAX_VALUE,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                currentMilliseconds +=1000;
+            }
+            @Override
+            public void onFinish() {}
+        }.start();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,6 +221,10 @@ public class GeneralActivity extends AppCompatActivity {
                     CompeticionDao c = compe.getValue(CompeticionDao.class); //Rellenar objeto de tipo competicion
                     c.setId(Integer.parseInt(compe.getKey()));
                     competitionsList.add(c); //Agregamos a la lista de competiciones
+
+                    //Comprobar si la competicion que ha cambiado es la que se esta mostrando en fragment para actualizar los cambios
+                    if(c.getId()==showingCompeId)
+                        prinF.setDataCompetition(c);
                 }
 
                 //Establecer el nuevos valores para el fragmento del listado de competiciones
@@ -245,4 +277,17 @@ public class GeneralActivity extends AppCompatActivity {
             }
         });
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                      GETS + SETS                                           //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * METODO PARA OBTENER LOS MILISEGUNDOS DE LA HORA ACTUAL
+     * @return
+     */
+    public long getCurrentMilliseconds() {
+        return currentMilliseconds;
+    }
+
 }

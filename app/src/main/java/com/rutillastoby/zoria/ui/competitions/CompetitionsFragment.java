@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.rutillastoby.zoria.CompetitionElement;
+import com.rutillastoby.zoria.GeneralActivity;
 import com.rutillastoby.zoria.GenericFuntions;
 import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.dao.CompeticionDao;
@@ -63,7 +64,7 @@ public class CompetitionsFragment extends Fragment{
         competitionsList.remove(competitionsList.size()-1);
 
         //Asignar listado al recyclerview
-        adapter = new CompetitionElement(competitionsList, thisClass);
+        adapter = new CompetitionElement(competitionsList, thisClass, ((GeneralActivity)getActivity()).getCurrentMilliseconds());
         rvCompetitions.setLayoutManager(new LinearLayoutManager(getContext()));
         rvCompetitions.setAdapter(adapter);
     }
@@ -88,7 +89,7 @@ public class CompetitionsFragment extends Fragment{
             //Segun si tenemos accesso o no
             if (access) {
                 ///////////// ACCEDER A COMPETICION ////////////////
-                openCompetition();
+                ((GeneralActivity)getActivity()).showMainViewCompetition(id);
             } else {
                 ///////////// SOLICITAR ACCESO /////////////////
                 //Solicitar Contraseña con una ventana emergente
@@ -130,7 +131,7 @@ public class CompetitionsFragment extends Fragment{
                             //Marcar como competicion activa en base de datos
 
                             //Abrir la competicion
-                            openCompetition();
+                            //openCompetition();
                         }else{
                             //Contrasenna incorrecta
                             GenericFuntions.errorSnack(getView(), getString(R.string.pwdFail), getContext());
@@ -166,35 +167,4 @@ public class CompetitionsFragment extends Fragment{
     public void setCompetitionsRegisteredList(ArrayList<Integer> competitionsRegisteredList) {
         this.competitionsRegisteredList = competitionsRegisteredList;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
-     * METODO PARA ABRIR UNA COMPETICION
-     */
-    public void openCompetition(){
-        //((GeneralActivity)getActivity()).setFragmentCurrent();
-    }
-
-
-
 }

@@ -11,9 +11,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -22,6 +24,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
@@ -34,6 +37,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -247,9 +252,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 baseDatos.getReference("usuarios").removeEventListener(this);
                 //Cargamos el intent segun si es un usuario nuevo o no
                 if(registrado){
-                    //Abrir activity principal
-                    Intent i = new Intent(context, GeneralActivity.class);
-                    startActivity(i);
+
+                    //Obtener la hora de la base de datos para pasarla a la activity general
+                    FirebaseFunctions.getInstance("europe-west1").getHttpsCallable("getTime")
+                            .call().addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                        @Override
+                        public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                            long currentMilliseconds = (long) httpsCallableResult.getData();
+
+                            //Abrir activity general
+                            Intent i = new Intent(context, GeneralActivity.class);
+                            i.putExtra("currentTime", currentMilliseconds);
+                            startActivity(i);
+                        }
+                    });
 
                 }else{
                     //Abrir activity nuevo usuario

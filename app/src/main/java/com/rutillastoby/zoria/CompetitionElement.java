@@ -16,17 +16,22 @@ import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.CompetitionInstance>{
     private ArrayList<CompeticionDao> competitionsList;
     CompetitionsFragment context;
+    private float currentTime;
 
     /**
      * CONSTRUCTOR PARAMETRIZADO
      */
-    public CompetitionElement(ArrayList<CompeticionDao> c, CompetitionsFragment cc){
+    public CompetitionElement(ArrayList<CompeticionDao> c, CompetitionsFragment cc, long currentTime){
         competitionsList =c;
         context =cc;
+        this.currentTime=currentTime;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -58,14 +63,26 @@ public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.
      */
     @Override
     public void onBindViewHolder(@NonNull final CompetitionInstance instance, final int i) {
-        //Obtener los datos del array y agregarlos a los elementos del elemento de competicion
+        //1. Obtener los datos del array y agregarlos a los elementos del elemento de competicion
         instance.tvNombre.setText(competitionsList.get(i).getNombre());
         Picasso.get().load(competitionsList.get(i).getFoto()).error(R.color.colorPrimaryDark).into(instance.ivCompe);
-        //Comprobar si es el tutorial para modificarlo
+        //2. Segun si la competicion ha finalizado o no mostramos un elemento u otro
+        if(currentTime<competitionsList.get(i).getHora().getFin()){
+            instance.lyDateFinish.setVisibility(View.GONE); //Ocultar finalizado
+            instance.lyDateAvailable.setVisibility(View.VISIBLE);
+
+            //Establecer la fecha de la competicion
+            Date now = new Date(competitionsList.get(i).getHora().getFin());
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+            cal.setTime(now);
+            instance.tvDateCompe.setText(cal.get(Calendar.DAY_OF_MONTH)+"/"+cal.get(Calendar.MONTH)
+                                            +"/"+cal.get(Calendar.YEAR));
+        }
+        //3. Comprobar si es el tutorial para modificarlo
         if(competitionsList.get(i).getId() == 1){
             instance.clGeneralDate.setVisibility(View.GONE);
         }
-        //Accion al presionar la competicion
+        //4. Accion al presionar la competicion
         instance.layoutElemCompe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -1,22 +1,22 @@
 package com.rutillastoby.zoria.dao;
 
 public class Hora {
-    private String inicio;
-    private String fin;
+    private Long inicio;
+    private Long fin;
 
-    public String getInicio() {
+    public Long getInicio() {
         return inicio;
     }
 
-    public void setInicio(String inicio) {
+    public void setInicio(Long inicio) {
         this.inicio = inicio;
     }
 
-    public String getFin() {
+    public Long getFin() {
         return fin;
     }
 
-    public void setFin(String fin) {
+    public void setFin(Long fin) {
         this.fin = fin;
     }
 }
