@@ -6,9 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.rutillastoby.zoria.GeneralActivity;
@@ -17,7 +19,9 @@ import com.rutillastoby.zoria.dao.CompeticionDao;
 
 public class PrincipalFragment extends Fragment {
     //Referencias
-    private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin;
+    private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart;
+    private ConstraintLayout lyInProgress, lyToStart, bMapPrin;
+    private ProgressBar pbToStart;
 
     //Variables
     CountDownTimer countCompe=null;
@@ -33,6 +37,8 @@ public class PrincipalFragment extends Fragment {
         return view;
     }
 
+    //----------------------------------------------------------------------------------------------
+
     /**
      * METODO PARA INICIALIZAR VARIABLES Y REFERENCIAS
      */
@@ -43,6 +49,21 @@ public class PrincipalFragment extends Fragment {
         tvTitlePrincipalCompe = view.findViewById(R.id.tvTitlePrincipalCompe);
         tvHourMinPrin = view.findViewById(R.id.tvHourMinPrin);
         tvSecPrin = view.findViewById(R.id.tvSecPrin);
+        lyInProgress = view.findViewById(R.id.lyInProgress);
+        lyToStart = view.findViewById(R.id.lyToStart);
+        tvHourMinToStart = view.findViewById(R.id.tvHourMinToStart);
+        tvSecToStart = view.findViewById(R.id.tvSecToStart);
+        pbToStart = view.findViewById(R.id.pbToStart);
+        bMapPrin = view.findViewById(R.id.bMapPrin);
+
+        //Clicks de botones
+        bMapPrin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((GeneralActivity)getActivity()).showMapFragment();
+            }
+        });
+
     }
 
     //----------------------------------------------------------------------------------------------
@@ -57,7 +78,7 @@ public class PrincipalFragment extends Fragment {
         tvTitlePrincipalCompe.setText(competition.getNombre());
 
         //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
-        checkTime(competition.getHora().getInicio(),competition.getHora().getFin());
+        checkTime(competition.getHora().getInicio(), competition.getHora().getFin());
     }
 
     //----------------------------------------------------------------------------------------------
@@ -68,6 +89,10 @@ public class PrincipalFragment extends Fragment {
      */
     private void checkTime(final long startTime, final long finishTime){
         long currentTime = ((GeneralActivity)getActivity()).getCurrentMilliseconds();
+        //Inicializar layouts
+        lyInProgress.setVisibility(View.GONE);
+        lyToStart.setVisibility(View.GONE);
+
 
         //Comprobar si no ha comenzado, si ha finalizado o si esta en curso
         if(currentTime>finishTime){
@@ -83,10 +108,16 @@ public class PrincipalFragment extends Fragment {
             //2. Calcular tiempo restante
             final long remainingTime;
             if(statusCompe==0) {
+                Log.d("aaa", "aqui");
+                //Competicion no iniciada
                 remainingTime = startTime - currentTime;//Tiempo restante
+                updateCountToStart(remainingTime); //Llamada inicial para establecer valores
+                lyToStart.setVisibility(View.VISIBLE);
             }else {
+                //Competicion en curso
                 remainingTime = finishTime - currentTime;//Tiempo restante
                 updateCount(remainingTime); //Llamada inicial para establecer valores
+                lyInProgress.setVisibility(View.VISIBLE);
             }
             //3.Iniciar contador regresivo
             countCompe = new CountDownTimer(remainingTime,1000) {
@@ -94,7 +125,7 @@ public class PrincipalFragment extends Fragment {
                 public void onTick(long millisUntilFinished) {
                     if(statusCompe==0) {
                         //Competicion no iniciada
-
+                        updateCountToStart(millisUntilFinished);
                     }else{
                         //Competicion en curso
                         updateCount(millisUntilFinished);
@@ -102,6 +133,9 @@ public class PrincipalFragment extends Fragment {
                 }
                 @Override
                 public void onFinish() {
+                    //Resetear layout
+                    lyInProgress.setVisibility(View.GONE);
+                    lyToStart.setVisibility(View.GONE);
                     //Rellamar a la funcion para actuar
                     checkTime(startTime, finishTime);
                 }
@@ -119,7 +153,26 @@ public class PrincipalFragment extends Fragment {
         int seconds = (int) (time / 1000) % 60 ;
         int minutes = (int) ((time / (1000*60)) % 60);
         int hours   = (int) ((time / (1000*60*60)) % 24);
-        tvHourMinPrin.setText(String.format("%02d", hours)+":"+String.format("%02d", minutes));
+        tvHourMinPrin.setText(hours+":"+String.format("%02d", minutes));
         tvSecPrin.setText(String.format("%02d", seconds));
     }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ACTUALIZAR EL CONTADOR REGRESIVO DE TIEMPO DE LA VISTA DE COMPETICION ANTES DE EMPEZAR
+     * @param time
+     */
+    public void updateCountToStart(long time){
+        int seconds = (int) (time / 1000) % 60 ;
+        int minutes = (int) ((time / (1000*60)) % 60);
+        int hours   = (int) ((time / (1000*60*60)) % 24);
+        //Actualizar texto
+        tvHourMinToStart.setText(String.format("%02d", hours)+":"+String.format("%02d", minutes));
+        tvSecToStart.setText(String.format("%02d", seconds));
+        //Actualizar progresbar
+        pbToStart.setProgress(seconds);
+    }
+
+
 }

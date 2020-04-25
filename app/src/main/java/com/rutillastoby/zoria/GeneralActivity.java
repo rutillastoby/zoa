@@ -35,6 +35,8 @@ public class GeneralActivity extends AppCompatActivity {
     final Fragment competitionsFrag = new CompetitionsFragment();
     final Fragment principalFrag = new PrincipalFragment();
     final Fragment profileFrag = new ProfileFragment();
+    final Fragment mapFragment = new MapFragment();
+    final Fragment scannerFragment = new ScannerFragment();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active;
 
@@ -50,6 +52,7 @@ public class GeneralActivity extends AppCompatActivity {
     CompetitionsFragment compF;
     ProfileFragment profF;
     PrincipalFragment prinF;
+    ScannerFragment scanF;
 
     //Variables
     private static ArrayList<CompeticionDao> competitionsList;
@@ -57,6 +60,7 @@ public class GeneralActivity extends AppCompatActivity {
     private int currentCompeId=-1; //Id de la competicion que esta como activa para el usuario (Accesible desde el boton current del menu inferior)
     private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
     private long currentMilliseconds;
+    private UsuarioDao myUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,9 @@ public class GeneralActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(onClickMenuItem);
 
         //Ocultar fragmentos inicialmente
+        fm.beginTransaction().add(R.id.container_fragment, scannerFragment, "5").hide(scannerFragment).commit();
+        fm.beginTransaction().add(R.id.container_fragment, mapFragment, "4").hide(mapFragment).commit();
+
         fm.beginTransaction().add(R.id.container_fragment, profileFrag, "3").hide(profileFrag).commit();
         fm.beginTransaction().add(R.id.container_fragment, competitionsFrag, "2").hide(competitionsFrag).commit();
         fm.beginTransaction().add(R.id.container_fragment, principalFrag, "1").commit();
@@ -86,6 +93,7 @@ public class GeneralActivity extends AppCompatActivity {
         compF = (CompetitionsFragment) competitionsFrag;
         profF = (ProfileFragment) profileFrag;
         prinF = (PrincipalFragment) principalFrag;
+        scanF = (ScannerFragment) scannerFragment;
 
         //Obtener hora actual del intent
         currentMilliseconds = getIntent().getLongExtra("currentTime", 0);
@@ -125,7 +133,7 @@ public class GeneralActivity extends AppCompatActivity {
                     //Ocultar boton cerrar sesison
                     ivLogout.setVisibility(View.GONE);
                     //Llamada al metodo que mostrará el fragmento current
-                    setFragmentCurrent();
+                    checkFragmentCurrent();
                     return true;
 
                 case R.id.navigation_profile:
@@ -135,6 +143,10 @@ public class GeneralActivity extends AppCompatActivity {
                     ivLogout.setVisibility(View.VISIBLE);
                     return true;
             }
+
+            //Detener el scanner al cambiar de fragmento por si estaba iniciado
+            scanF.stopScanner();
+
             return false;
         }
     };
@@ -142,14 +154,54 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
+     * METODO PARA MOSTRAR EL FRAGMENTO DE TIPO MAPA
+     */
+    public void showMapFragment(){
+        fm.beginTransaction().hide(active).show(mapFragment).commit();
+        active = mapFragment;
+        //Detener el scanner al cambiar de fragmento por si estaba iniciado
+        scanF.stopScanner();
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA MOSTRAR EL FRAGMENTO DE TIPO SCANNER
+     */
+    public void showScannerFragment(){
+        fm.beginTransaction().hide(active).show(scannerFragment).commit();
+        active = scannerFragment;
+        //Iniciar la camara para el scanner
+        scanF.startScanner();
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA APLICAR UNA TRANSICION ENTRE FRAGMENTOS Y MOSTRAR EL PRINCIPAL SIN CAMBIAR DE COMPETICION
+     */
+    public void showPrincActivityNotChange(){
+        fm.beginTransaction().hide(active).show(principalFrag).commit();
+        active = principalFrag;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
      *  METODO PARA MOSTRAR LA COMPETICIÓN QUE SE ESTÁ DISPUTANDO
      *  SE EJECUTA AL HACER CLIC EN LA OPCION CURRENT DEL MENU INFERIOR
      */
-    public void setFragmentCurrent(){
+    public void checkFragmentCurrent(){
         //Marcar opcion del menu como activa
         navigation.getMenu().findItem(R.id.navigation_current).setChecked(true);
+        fm.beginTransaction().hide(active).show(principalFrag).commit();
+        active = principalFrag;
+
+        //INSERTAR AQUI CODIGO PARA MOSTRAR PANEL DE NO REGISTRADO EN NINGUNA COMPETICION
+        ////// AQUI
+
         //Mostrar la vista de la competicion activa
-        showMainViewCompetition(currentCompeId);
+        if(currentCompeId!=-1) showMainViewCompetition(currentCompeId);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -163,6 +215,8 @@ public class GeneralActivity extends AppCompatActivity {
         //Mostrar el fragmento principal de la competicion
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
+        //Detener el scanner al cambiar de fragmento por si estaba iniciado
+        scanF.stopScanner();
         //Enviar los datos de la competicion
         for(int i=0; i<competitionsList.size();i++){
             if(competitionsList.get(i).getId() == id)
@@ -178,8 +232,22 @@ public class GeneralActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        finishAffinity(); //Cerrar aplicacion directamente
-        super.onBackPressed();
+        //En funcion del fragmento activo actuaremos
+        switch (active.getTag()){
+            //MAP FRAGMENT
+            case "4":
+                //Volver al fragmento principal sin hacer cambios
+                showPrincActivityNotChange();
+                break;
+            //SCANNER FRAGMENT
+            case "5":
+                showMapFragment();
+                break;
+            //OTRO FRAGMENT
+            default:
+                finishAffinity(); //Cerrar aplicacion directamente
+                break;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,7 +326,8 @@ public class GeneralActivity extends AppCompatActivity {
 
                     //Si es mi propio usuario, actumamos
                     if(u.getUid().equals(user.getUid())){
-                        //Obtener compecion marcada como activa
+                        //Guardar los datos de mi usuario
+                        myUser = u;
                         currentCompeId = u.getCompeActiva();
 
                         //Llamada al metodo para establecer las competiciones en las que el usuario esta registrado.
@@ -290,4 +359,33 @@ public class GeneralActivity extends AppCompatActivity {
         return currentMilliseconds;
     }
 
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA RECUPERAR LOS DATOS DE MI USUARIO
+     * @return
+     */
+    public UsuarioDao getMyUser() {
+        return myUser;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ESTABLECER EL VALOR DE LA COMPETICION MARCADA COMO ACTIVA
+     * @param currentCompeId
+     */
+    public void setCurrentCompeId(int currentCompeId) {
+        this.currentCompeId = currentCompeId;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER EL VALOR DE LA COMPETICION MARCADA COMO ACTIVA
+     * @return
+     */
+    public int getCurrentCompeId() {
+        return currentCompeId;
+    }
 }

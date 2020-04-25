@@ -3,6 +3,7 @@ package com.rutillastoby.zoria.ui.competitions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.FirebaseDatabase;
 import com.rutillastoby.zoria.CompetitionElement;
 import com.rutillastoby.zoria.GeneralActivity;
 import com.rutillastoby.zoria.GenericFuntions;
@@ -26,6 +28,9 @@ public class CompetitionsFragment extends Fragment{
 
     //Referencias
     private RecyclerView rvCompetitions;
+
+    //Firebase
+    private FirebaseDatabase db;
 
     //Variables
     private ArrayList<CompeticionDao> competitionsList;
@@ -47,7 +52,8 @@ public class CompetitionsFragment extends Fragment{
      */
     private void initVar(View view){
         thisClass = this;
-
+        //Firebase
+        db = FirebaseDatabase.getInstance();
         //Referencias
         rvCompetitions = view.findViewById(R.id.rvCompetitions);
     }
@@ -89,7 +95,20 @@ public class CompetitionsFragment extends Fragment{
             //Segun si tenemos accesso o no
             if (access) {
                 ///////////// ACCEDER A COMPETICION ////////////////
-                ((GeneralActivity)getActivity()).showMainViewCompetition(id);
+                GeneralActivity ga = ((GeneralActivity)getActivity());
+                //Si es diferente al tutorial y no es la primera vez que accedemos al mismo
+                // la marcamos como competicion activa y la abrimos en seccion current
+                if(id!=1 || id==ga.getCurrentCompeId()){
+                    String myUid = ((GeneralActivity)getActivity()).getMyUser().getUid();
+                    db.getReference("usuarios/"+myUid+"/compeActiva").setValue(id);
+                    ga.checkFragmentCurrent();
+                }else{
+                    //Si es el tutorial lo abrimos en la propia seccion de competiciones
+                    ga.showMainViewCompetition(id);
+                }
+
+                Log.d("aaa", ((GeneralActivity)getActivity()).getCurrentCompeId()+"");
+
             } else {
                 ///////////// SOLICITAR ACCESO /////////////////
                 //Solicitar Contraseña con una ventana emergente
@@ -109,6 +128,7 @@ public class CompetitionsFragment extends Fragment{
      * @param pwd
      */
     public void inputPwd(final int pwd, int id){
+        final int compeId = id;
         //Creación de la vantana modal con layout personalizado
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View dialog = inflater.inflate(R.layout.dialog_register_compe, null);
@@ -116,7 +136,7 @@ public class CompetitionsFragment extends Fragment{
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         builder.setView(dialog)
-                .setTitle(id==1? getString(R.string.titleDialogRegister)+" (0000)" : getString(R.string.titleDialogRegister))
+                .setTitle(compeId==1? getString(R.string.titleDialogRegister)+" (0000)" : getString(R.string.titleDialogRegister))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     //Al hacer clic en aceptar
                     @Override
@@ -129,9 +149,14 @@ public class CompetitionsFragment extends Fragment{
                         //Comprobar si la contrasenna introducida es correcta
                         if(answer==pwd){
                             //Marcar como competicion activa en base de datos
+                            String myUid = ((GeneralActivity)getActivity()).getMyUser().getUid();
+                            db.getReference("usuarios/"+myUid+"/compeActiva").setValue(compeId);
+                            db.getReference("usuarios/"+myUid+"/competiciones/compe"+compeId).setValue(compeId);
 
-                            //Abrir la competicion
-                            //openCompetition();
+
+                            //Abrir la competicion en la ventana de competicion activa (current)
+                            ((GeneralActivity)getActivity()).setCurrentCompeId(compeId);
+                            ((GeneralActivity)getActivity()).checkFragmentCurrent();
                         }else{
                             //Contrasenna incorrecta
                             GenericFuntions.errorSnack(getView(), getString(R.string.pwdFail), getContext());
