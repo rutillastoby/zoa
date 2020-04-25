@@ -16,4 +16,6 @@
     <string name="titleDialogRegister">Acceso a la competición:</string>
     <string name="pwdFail">Contraseña incorrecta :(</string>
     <string name="myPointsCurrent">Mi puntuación</string>
+    <string name="titleQuestions">PREGUNTAS</string>
+    <string name="acept">Aceptar</string>
 </resources>

@@ -122,13 +122,13 @@ public class ProfileFragment extends Fragment {
                                 for(DataSnapshot usu : dataSnapshot.getChildren()) {
                                     for(DataSnapshot dato : usu.getChildren()){
                                         if(dato.getKey().equalsIgnoreCase("nombre")){
-                                            nombresUsados.add(dato.getValue().toString());
+                                            nombresUsados.add(dato.getValue().toString().toLowerCase());
                                         }
                                     }
                                 }
 
                                 //Comprobar si el usuario es valido
-                                if(GenericFuntions.checkNick(newNick, nombresUsados)=="true"){
+                                if(GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados)=="true"){
                                     updateName(view, newNick);
                                 }else{
                                     GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick, nombresUsados),getContext());

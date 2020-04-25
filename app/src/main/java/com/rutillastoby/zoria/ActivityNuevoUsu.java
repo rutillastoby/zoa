@@ -1,7 +1,6 @@
 package com.rutillastoby.zoria;
 
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -61,7 +60,6 @@ public class ActivityNuevoUsu extends AppCompatActivity {
 
 
         setTitle("Información Inicial");
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimaryDark)));
 
         obtenerNombresUsuario();
 

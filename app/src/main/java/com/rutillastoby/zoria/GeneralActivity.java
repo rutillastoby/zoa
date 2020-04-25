@@ -1,5 +1,4 @@
 package com.rutillastoby.zoria;
-
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -37,6 +36,7 @@ public class GeneralActivity extends AppCompatActivity {
     final Fragment profileFrag = new ProfileFragment();
     final Fragment mapFragment = new MapFragment();
     final Fragment scannerFragment = new ScannerFragment();
+    final Fragment questionsFragment = new QuestionsFragment();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active;
 
@@ -53,6 +53,7 @@ public class GeneralActivity extends AppCompatActivity {
     ProfileFragment profF;
     PrincipalFragment prinF;
     ScannerFragment scanF;
+    QuestionsFragment questF;
 
     //Variables
     private static ArrayList<CompeticionDao> competitionsList;
@@ -61,6 +62,8 @@ public class GeneralActivity extends AppCompatActivity {
     private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
     private long currentMilliseconds;
     private UsuarioDao myUser;
+
+    //----------------------------------------------------------------------------------------------
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,7 @@ public class GeneralActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(onClickMenuItem);
 
         //Ocultar fragmentos inicialmente
+        fm.beginTransaction().add(R.id.container_fragment, questionsFragment, "6").hide(questionsFragment).commit();
         fm.beginTransaction().add(R.id.container_fragment, scannerFragment, "5").hide(scannerFragment).commit();
         fm.beginTransaction().add(R.id.container_fragment, mapFragment, "4").hide(mapFragment).commit();
 
@@ -94,6 +98,7 @@ public class GeneralActivity extends AppCompatActivity {
         profF = (ProfileFragment) profileFrag;
         prinF = (PrincipalFragment) principalFrag;
         scanF = (ScannerFragment) scannerFragment;
+        questF = (QuestionsFragment) questionsFragment;
 
         //Obtener hora actual del intent
         currentMilliseconds = getIntent().getLongExtra("currentTime", 0);
@@ -178,6 +183,16 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
+     * METODO PARA MOSTRAR EL FRAGMENTO DE TIPO PREGUNTAS
+     */
+    public void showQuestionsFragment(){
+        fm.beginTransaction().hide(active).show(questionsFragment).commit();
+        active = questionsFragment;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
      * METODO PARA APLICAR UNA TRANSICION ENTRE FRAGMENTOS Y MOSTRAR EL PRINCIPAL SIN CAMBIAR DE COMPETICION
      */
     public void showPrincActivityNotChange(){
@@ -219,8 +234,9 @@ public class GeneralActivity extends AppCompatActivity {
         scanF.stopScanner();
         //Enviar los datos de la competicion
         for(int i=0; i<competitionsList.size();i++){
-            if(competitionsList.get(i).getId() == id)
-                prinF.setDataCompetition(competitionsList.get(i));
+            if(competitionsList.get(i).getId() == id) {
+                prinF.setDataCompetition(competitionsList.get(i), questF);
+            }
         }
     }
 
@@ -234,7 +250,9 @@ public class GeneralActivity extends AppCompatActivity {
     public void onBackPressed() {
         //En funcion del fragmento activo actuaremos
         switch (active.getTag()){
-            //MAP FRAGMENT
+            //MAP FRAGMENT, QUESTIONS FRAGMENT, RANKING FRAGMENT
+            case "6":
+            case "7":
             case "4":
                 //Volver al fragmento principal sin hacer cambios
                 showPrincActivityNotChange();
@@ -291,8 +309,9 @@ public class GeneralActivity extends AppCompatActivity {
                     competitionsList.add(c); //Agregamos a la lista de competiciones
 
                     //Comprobar si la competicion que ha cambiado es la que se esta mostrando en fragment para actualizar los cambios
-                    if(c.getId()==showingCompeId)
-                        prinF.setDataCompetition(c);
+                    if(c.getId()==showingCompeId) {
+                        prinF.setDataCompetition(c, questF); //Establecemos los datos al fragmento principal de la competicion
+                    }
                 }
 
                 //Establecer el nuevos valores para el fragmento del listado de competiciones

@@ -14,14 +14,19 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.rutillastoby.zoria.GeneralActivity;
+import com.rutillastoby.zoria.QuestionsFragment;
 import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.dao.CompeticionDao;
+import com.rutillastoby.zoria.dao.competicion.Pregunta;
+
+import java.util.ArrayList;
 
 public class PrincipalFragment extends Fragment {
     //Referencias
     private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart;
-    private ConstraintLayout lyInProgress, lyToStart, bMapPrin;
+    private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin;
     private ProgressBar pbToStart;
+    private GeneralActivity ga;
 
     //Variables
     CountDownTimer countCompe=null;
@@ -46,6 +51,7 @@ public class PrincipalFragment extends Fragment {
         View view = v;
 
         //Referencias
+        ga =  ((GeneralActivity)getActivity());
         tvTitlePrincipalCompe = view.findViewById(R.id.tvTitlePrincipalCompe);
         tvHourMinPrin = view.findViewById(R.id.tvHourMinPrin);
         tvSecPrin = view.findViewById(R.id.tvSecPrin);
@@ -55,15 +61,24 @@ public class PrincipalFragment extends Fragment {
         tvSecToStart = view.findViewById(R.id.tvSecToStart);
         pbToStart = view.findViewById(R.id.pbToStart);
         bMapPrin = view.findViewById(R.id.bMapPrin);
+        bQuestionPrin = view.findViewById(R.id.bQuestionPrin);
 
         //Clicks de botones
         bMapPrin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((GeneralActivity)getActivity()).showMapFragment();
+                //Boton mapa en fragmento principal
+                ga.showMapFragment();
             }
         });
 
+        bQuestionPrin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Boton preguntas en fragmento principal
+                ga.showQuestionsFragment();
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -71,11 +86,14 @@ public class PrincipalFragment extends Fragment {
     /**
      * METODO PARA ESTABLECER LOS DATOS DE LA COMPETICION EN EL FRAGMENTO
      */
-    public void setDataCompetition(CompeticionDao competition){
+    public void setDataCompetition(CompeticionDao competition, QuestionsFragment questF){
         //Obtener tiempo del servidor
         Log.d("aaa", ""+competition.getHora().getInicio());
 
         tvTitlePrincipalCompe.setText(competition.getNombre());
+
+        //Establecer datos al fragmento de preguntas crear listado con las preguntas
+        questF.setQuestionsList(new ArrayList<Pregunta>(competition.getPreguntas().values()));
 
         //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
         checkTime(competition.getHora().getInicio(), competition.getHora().getFin());
@@ -88,7 +106,7 @@ public class PrincipalFragment extends Fragment {
      * COMPETICION Y ACTUAR EN FUNCION DE ELLO
      */
     private void checkTime(final long startTime, final long finishTime){
-        long currentTime = ((GeneralActivity)getActivity()).getCurrentMilliseconds();
+        long currentTime = ga.getCurrentMilliseconds();
         //Inicializar layouts
         lyInProgress.setVisibility(View.GONE);
         lyToStart.setVisibility(View.GONE);

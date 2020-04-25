@@ -46,7 +46,7 @@ public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.
     @Override
     public CompetitionInstance onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         //Crear la vista con el layout correspondiente a la plantilla de paquete
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.competition_element, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.element_competition, viewGroup, false);
         //Crear objeto de tipo viewHolder de la clase interna con la vista creada anteriormente
         CompetitionInstance ejemplo = new CompetitionInstance(view);
         //Devolver el objeto de la fila creado

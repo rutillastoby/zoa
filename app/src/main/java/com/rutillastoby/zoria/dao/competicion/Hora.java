@@ -1,4 +1,4 @@
-package com.rutillastoby.zoria.dao;
+package com.rutillastoby.zoria.dao.competicion;
 
 public class Hora {
     private Long inicio;
