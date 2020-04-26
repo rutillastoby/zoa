@@ -19,4 +19,5 @@
     <string name="titleQuestions">PREGUNTAS</string>
     <string name="acept">Aceptar</string>
     <string name="sendResponse">¿Enviar Respuesta?</string>
+    <string name="gpsDisabled">GPS Deshabilitado\nActívalo para ver tu ubicación</string>
 </resources>

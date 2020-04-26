@@ -127,6 +127,9 @@ public class GeneralActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            //Detener el scanner al cambiar de fragmento por si estaba iniciado
+            scanF.stopScanner();
+
             switch (item.getItemId()) {
                 case R.id.navigation_competitions:
                     fm.beginTransaction().hide(active).show(competitionsFrag).commit();
@@ -150,10 +153,6 @@ public class GeneralActivity extends AppCompatActivity {
                     ivLogout.setVisibility(View.VISIBLE);
                     return true;
             }
-
-            //Detener el scanner al cambiar de fragmento por si estaba iniciado
-            scanF.stopScanner();
-
             return false;
         }
     };
