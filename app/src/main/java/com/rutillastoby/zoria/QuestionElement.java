@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,7 +30,6 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
     public QuestionElement(ArrayList<Pregunta> questionList, QuestionsFragment context){
         this.questionList = questionList;
         this.context = context;
-        Log.d("aaa", questionList.get(1).getResp().toString());
     }
 
     //----------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
                 //Comprobar que se ha seleccionado una respuesta
                 if(questionList.get(i).getRespSelect()!=-1) {
                     //Obtener el texto de la respuesta seleccionada
-                    int idResp = questionList.get(i).getRespSelect();
+                    final int idResp = questionList.get(i).getRespSelect();
                     String txtResp = questionList.get(i).getResp().get(idResp);
                     //Mostrar ventana de confirmacion
                     AlertDialog.Builder builder = new AlertDialog.Builder(context.getContext());
@@ -158,7 +158,13 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             //Enviar respuesta
-                            GenericFuntions.snack(context.getView(), "Enviada");
+                            ((GeneralActivity)context.getActivity()).sendResponseQuestion(questionList.get(i).getId(),idResp);
+                            //Mostrar mensaje segun si la respuesta es correcta o no
+                            if(questionList.get(i).getSolu()==idResp) {
+                                GenericFuntions.snack(context.getView(), "Respuesta Correcta :)");
+                            }else{
+                                GenericFuntions.errorSnack(context.getView(), "Respuesta Incorrecta", context.getContext());
+                            }
                         }
                     });
 
@@ -169,6 +175,79 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
                 }
             }
         });
+
+        //6. En funcion del estado de respuesta de la pregunta actuaremos
+        hideAllStatus(instance);
+        if(questionList.get(i).getResponseSend()==0){
+            //SIN CONTESTAR
+            instance.bAceptResponse.setVisibility(View.VISIBLE);
+            instance.ivEmptyResponse.setVisibility(View.VISIBLE);
+        }else {
+            if(questionList.get(i).getSolu()==questionList.get(i).getResponseSend()){
+                //CORRECTA
+                instance.ivCorrectResponse.setVisibility(View.VISIBLE);
+            }else{
+                //INCORRECTA
+                instance.ivErrorResponse.setVisibility(View.VISIBLE);
+            }
+            //Ocultar boton aceptar enviar respuesta
+            instance.bAceptResponse.setVisibility(View.GONE);
+            //Desactivar escucha clic opciones de respuesta
+            instance.tvResp1.setOnClickListener(null); instance.tvResp2.setOnClickListener(null);
+            instance.tvResp3.setOnClickListener(null); instance.tvResp4.setOnClickListener(null);
+            //Cambiar colores de lasrespuestas segun si es correcta o incorrecta
+            checkResponses(instance, questionList.get(i).getSolu(), questionList.get(i).getResponseSend());
+        }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OCULTAR LOS ICONOS DE ESTADO DE LAS APLICACIONES
+     */
+    public void hideAllStatus(QuestionInstance instance){
+        instance.ivCorrectResponse.setVisibility(View.INVISIBLE);
+        instance.ivEmptyResponse.setVisibility(View.INVISIBLE);
+        instance.ivErrorResponse.setVisibility(View.INVISIBLE);
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA MARCAR LAS OPCIONES DE RESPUESTA SEGUN SI ES CORRECTA O INCORRECTA
+     */
+    public void checkResponses(QuestionInstance instance, int correct, int marked){
+        //Marcar primero el error para sobreescribir con la opcion correcta si coinciden
+        int colorError = Color.rgb(216,37,37);
+        switch (marked){
+            case 1: instance.tvResp1.setBackgroundColor(colorError);
+                    instance.tvResp1.setTextColor(Color.WHITE);
+                    break;
+            case 2: instance.tvResp2.setBackgroundColor(colorError);
+                    instance.tvResp2.setTextColor(Color.WHITE);
+                    break;
+            case 3: instance.tvResp3.setBackgroundColor(colorError);
+                    instance.tvResp3.setTextColor(Color.WHITE);
+                    break;
+            case 4: instance.tvResp4.setBackgroundColor(colorError);
+                    instance.tvResp4.setTextColor(Color.WHITE);
+                    break;
+        }
+        int colorCorrect = Color.rgb(119,170,23);
+        switch (correct){
+            case 1: instance.tvResp1.setBackgroundColor(colorCorrect);
+                    instance.tvResp1.setTextColor(Color.WHITE);
+                    break;
+            case 2: instance.tvResp2.setBackgroundColor(colorCorrect);
+                    instance.tvResp2.setTextColor(Color.WHITE);
+                    break;
+            case 3: instance.tvResp3.setBackgroundColor(colorCorrect);
+                    instance.tvResp3.setTextColor(Color.WHITE);
+                    break;
+            case 4: instance.tvResp4.setBackgroundColor(colorCorrect);
+                    instance.tvResp4.setTextColor(Color.WHITE);
+                    break;
+        }
     }
 
     //----------------------------------------------------------------------------------------------
@@ -236,6 +315,7 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
         protected ConstraintLayout lyResponseQuestion, lyQuestionElement, lyTitleQuestion;
         protected View divider3, divider4;
         protected Button bAceptResponse;
+        protected ImageView ivEmptyResponse, ivCorrectResponse, ivErrorResponse;
 
         public QuestionInstance(@NonNull View itemView) {
             super(itemView);
@@ -251,6 +331,9 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
             divider3 = itemView.findViewById(R.id.divider3);
             divider4 = itemView.findViewById(R.id.divider4);
             bAceptResponse = itemView.findViewById(R.id.bAceptResponse);
+            ivErrorResponse = itemView.findViewById(R.id.ivErrorResponse);
+            ivCorrectResponse = itemView.findViewById(R.id.ivCorrectResponse);
+            ivEmptyResponse = itemView.findViewById(R.id.ivEmptyResponse);
 
             //Estado inicial
             divider3.setVisibility(View.GONE);

@@ -22,11 +22,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
+import com.rutillastoby.zoria.dao.competicion.Pregunta;
 import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
 import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
 import com.rutillastoby.zoria.ui.profile.ProfileFragment;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class GeneralActivity extends AppCompatActivity {
 
@@ -235,7 +237,7 @@ public class GeneralActivity extends AppCompatActivity {
         //Enviar los datos de la competicion
         for(int i=0; i<competitionsList.size();i++){
             if(competitionsList.get(i).getId() == id) {
-                prinF.setDataCompetition(competitionsList.get(i), questF);
+                prinF.setDataCompetition(competitionsList.get(i), questF, myUser);
             }
         }
     }
@@ -306,11 +308,18 @@ public class GeneralActivity extends AppCompatActivity {
                 for (DataSnapshot compe : dataSnapshot.getChildren()) {
                     CompeticionDao c = compe.getValue(CompeticionDao.class); //Rellenar objeto de tipo competicion
                     c.setId(Integer.parseInt(compe.getKey()));
-                    competitionsList.add(c); //Agregamos a la lista de competiciones
+                    //Agregar los id de las preguntas a los objetos de tipo pregunta
+                    if(c.getPreguntas()!=null) {
+                        for (Map.Entry<String, Pregunta> entry : c.getPreguntas().entrySet()) {
+                            entry.getValue().setId(entry.getKey()); //Obtener la key del hasmap y establecer como id del objeto
+                        }
+                    }
+                    //Agregamos a la lista de competiciones
+                    competitionsList.add(c);
 
                     //Comprobar si la competicion que ha cambiado es la que se esta mostrando en fragment para actualizar los cambios
                     if(c.getId()==showingCompeId) {
-                        prinF.setDataCompetition(c, questF); //Establecemos los datos al fragmento principal de la competicion
+                        prinF.setDataCompetition(c, questF, myUser); //Establecemos los datos al fragmento principal de la competicion
                     }
                 }
 
@@ -364,6 +373,15 @@ public class GeneralActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                         GUARDAR INFORMACION EN LA BASE DE DATOS                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void sendResponseQuestion(String idQuestion, int idResponse){
+        db.getReference("competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion)
+                .setValue(idResponse);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

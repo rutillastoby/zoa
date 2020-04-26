@@ -12,6 +12,8 @@ public class Pregunta {
     private boolean viewRespOpen;
     //Variable para almacenar la respuesta marcada
     private int respSelect;
+    //Variable indicando la respuesta enviada a la pregunta si ha sido contestado
+    private int responseSend; //0-Para preguntas sin contestar
 
     public String getId() {
         return id;
@@ -67,5 +69,13 @@ public class Pregunta {
 
     public void setRespSelect(int respSelect) {
         this.respSelect = respSelect;
+    }
+
+    public int getResponseSend() {
+        return responseSend;
+    }
+
+    public void setResponseSend(int responseSend) {
+        this.responseSend = responseSend;
     }
 }
