@@ -8,6 +8,10 @@ public class Pregunta {
     private int solu;
     private int idPunto;
     private ArrayList<String> resp;
+    //Variable para indicar si se tiene que mostrar las opciones de respuesta en la vista del elemento
+    private boolean viewRespOpen;
+    //Variable para almacenar la respuesta marcada
+    private int respSelect;
 
     public String getId() {
         return id;
@@ -47,5 +51,21 @@ public class Pregunta {
 
     public void setResp(ArrayList<String> resp) {
         this.resp = resp;
+    }
+
+    public boolean isViewRespOpen() {
+        return viewRespOpen;
+    }
+
+    public void setViewRespOpen(boolean viewRespOpen) {
+        this.viewRespOpen = viewRespOpen;
+    }
+
+    public int getRespSelect() {
+        return respSelect;
+    }
+
+    public void setRespSelect(int respSelect) {
+        this.respSelect = respSelect;
     }
 }

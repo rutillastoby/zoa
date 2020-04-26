@@ -62,8 +62,6 @@ public class ElementoClasificado extends RecyclerView.Adapter<ElementoClasificad
         instancia.tvN3.setText(listUsuarios.get(i).getPuntosN3()+"");
         instancia.tvTotal.setText(listUsuarios.get(i).getTotal()+"");
         Picasso.get().load(listUsuarios.get(i).getFotoPerfil()).into(instancia.ivFoto);
-
-
     }
 
     //----------------------------------------------------------------------------------------------

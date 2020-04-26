@@ -8,46 +8,87 @@
     android:layout_marginTop="2dp"
     android:layout_marginRight="24dp"
     android:layout_marginBottom="15dp"
-    app:cardCornerRadius="20dp">
+    app:cardCornerRadius="15dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/lyQuestionElement"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp">
-
-        <TextView
-            android:id="@+id/tvQuestionText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="24dp"
-            android:text="TextView"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/lyResponse"
+            android:id="@+id/lyTitleQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tvQuestionText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="TextView"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/ivEmptyResponse"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/ivEmptyResponse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvQuestionText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvQuestionText"
+                app:srcCompat="@drawable/ic_emptytick24dp" />
+
+            <ImageView
+                android:id="@+id/ivCorrectResponse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/tvQuestionText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvQuestionText"
+                app:srcCompat="@drawable/ic_tick24dp" />
+
+            <ImageView
+                android:id="@+id/ivErrorResponse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/tvQuestionText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvQuestionText"
+                app:srcCompat="@drawable/ic_notick24dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/lyResponseQuestion"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvQuestionText">
+            app:layout_constraintTop_toBottomOf="@+id/lyTitleQuestion">
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/bAceptResponse"
                 android:layout_width="0dp"
                 android:layout_height="34dp"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="16dp"
                 android:background="@drawable/button_c"
                 android:text="@string/acept"
                 android:textSize="14sp"
@@ -111,6 +152,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
                     android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="16dp"
                     android:padding="8dp"
                     android:text="TextView"
                     android:textSize="16sp"
@@ -126,8 +168,7 @@
                     android:layout_height="2dp"
                     android:layout_marginStart="24dp"
                     android:layout_marginEnd="24dp"
-                    android:background="?android:attr/listDivider"
-                    android:padding="5dp"
+                    android:background="@color/gray"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvResp1" />
@@ -138,7 +179,7 @@
                     android:layout_height="2dp"
                     android:layout_marginStart="24dp"
                     android:layout_marginEnd="24dp"
-                    android:background="?android:attr/listDivider"
+                    android:background="@color/gray"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvResp2" />
@@ -149,7 +190,7 @@
                     android:layout_height="2dp"
                     android:layout_marginStart="24dp"
                     android:layout_marginEnd="24dp"
-                    android:background="?android:attr/listDivider"
+                    android:background="@color/gray"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvResp3" />

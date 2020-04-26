@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#fffe00</color>
     <color name="colorAccent">#000000</color>
     <color name="background">#F8F8F8</color>
-    <color name="gray">#AEAEAE</color>
+    <color name="gray">#CDCDCD</color>
     <color name="error">#FF0000</color>
     <!--COLORES DE LOS PUNTOS-->
     <color name="pointBlue">#2DAECD</color>

@@ -18,4 +18,5 @@
     <string name="myPointsCurrent">Mi puntuación</string>
     <string name="titleQuestions">PREGUNTAS</string>
     <string name="acept">Aceptar</string>
+    <string name="sendResponse">¿Enviar Respuesta?</string>
 </resources>
