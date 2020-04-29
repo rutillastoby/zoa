@@ -49,19 +49,20 @@ public class QuestionsFragment extends Fragment{
     /**
      * METODO PARA CARGAR EL LISTADO DE PREGUNTAS EN LA VISTA DEL FRAGMENTO
      */
-    public void loadQuestions(ArrayList<Pregunta> questionsList, HashMap<String, Integer> myQuestions){
-        //Establecer los valores del listado
-
+    public void loadQuestions(HashMap<String, Pregunta> questionsList, HashMap<String, Integer> myQuestions){
+        //Establecer el listado de preguntas disponibles
         ArrayList<Pregunta> questionsListAvailable = new ArrayList<Pregunta>(); //Listado de preguntas disponibles para el usuario
 
         //Recorrer el listado completo de preguntas y comprobar cuales de ellas estan disponibles para el usuario
-        for(int i=0; i<questionsList.size();i++){
-            for (Map.Entry<String, Integer> entry : myQuestions.entrySet()) {
+        for (Map.Entry<String, Pregunta> quest : questionsList.entrySet()) {
+            //Agregar id al objeto de tipo pregunta para usarlo en el recyclerView
+            quest.getValue().setId(quest.getKey());
+            for (Map.Entry<String, Integer> myQuest : myQuestions.entrySet()) {
                 //Si la pregunta está entre las desbloqueadas la agregamos al listado
-                if(entry.getKey().equals(questionsList.get(i).getId())){
+                if(myQuest.getKey().equals(quest.getKey())){
                     //Establecemos la contestacion a la pregunta, 0 si no se ha contestado aun.
-                    questionsList.get(i).setResponseSend(entry.getValue());
-                    questionsListAvailable.add(questionsList.get(i));
+                    quest.getValue().setResponseSend(myQuest.getValue());
+                    questionsListAvailable.add(quest.getValue());
                 }
             }
         }
@@ -71,6 +72,4 @@ public class QuestionsFragment extends Fragment{
         rvQuestions.setLayoutManager(new LinearLayoutManager(getContext()));
         rvQuestions.setAdapter(adapter);
     }
-
-    //----------------------------------------------------------------------------------------------
 }

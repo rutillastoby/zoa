@@ -3,6 +3,7 @@ package com.rutillastoby.zoria.dao;
 import com.rutillastoby.zoria.dao.competicion.Hora;
 import com.rutillastoby.zoria.dao.competicion.Jugador;
 import com.rutillastoby.zoria.dao.competicion.Pregunta;
+import com.rutillastoby.zoria.dao.competicion.Punto;
 
 import java.util.HashMap;
 
@@ -12,8 +13,9 @@ public class CompeticionDao {
     private String nombre;
     private Hora hora;
     private int id;
-    private HashMap<String, Pregunta> preguntas;
-    private HashMap<String, Jugador> jugadores;
+    private HashMap<String, Pregunta> preguntas = new HashMap<String, Pregunta>();
+    private HashMap<String, Jugador> jugadores = new HashMap<String, Jugador>();
+    private HashMap<String, Punto> puntos = new HashMap<String, Punto>();
 
     public int getId() {
         return id;
@@ -69,5 +71,13 @@ public class CompeticionDao {
 
     public void setJugadores(HashMap<String, Jugador> jugadores) {
         this.jugadores = jugadores;
+    }
+
+    public HashMap<String, Punto> getPuntos() {
+        return puntos;
+    }
+
+    public void setPuntos(HashMap<String, Punto> puntos) {
+        this.puntos = puntos;
     }
 }

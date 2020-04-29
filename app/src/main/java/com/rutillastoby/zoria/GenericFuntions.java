@@ -1,12 +1,19 @@
 package com.rutillastoby.zoria;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -83,5 +90,22 @@ public class GenericFuntions {
         View snackBarView = snackbar.getView();
         snackBarView.setBackgroundColor(Color.BLACK);
         snackbar.show();
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA CONVERTIR UN VECTOR EN BITMAPDESCRIPTOR NECESARIO PARA AGREGAR UN MARCADOR AL MAPA
+     * @param context
+     * @param vectorResId
+     * @return
+     */
+    public static BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 }

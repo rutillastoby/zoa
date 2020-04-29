@@ -1,7 +1,6 @@
 package com.rutillastoby.zoria;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,13 +21,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
-import com.rutillastoby.zoria.dao.competicion.Pregunta;
 import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
 import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
 import com.rutillastoby.zoria.ui.profile.ProfileFragment;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class GeneralActivity extends AppCompatActivity {
 
@@ -56,6 +53,7 @@ public class GeneralActivity extends AppCompatActivity {
     PrincipalFragment prinF;
     ScannerFragment scanF;
     QuestionsFragment questF;
+    MapFragment mapF;
 
     //Variables
     private static ArrayList<CompeticionDao> competitionsList;
@@ -101,6 +99,7 @@ public class GeneralActivity extends AppCompatActivity {
         prinF = (PrincipalFragment) principalFrag;
         scanF = (ScannerFragment) scannerFragment;
         questF = (QuestionsFragment) questionsFragment;
+        mapF = (MapFragment) mapFragment;
 
         //Obtener hora actual del intent
         currentMilliseconds = getIntent().getLongExtra("currentTime", 0);
@@ -136,7 +135,6 @@ public class GeneralActivity extends AppCompatActivity {
                     active = competitionsFrag;
                     //Ocultar boton cerrar sesion
                     ivLogout.setVisibility(View.GONE);
-                    Log.d("aaa" ,"competitions");
                     return true;
 
                 case R.id.navigation_current:
@@ -236,7 +234,7 @@ public class GeneralActivity extends AppCompatActivity {
         //Enviar los datos de la competicion
         for(int i=0; i<competitionsList.size();i++){
             if(competitionsList.get(i).getId() == id) {
-                prinF.setDataCompetition(competitionsList.get(i), questF, myUser);
+                prinF.setDataCompetition(competitionsList.get(i), questF, mapF, myUser);
             }
         }
     }
@@ -307,18 +305,13 @@ public class GeneralActivity extends AppCompatActivity {
                 for (DataSnapshot compe : dataSnapshot.getChildren()) {
                     CompeticionDao c = compe.getValue(CompeticionDao.class); //Rellenar objeto de tipo competicion
                     c.setId(Integer.parseInt(compe.getKey()));
-                    //Agregar los id de las preguntas a los objetos de tipo pregunta
-                    if(c.getPreguntas()!=null) {
-                        for (Map.Entry<String, Pregunta> entry : c.getPreguntas().entrySet()) {
-                            entry.getValue().setId(entry.getKey()); //Obtener la key del hasmap y establecer como id del objeto
-                        }
-                    }
+
                     //Agregamos a la lista de competiciones
                     competitionsList.add(c);
 
                     //Comprobar si la competicion que ha cambiado es la que se esta mostrando en fragment para actualizar los cambios
                     if(c.getId()==showingCompeId) {
-                        prinF.setDataCompetition(c, questF, myUser); //Establecemos los datos al fragmento principal de la competicion
+                        prinF.setDataCompetition(c, questF, mapF,myUser); //Establecemos los datos al fragmento principal de la competicion
                     }
                 }
 

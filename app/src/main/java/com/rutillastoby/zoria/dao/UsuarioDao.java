@@ -7,7 +7,7 @@ public class UsuarioDao {
     private String foto;
     private String nombre;
     private Integer compeActiva; //Competicion actual (para fragment current)
-    private HashMap<String, Integer> competiciones;
+    private HashMap<String, Integer> competiciones = new HashMap<String, Integer>();
 
     public String getFoto() {
         return foto;

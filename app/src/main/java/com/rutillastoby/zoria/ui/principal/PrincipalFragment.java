@@ -14,14 +14,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.rutillastoby.zoria.GeneralActivity;
+import com.rutillastoby.zoria.MapFragment;
 import com.rutillastoby.zoria.QuestionsFragment;
 import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
-import com.rutillastoby.zoria.dao.competicion.Pregunta;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class PrincipalFragment extends Fragment {
     //Referencias
@@ -88,18 +85,18 @@ public class PrincipalFragment extends Fragment {
     /**
      * METODO PARA ESTABLECER LOS DATOS DE LA COMPETICION EN EL FRAGMENTO
      */
-    public void setDataCompetition(CompeticionDao competition, QuestionsFragment questF, UsuarioDao myUser){
+    public void setDataCompetition(CompeticionDao competition, QuestionsFragment questF, MapFragment mapF,
+                                   UsuarioDao myUser){
         //Obtener tiempo del servidor
         Log.d("aaa", ""+competition.getHora().getInicio());
 
         tvTitlePrincipalCompe.setText(competition.getNombre());
 
         //Establecer datos al fragmento de preguntas para crear listado con las preguntas de la competicion
-        if(competition.getJugadores().get(myUser.getUid()).getPreguntas()!=null) {
-            ArrayList<Pregunta> allQuestions = new ArrayList<Pregunta>(competition.getPreguntas().values()); //Obtener todas las preguntas
-            HashMap<String, Integer> myQuestions = competition.getJugadores().get(myUser.getUid()).getPreguntas(); //Obtener mis pregustas
-            questF.loadQuestions(allQuestions, myQuestions);
-        }
+        questF.loadQuestions(competition.getPreguntas(), competition.getJugadores().get(myUser.getUid()).getPreguntas());
+
+        //Establecer datos al fragmento del mapa
+        mapF.loadPoints(competition.getPuntos(), competition.getJugadores().get(myUser.getUid()).getPuntos());
 
         //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
         checkTime(competition.getHora().getInicio(), competition.getHora().getFin());

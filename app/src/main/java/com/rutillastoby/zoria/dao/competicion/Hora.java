@@ -1,22 +1,22 @@
 package com.rutillastoby.zoria.dao.competicion;
 
 public class Hora {
-    private Long inicio;
-    private Long fin;
+    private long inicio;
+    private long fin;
 
-    public Long getInicio() {
+    public long getInicio() {
         return inicio;
     }
 
-    public void setInicio(Long inicio) {
+    public void setInicio(long inicio) {
         this.inicio = inicio;
     }
 
-    public Long getFin() {
+    public long getFin() {
         return fin;
     }
 
-    public void setFin(Long fin) {
+    public void setFin(long fin) {
         this.fin = fin;
     }
 }

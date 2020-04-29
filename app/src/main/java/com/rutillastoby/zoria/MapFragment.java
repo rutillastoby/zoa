@@ -21,11 +21,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.rutillastoby.zoria.dao.competicion.Punto;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     //Referencias
@@ -38,8 +44,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     LocationListener locationListener;
     Location currentLocation;
     SupportMapFragment mMapFragment;
-    View locationButton;
     GoogleMap map;
+    ArrayList<Marker> instanciatedMarker = new ArrayList<Marker>(); //Variable para almacenar los puntos instanciados en mapa
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,9 +74,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         fabCurrentPosition = view.findViewById(R.id.fabCurrentPosition);
         ivBackMap = view.findViewById(R.id.ivBackMap);
         lyWarningGPS = view.findViewById(R.id.lyWarningGPS);
-
-        //Estado inicial
-        lyWarningGPS.setVisibility(View.GONE);
 
         //Escuchadores de clicks
         fabScanner.setOnClickListener(new View.OnClickListener() {
@@ -138,6 +141,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             lyWarningGPS.setVisibility(View.VISIBLE);
             fabCurrentPosition.hide(); //Ocultar boton de ir a mi ubicacion
+        }else{
+            lyWarningGPS.setVisibility(View.GONE);
         }
     }
 
@@ -146,38 +151,92 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         this.map = map;
-        // Posicionar el mapa en una localización y con un nivel de zoom
-        LatLng latLng = new LatLng(36.679582, -5.444791);
-        // Un zoom mayor que 13 hace que el emulador falle, pero un valor deseado para
-        // callejero es 17 aprox.
-        float zoom = 13;
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-        // Colocar un marcador en la misma posición
-        map.addMarker(new MarkerOptions().position(latLng));
 
+        //Si no se tiene la ubicacion activada posicionar en lugar por defecto, si no en su ubicacion
+        if(!moveViewMap()){
+            //Posicion manual
+            LatLng latLng = new LatLng(37.3996770, -2.4282695781);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8));
+        }
 
-        //Boton de ir a mi ubicacion en el mapa
+        //Ocultar botones de la interfaz del mapa
         map.getUiSettings().setMapToolbarEnabled(false);
         map.getUiSettings().setMyLocationButtonEnabled(false);
-
 
         //El padding hace que la brujula que aparece en la interfaz del mapa al
         // rotarlo se desplace y no se coloque con la flecha de volver
         map.setPadding(0, 100, 0, 0);
 
-
         //Mapa de tipo terreno
         map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
         //Mostrar mi ubicación en el mapa
         map.setMyLocationEnabled(true);
+    }
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA CARGAR EN EL MAPA AQUELLOS PUNTOS QUE NO TENGAMOS REGISTRADOS
+     * @param allPoints
+     * @param myPoints
+     */
+    public void loadPoints(HashMap<String, Punto> allPoints, HashMap<String, String> myPoints){
+        //Resetear todos los puntos agregados anteriormente
+        for(int i =0; i<instanciatedMarker.size(); i++){
+            instanciatedMarker.get(i).remove();
+        }
+
+        //Recorrer el listado completo de preguntas y comprobar cuales de ellas estan disponibles para el usuario
+        for (Map.Entry<String, Punto> point : allPoints.entrySet()) {
+            boolean show=true;
+            for (Map.Entry<String, String> mPoint : myPoints.entrySet()) {
+                //Si el punto en cuestion lo tenemos en posesion no lo mostraremos en el mapa
+                if(point.getKey().equals(mPoint.getKey())){
+                    show = false;
+                    //break;
+                }
+            }
+
+            //Si no tenemos el punto escaneado, lo agregamos al mapa
+            if(show){
+                //Generar la ubicacion del punto
+                LatLng locationPoint = new LatLng(point.getValue().getLat(), point.getValue().getLon());
+                BitmapDescriptor icon = null;
+
+                //Seleccionar icono del punto
+                switch (point.getValue().getNivel()){
+                    case 1:
+                        icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level1);
+                        break;
+                    case 2:
+                        icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level2);
+                        break;
+                    case 3:
+                        icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level3);
+                        break;
+                    case 4:
+                        icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_qp);
+                }
+
+                //Anadir marcador al mapa
+                instanciatedMarker.add(
+                    map.addMarker(new MarkerOptions()
+                        .position(locationPoint)
+                        .title(point.getValue().getNombre())
+                        .icon(icon)
+                        .anchor(0.5f,0.5f))
+                );
+            }
+        }
     }
 
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA MOVER LA VISTA DEL MAPA HASTA LA UBICACION DEL USUARIO
+     * METODO PARA MOVER LA VISTA DEL MAPA HASTA LA UBICACION DEL USUARIO, DEVUELVE TRUE O FALSE SEGUN
+     * SI HA PODIDO MOVER LA CAMARA
      */
-    public void moveViewMap() {
+    public boolean moveViewMap() {
         //Proceso para obtener la ultima ubicación activa de gps
         LocationManager mLocationManager = (LocationManager) getActivity().getApplicationContext().getSystemService(getContext().LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
@@ -185,7 +244,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         for (String provider : providers) {
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
+                return false;
             }
             Location l = mLocationManager.getLastKnownLocation(provider);
             if (l == null) { continue; }
@@ -197,6 +256,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             LatLng latLng = new LatLng(bestLocation.getLatitude(), bestLocation.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 14);
             map.animateCamera(cameraUpdate);
+            return true;
+        }else{
+            return false;
         }
     }
 
