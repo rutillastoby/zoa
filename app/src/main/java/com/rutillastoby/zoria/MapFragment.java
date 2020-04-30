@@ -180,7 +180,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * @param allPoints
      * @param myPoints
      */
-    public void loadPoints(HashMap<String, Punto> allPoints, HashMap<String, String> myPoints){
+    public void loadPoints(HashMap<String, Punto> allPoints, HashMap<String, Long> myPoints){
         //Resetear todos los puntos agregados anteriormente
         for(int i =0; i<instanciatedMarker.size(); i++){
             instanciatedMarker.get(i).remove();
@@ -189,7 +189,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         //Recorrer el listado completo de preguntas y comprobar cuales de ellas estan disponibles para el usuario
         for (Map.Entry<String, Punto> point : allPoints.entrySet()) {
             boolean show=true;
-            for (Map.Entry<String, String> mPoint : myPoints.entrySet()) {
+            for (Map.Entry<String, Long> mPoint : myPoints.entrySet()) {
                 //Si el punto en cuestion lo tenemos en posesion no lo mostraremos en el mapa
                 if(point.getKey().equals(mPoint.getKey())){
                     show = false;

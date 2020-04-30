@@ -61,6 +61,7 @@ public class GeneralActivity extends AppCompatActivity {
     private int currentCompeId=-1; //Id de la competicion que esta como activa para el usuario (Accesible desde el boton current del menu inferior)
     private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
     private long currentMilliseconds;
+    private CompeticionDao competitionShow = new CompeticionDao();//Datos de la competicion que se esta visualizando en este momento
     private UsuarioDao myUser;
 
     //----------------------------------------------------------------------------------------------
@@ -235,6 +236,7 @@ public class GeneralActivity extends AppCompatActivity {
         for(int i=0; i<competitionsList.size();i++){
             if(competitionsList.get(i).getId() == id) {
                 prinF.setDataCompetition(competitionsList.get(i), questF, mapF, myUser);
+                competitionShow = competitionsList.get(i); //Establecer los datos de la competicion que se está visualizando
             }
         }
     }
@@ -312,6 +314,7 @@ public class GeneralActivity extends AppCompatActivity {
                     //Comprobar si la competicion que ha cambiado es la que se esta mostrando en fragment para actualizar los cambios
                     if(c.getId()==showingCompeId) {
                         prinF.setDataCompetition(c, questF, mapF,myUser); //Establecemos los datos al fragmento principal de la competicion
+                        competitionShow = c; //Establecer los datos de la competicion que se está visualizando
                     }
                 }
 
@@ -376,6 +379,13 @@ public class GeneralActivity extends AppCompatActivity {
                 .setValue(idResponse);
     }
 
+    //----------------------------------------------------------------------------------------------
+
+    public void sendPointScann(String idPoint){
+        db.getReference("competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/puntos/"+idPoint)
+                .setValue(currentMilliseconds);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                      GETS + SETS                                           //
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -416,5 +426,14 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public int getCurrentCompeId() {
         return currentCompeId;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER LOS DATOS DE LA COMPETICION QUE SE ESTÁ VISUALIZANDO EN ESTE INSTANTE
+     */
+    public CompeticionDao getCompetitionShow() {
+        return competitionShow;
     }
 }

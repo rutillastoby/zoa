@@ -5,8 +5,8 @@ import java.util.HashMap;
 public class Jugador {
     private String uid;
     private String tipo;
-    private HashMap<String, Integer> preguntas = new HashMap<String, Integer>();
-    private HashMap<String, String> puntos = new HashMap<String, String>();
+    private HashMap<String, Integer> preguntas;
+    private HashMap<String, Long> puntos;
 
     public String getUid() {
         return uid;
@@ -25,6 +25,8 @@ public class Jugador {
     }
 
     public HashMap<String, Integer> getPreguntas() {
+        if(preguntas==null)
+            return new HashMap<String, Integer>();
         return preguntas;
     }
 
@@ -32,11 +34,13 @@ public class Jugador {
         this.preguntas = preguntas;
     }
 
-    public HashMap<String, String> getPuntos() {
+    public HashMap<String, Long> getPuntos() {
+        if(puntos==null)
+            return new HashMap<String, Long>();
         return puntos;
     }
 
-    public void setPuntos(HashMap<String, String> puntos) {
+    public void setPuntos(HashMap<String, Long> puntos) {
         this.puntos = puntos;
     }
 }

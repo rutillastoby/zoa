@@ -20,4 +20,6 @@
     <string name="acept">Aceptar</string>
     <string name="sendResponse">¿Enviar Respuesta?</string>
     <string name="gpsDisabled">GPS Deshabilitado\nActívalo para ver tu ubicación</string>
+    <string name="titleMap">MAPA</string>
+    <string name="titleRanking">CLASIFICACIÓN</string>
 </resources>

@@ -11,6 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.zxing.Result;
+import com.rutillastoby.zoria.dao.competicion.Punto;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
@@ -21,6 +25,7 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
 
     //Variables
     private ZXingScannerView scanner;
+
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,7 +93,41 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
      */
     @Override
     public void handleResult(Result rawResult) {
-        Log.d("aaa", rawResult.getText());
+        //Detener el scanner
         stopScanner();
+
+        //Interpretar respuesta
+        String code = rawResult.getText();
+        HashMap<String, Long> myPoints = ga.getCompetitionShow().getJugadores().get(ga.getMyUser().getUid()).getPuntos();
+        boolean exist=false, escaned=false;
+
+        //Recorrer todos los puntos para comprobar si el punto escaneado existe
+        for (Map.Entry<String, Punto> point : ga.getCompetitionShow().getPuntos().entrySet()) {
+            Log.d("aaa", "vuelta "+point.getKey());
+            if(point.getKey().equals(code)){
+                exist = true;
+                //Recorrer mis puntos para comprobar que el codigo no haya sido ya escaneado
+                for (Map.Entry<String, Long> mPoint : myPoints.entrySet()) {
+                    if(mPoint.getKey().equals(code)){
+                        escaned = true;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        //En funcion del estado actuamos
+        if(exist && !escaned){
+            //REGISTRAR PUNTO
+            ga.sendPointScann(code);
+            Log.d("aaa", "codigo guardado");
+        }else if(exist && escaned) {
+            //EL PUNTO YA ESTA REGISTRADO
+            Log.d("aaa", "codigo ya registrado");
+        }else{
+            //EL PUNTO NO EXISTE
+            Log.d("aaa", "eii ese codigo no existe: "+code);
+        }
     }
 }

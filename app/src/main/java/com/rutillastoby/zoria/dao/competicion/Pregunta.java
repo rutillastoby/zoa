@@ -7,7 +7,7 @@ public class Pregunta {
     private String texto;
     private int solu;
     private int idPunto;
-    private ArrayList<String> resp = new ArrayList<String>();
+    private ArrayList<String> resp;
     //Variable para indicar si se tiene que mostrar las opciones de respuesta en la vista del elemento
     private boolean viewRespOpen;
     //Variable para almacenar la respuesta marcada
@@ -48,6 +48,8 @@ public class Pregunta {
     }
 
     public ArrayList<String> getResp() {
+        if(resp==null)
+            new ArrayList<String>();
         return resp;
     }
 
