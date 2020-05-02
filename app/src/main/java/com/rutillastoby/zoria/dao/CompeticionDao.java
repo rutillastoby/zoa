@@ -12,9 +12,12 @@ public class CompeticionDao {
     private String nombre;
     private Hora hora;
     private int id;
+    private int tipo; //Tipo: 0 diurno, 1 nocturno.
+    private int hist; //Historial: 0 no mostrar en historial, 1 si mostrar en historial
     private HashMap<String, Pregunta> preguntas;
     private HashMap<String, Jugador> jugadores;
     private HashMap<String, Punto> puntos;
+
 
     public int getId() {
         return id;
@@ -54,6 +57,22 @@ public class CompeticionDao {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public int getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(int tipo) {
+        this.tipo = tipo;
+    }
+
+    public int getHist() {
+        return hist;
+    }
+
+    public void setHist(int hist) {
+        this.hist = hist;
     }
 
     public HashMap<String, Pregunta> getPreguntas() {

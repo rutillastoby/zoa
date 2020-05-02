@@ -257,6 +257,7 @@
                 app:cardCornerRadius="20dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/bRankingPrin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -345,13 +346,14 @@
                 app:layout_constraintVertical_bias="0.40" />
 
             <TextView
-                android:id="@+id/textView13"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvTotalPointsPrin"
+                android:layout_width="62dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 android:text="000"
+                android:textAlignment="center"
                 android:textColor="#000000"
                 android:textSize="34sp"
                 android:textStyle="bold"
@@ -371,7 +373,7 @@
                 app:layout_constraintVertical_bias="0.40" />
 
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/tvL1PointsPrin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="x 32"
@@ -384,7 +386,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/imageView13" />
 
             <TextView
-                android:id="@+id/textView11"
+                android:id="@+id/tvL3PointsPrin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="x 32"
@@ -397,7 +399,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/imageView14" />
 
             <TextView
-                android:id="@+id/textView15"
+                android:id="@+id/tvL2PointsPrin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="x 32"
@@ -410,7 +412,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/imageView15" />
 
             <TextView
-                android:id="@+id/textView16"
+                android:id="@+id/tvL4PointsPrin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="x 32"

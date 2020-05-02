@@ -1,6 +1,8 @@
 package com.rutillastoby.zoria;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -180,7 +183,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * @param allPoints
      * @param myPoints
      */
-    public void loadPoints(HashMap<String, Punto> allPoints, HashMap<String, Long> myPoints){
+    public void loadPoints(HashMap<String, Punto> allPoints, HashMap<String, String> myPoints){
         //Resetear todos los puntos agregados anteriormente
         for(int i =0; i<instanciatedMarker.size(); i++){
             instanciatedMarker.get(i).remove();
@@ -189,7 +192,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         //Recorrer el listado completo de preguntas y comprobar cuales de ellas estan disponibles para el usuario
         for (Map.Entry<String, Punto> point : allPoints.entrySet()) {
             boolean show=true;
-            for (Map.Entry<String, Long> mPoint : myPoints.entrySet()) {
+            for (Map.Entry<String, String> mPoint : myPoints.entrySet()) {
                 //Si el punto en cuestion lo tenemos en posesion no lo mostraremos en el mapa
                 if(point.getKey().equals(mPoint.getKey())){
                     show = false;
@@ -216,6 +219,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         break;
                     case 4:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_qp);
+                    case 5:
+                        icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_flag);
                 }
 
                 //Anadir marcador al mapa
@@ -260,6 +265,99 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }else{
             return false;
         }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA MOSTRAR UN DIALOGO CON LA INFORMACIÓN DEL PUNTO ESCANEADO
+     */
+    public void alertDialogScannedPoint(String name, int level, boolean duplicate) {
+
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialog = inflater.inflate(R.layout.dialog_escaned_point, null);
+        ConstraintLayout lyNormalPointEscaned = dialog.findViewById(R.id.lyNormalPointEscaned);
+        ConstraintLayout lyQuestPointEscaned = dialog.findViewById(R.id.lyQuestPointEscaned);
+        ConstraintLayout lyDuplicateEscaned = dialog.findViewById(R.id.lyDuplicateEscaned);
+        ConstraintLayout lyFlagEscaned = dialog.findViewById(R.id.lyFlagEscaned);
+        lyQuestPointEscaned.setVisibility(View.GONE);
+        lyNormalPointEscaned.setVisibility(View.GONE);
+        lyDuplicateEscaned.setVisibility(View.GONE);
+        lyFlagEscaned.setVisibility(View.GONE);
+        AlertDialog.Builder builder = null;
+
+        //Comprobar si es un codigo de pregunta, normal o es un escaneo duplicado (Ya escaneado previamente)
+        if (duplicate) {
+            //CODIGO YA ESCANEADO
+            lyDuplicateEscaned.setVisibility(View.VISIBLE);
+            builder = new AlertDialog.Builder(getContext());
+
+            builder.setView(dialog)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+
+        } else if (level == 4) {
+            //CODIGO DE PREGUNTA
+            lyQuestPointEscaned.setVisibility(View.VISIBLE);
+            builder = new AlertDialog.Builder(getContext());
+
+            builder.setView(dialog)
+                    .setPositiveButton("Ver pregunta", new DialogInterface.OnClickListener() {
+                        //Al hacer clic en ver pregunta
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ga.showQuestionsFragment();
+                        }
+                    }).setNegativeButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+        } else if (level == 5){
+            //CODIGO BANDERA
+            lyFlagEscaned.setVisibility(View.VISIBLE);
+            builder = new AlertDialog.Builder(getContext());
+
+            builder.setView(dialog)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //MARCAR COMPETICION COMO FINALIZADA PARA MI UNICAMENTE
+                        }
+                    });
+
+        }else {
+            //CODIGO NORMAL
+            TextView tvPoints = dialog.findViewById(R.id.tvDialogPoints);
+            TextView tvNamePoint = dialog.findViewById(R.id.tvDialogNamePoint);
+            ImageView ivIconPointDialog = dialog.findViewById(R.id.ivIconPointDialog);
+            builder = new AlertDialog.Builder(getContext());
+
+            //Mostrar layout correspondiente
+            lyNormalPointEscaned.setVisibility(View.VISIBLE);
+
+            //Establecer datos a los elementos del dialogo
+            tvNamePoint.setText("CÓDIGO " + name.toUpperCase() + " REGISTRADO!");
+            tvPoints.setText("+ " + level + ((level == 1) ? " punto." : " puntos."));
+            switch (level){
+                case 1: ivIconPointDialog.setImageResource(R.drawable.ic_level1); break;
+                case 2: ivIconPointDialog.setImageResource(R.drawable.ic_level2); break;
+                case 3: ivIconPointDialog.setImageResource(R.drawable.ic_level3); break;
+            }
+
+            //Mostrar dialogo con información del punto escaneado
+            builder.setView(dialog)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialog, int which) {}
+                });
+        }
+
+        //Mostrar ventana
+        builder.show();
     }
 
 }

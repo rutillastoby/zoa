@@ -3,18 +3,10 @@ package com.rutillastoby.zoria.dao.competicion;
 import java.util.HashMap;
 
 public class Jugador {
-    private String uid;
     private String tipo;
     private HashMap<String, Integer> preguntas;
-    private HashMap<String, Long> puntos;
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
+    private HashMap<String, String> puntos;
+    private boolean getFlag; //Indicar si ha cogido la bandera
 
     public String getTipo() {
         return tipo;
@@ -25,7 +17,7 @@ public class Jugador {
     }
 
     public HashMap<String, Integer> getPreguntas() {
-        if(preguntas==null)
+        if (preguntas == null)
             return new HashMap<String, Integer>();
         return preguntas;
     }
@@ -34,13 +26,21 @@ public class Jugador {
         this.preguntas = preguntas;
     }
 
-    public HashMap<String, Long> getPuntos() {
+    public HashMap<String, String> getPuntos() {
         if(puntos==null)
-            return new HashMap<String, Long>();
+            return new HashMap<String, String>();
         return puntos;
     }
 
-    public void setPuntos(HashMap<String, Long> puntos) {
+    public void setPuntos(HashMap<String, String> puntos) {
         this.puntos = puntos;
+    }
+
+    public boolean isGetFlag() {
+        return getFlag;
+    }
+
+    public void setGetFlag(boolean getFlag) {
+        this.getFlag = getFlag;
     }
 }

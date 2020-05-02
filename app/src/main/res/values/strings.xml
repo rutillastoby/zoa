@@ -22,4 +22,8 @@
     <string name="gpsDisabled">GPS Deshabilitado\nActívalo para ver tu ubicación</string>
     <string name="titleMap">MAPA</string>
     <string name="titleRanking">CLASIFICACIÓN</string>
+    <string name="questEnabled">NUEVA PREGUNTA DESBLOQUEADA</string>
+    <string name="duplicateScenned">ESTE CÓDIGO YA LO HAS REGISTRADO...</string>
+    <string name="getFlagText">CÓDIGO BANDERA REGISTRADO\nSuerte para la casificación!</string>
+    <string name="pointsFlag">+10 puntos.</string>
 </resources>

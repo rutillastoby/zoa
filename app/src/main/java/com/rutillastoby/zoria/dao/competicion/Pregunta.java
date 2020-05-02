@@ -6,9 +6,9 @@ public class Pregunta {
     private String id;
     private String texto;
     private int solu;
-    private int idPunto;
+    private String idPunto;
     private ArrayList<String> resp;
-    //Variable para indicar si se tiene que mostrar las opciones de respuesta en la vista del elemento
+    //Variable para indicar si se tienen que mostrar las opciones de respuesta abiertas en la vista del elemento
     private boolean viewRespOpen;
     //Variable para almacenar la respuesta marcada
     private int respSelect;
@@ -39,11 +39,11 @@ public class Pregunta {
         this.solu = solu;
     }
 
-    public int getIdPunto() {
+    public String getIdPunto() {
         return idPunto;
     }
 
-    public void setIdPunto(int idPunto) {
+    public void setIdPunto(String idPunto) {
         this.idPunto = idPunto;
     }
 

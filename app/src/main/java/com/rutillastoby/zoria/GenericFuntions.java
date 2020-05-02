@@ -40,10 +40,10 @@ public class GenericFuntions {
 
         if(disponible){
             if(nick.length()>0){
-                if(nick.length()>=5 && nick.length()<=15){
+                if(nick.length()>=5 && nick.length()<=12){
                   return "true";
                 }else{
-                    return("Tu nombre debe tener entre 5 Y 15 caracteres");
+                    return("Tu nombre debe tener entre 5 Y 12 caracteres");
                 }
             }else{
                return("Debes introducir un nombre.");

@@ -157,14 +157,18 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
                     builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //Enviar respuesta
-                            ((GeneralActivity)context.getActivity()).sendResponseQuestion(questionList.get(i).getId(),idResp);
+                            boolean correct; //Variable para indicar si la respuesta es correcta
                             //Mostrar mensaje segun si la respuesta es correcta o no
                             if(questionList.get(i).getSolu()==idResp) {
                                 GenericFuntions.snack(context.getView(), "Respuesta Correcta :)");
+                                correct=true;
                             }else{
                                 GenericFuntions.errorSnack(context.getView(), "Respuesta Incorrecta", context.getContext());
+                                correct=false;
                             }
+
+                            //Enviar respuesta
+                            ((GeneralActivity)context.getActivity()).sendResponseQuestion(questionList.get(i).getId(),idResp, correct);
                         }
                     });
 

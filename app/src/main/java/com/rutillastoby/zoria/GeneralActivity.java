@@ -1,4 +1,5 @@
 package com.rutillastoby.zoria;
+
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.MenuItem;
@@ -21,11 +22,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
+import com.rutillastoby.zoria.dao.competicion.Pregunta;
 import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
 import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
 import com.rutillastoby.zoria.ui.profile.ProfileFragment;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class GeneralActivity extends AppCompatActivity {
 
@@ -36,6 +39,7 @@ public class GeneralActivity extends AppCompatActivity {
     final Fragment mapFragment = new MapFragment();
     final Fragment scannerFragment = new ScannerFragment();
     final Fragment questionsFragment = new QuestionsFragment();
+    final Fragment rankingFragment = new RankingFragment();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active;
 
@@ -45,15 +49,16 @@ public class GeneralActivity extends AppCompatActivity {
     private FirebaseDatabase db;
 
     //Referencias
-    BottomNavigationView navigation;
-    Toolbar toolbar;
-    ImageView ivLogout;
-    CompetitionsFragment compF;
-    ProfileFragment profF;
-    PrincipalFragment prinF;
-    ScannerFragment scanF;
-    QuestionsFragment questF;
-    MapFragment mapF;
+    private BottomNavigationView navigation;
+    private Toolbar toolbar;
+    private ImageView ivLogout;
+    private CompetitionsFragment compF;
+    private ProfileFragment profF;
+    private PrincipalFragment prinF;
+    private ScannerFragment scanF;
+    private QuestionsFragment questF;
+    private MapFragment mapF;
+    private RankingFragment rankF;
 
     //Variables
     private static ArrayList<CompeticionDao> competitionsList;
@@ -63,6 +68,8 @@ public class GeneralActivity extends AppCompatActivity {
     private long currentMilliseconds;
     private CompeticionDao competitionShow = new CompeticionDao();//Datos de la competicion que se esta visualizando en este momento
     private UsuarioDao myUser;
+    private boolean getCompetitions=false, getUsers=false; //Variables para determinar cuando se han recuperado los datos
+    private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
 
     //----------------------------------------------------------------------------------------------
 
@@ -79,6 +86,7 @@ public class GeneralActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(onClickMenuItem);
 
         //Ocultar fragmentos inicialmente
+        fm.beginTransaction().add(R.id.container_fragment, rankingFragment, "7").hide(rankingFragment).commit();
         fm.beginTransaction().add(R.id.container_fragment, questionsFragment, "6").hide(questionsFragment).commit();
         fm.beginTransaction().add(R.id.container_fragment, scannerFragment, "5").hide(scannerFragment).commit();
         fm.beginTransaction().add(R.id.container_fragment, mapFragment, "4").hide(mapFragment).commit();
@@ -101,6 +109,7 @@ public class GeneralActivity extends AppCompatActivity {
         scanF = (ScannerFragment) scannerFragment;
         questF = (QuestionsFragment) questionsFragment;
         mapF = (MapFragment) mapFragment;
+        rankF = (RankingFragment) rankingFragment;
 
         //Obtener hora actual del intent
         currentMilliseconds = getIntent().getLongExtra("currentTime", 0);
@@ -155,6 +164,16 @@ public class GeneralActivity extends AppCompatActivity {
             return false;
         }
     };
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA MOSTRAR EL FRAGMENTO DE TIPO RANKING
+     */
+    public void showRankingFragment(){
+        fm.beginTransaction().hide(active).show(rankingFragment).commit();
+        active = rankingFragment;
+    }
 
     //----------------------------------------------------------------------------------------------
 
@@ -237,8 +256,25 @@ public class GeneralActivity extends AppCompatActivity {
             if(competitionsList.get(i).getId() == id) {
                 prinF.setDataCompetition(competitionsList.get(i), questF, mapF, myUser);
                 competitionShow = competitionsList.get(i); //Establecer los datos de la competicion que se está visualizando
+                rankF.loadRanking(competitionsList.get(i), usersList);
             }
         }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO QUE SE EJECUTA AL RECUPERAR TODOS LOS DATOS, TANTO COMPETICIONES COMO USUARIOS
+     * Y EN POSTERIORES CAMBIOS EN LOS DATOS
+     */
+    public void loadAllData(){
+        //Actualizar datos de ranking
+        rankF.loadRanking(competitionShow, usersList);
+
+        //Desbloquear estado de carga de los fragmentos principales
+        //////////////////
+        // INSERTAR AQUI
+        //////////////////
     }
 
     //----------------------------------------------------------------------------------------------
@@ -320,6 +356,11 @@ public class GeneralActivity extends AppCompatActivity {
 
                 //Establecer el nuevos valores para el fragmento del listado de competiciones
                 compF.setCompetitionsList(competitionsList);
+
+                //Ejecutar metodo si se han cargado los datos de los usuarios
+                getCompetitions=true;
+                if(getUsers)
+                    loadAllData();
             }
 
             @Override
@@ -362,6 +403,11 @@ public class GeneralActivity extends AppCompatActivity {
                         profF.setMyUser(u);
                     }
                 }
+
+                //Ejecutar metodo si se han cargado los datos de las competiciones
+                getUsers=true;
+                if(getCompetitions)
+                    loadAllData();
             }
 
             @Override
@@ -374,16 +420,33 @@ public class GeneralActivity extends AppCompatActivity {
     //                         GUARDAR INFORMACION EN LA BASE DE DATOS                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void sendResponseQuestion(String idQuestion, int idResponse){
+    public void sendResponseQuestion(String idQuestion, int idResponse, boolean correct){
         db.getReference("competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion)
                 .setValue(idResponse);
+
+        //Establecer la puntuación obtenida al resolver la pregunta
+        if(correct){
+            String idPointAssociated = competitionShow.getPreguntas().get(idQuestion).getIdPunto();
+            sendPointScann(idPointAssociated, -1, 5); //El nivel lo establecemos en -1 para no resetear de nuevo la pregunta
+        }
     }
 
     //----------------------------------------------------------------------------------------------
 
-    public void sendPointScann(String idPoint){
+    public void sendPointScann(String idPoint, int level, int points){
+
         db.getReference("competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/puntos/"+idPoint)
-                .setValue(currentMilliseconds);
+                .setValue(points+"-"+currentMilliseconds);
+
+        //Si es un codigo de pregunta buscar la pregunta para desbloquearla
+        if(level==4){
+            for (Map.Entry<String, Pregunta> quest : competitionShow.getPreguntas().entrySet()) {
+                //Al encontrar la pregunta asociada al punto la desbloqueamos
+                if(quest.getValue().getIdPunto().equals(idPoint)){
+                    sendResponseQuestion(quest.getValue().getId(),0,false); //El 0 indica que no esta contestada
+                }
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -435,5 +498,57 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public CompeticionDao getCompetitionShow() {
         return competitionShow;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER LA CLASE CORRESPONDIENTE CON EL FRAGMENTO DEL MAPA
+     * @return
+     */
+    public MapFragment getMapF() {
+        return mapF;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER LA CLASE CORRESPONDIENTE CON EL FRAGMENTO PRINCIPAL
+     * @return
+     */
+    public PrincipalFragment getPrinF() {
+        return prinF;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER LA CLASE CORRESPONDIENTE CON EL FRAGMENTO PRINCIPAL
+     * @return
+     */
+    public RankingFragment getRankF() {
+        return rankF;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ESTABLECER LA POSICION EN LA QUE SE ENCUENTRA EL ELEMENTO DE MI USUARIO EN EL
+     * RECYCLER VIEW DEL RANKING
+     * @param posMyUserRanking
+     */
+    public void setPosMyUserRanking(int posMyUserRanking) {
+        this.posMyUserRanking = posMyUserRanking;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER LA POSICION EN LA QUE SE ENCUENTRA EL ELEMENTO DE MI USUARIO EN EL
+     * RECYCLER VIEW DEL RANKING
+     * @return
+     */
+    public int getPosMyUserRanking() {
+        return posMyUserRanking;
     }
 }

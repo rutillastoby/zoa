@@ -21,6 +21,7 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class ScannerFragment extends Fragment implements ZXingScannerView.ResultHandler {
     //Referencias
     private GeneralActivity ga;
+    private MapFragment mapF;
     private ImageView ivBackScanner;
 
     //Variables
@@ -52,6 +53,7 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         View view = v;
         //Referencias
         ga = ((GeneralActivity) getActivity());
+        mapF = ga.getMapF();
         ivBackScanner = view.findViewById(R.id.ivBackScanner);
 
         //On clicks
@@ -71,6 +73,12 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
     public void startScanner(){
         scanner.setResultHandler(this);
         scanner.startCamera();
+        //Si la competicion es nocturna encendemos el falsh
+        if(ga.getCompetitionShow().getTipo()==1){
+            scanner.setFlash(true);
+        }else{
+            scanner.setFlash(false);
+        }
         Log.d("aaa", "iniciado Scanner");
     }
 
@@ -98,16 +106,20 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
 
         //Interpretar respuesta
         String code = rawResult.getText();
-        HashMap<String, Long> myPoints = ga.getCompetitionShow().getJugadores().get(ga.getMyUser().getUid()).getPuntos();
+        HashMap<String, String> myPoints = ga.getCompetitionShow().getJugadores().get(ga.getMyUser().getUid()).getPuntos();
         boolean exist=false, escaned=false;
+        int level=-1;
+        String namePoint="";
 
         //Recorrer todos los puntos para comprobar si el punto escaneado existe
         for (Map.Entry<String, Punto> point : ga.getCompetitionShow().getPuntos().entrySet()) {
             Log.d("aaa", "vuelta "+point.getKey());
             if(point.getKey().equals(code)){
                 exist = true;
+                level= point.getValue().getNivel();
+                namePoint = point.getValue().getNombre();
                 //Recorrer mis puntos para comprobar que el codigo no haya sido ya escaneado
-                for (Map.Entry<String, Long> mPoint : myPoints.entrySet()) {
+                for (Map.Entry<String, String> mPoint : myPoints.entrySet()) {
                     if(mPoint.getKey().equals(code)){
                         escaned = true;
                         break;
@@ -120,14 +132,30 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         //En funcion del estado actuamos
         if(exist && !escaned){
             //REGISTRAR PUNTO
-            ga.sendPointScann(code);
-            Log.d("aaa", "codigo guardado");
+            int points=0;
+            //Obtener puntos en funcion del nivel
+            if(level==5)
+                points=10;
+            else if(level!=4)
+                points=level;
+
+            //Llamada al metodo para almacenarlo en la base de datos
+            ga.sendPointScann(code, level, points);
+            mapF.alertDialogScannedPoint(namePoint, level, false); //Mostrar dialog de confirmacion de escaneo
+            //Volver al mapa
+            ga.showMapFragment();
+
         }else if(exist && escaned) {
             //EL PUNTO YA ESTA REGISTRADO
-            Log.d("aaa", "codigo ya registrado");
+            mapF.alertDialogScannedPoint(namePoint, level, true); //Mostrar dialog indicando que esta escaneado
+            //Volver al mapa
+            ga.showMapFragment();
+
         }else{
             //EL PUNTO NO EXISTE
-            Log.d("aaa", "eii ese codigo no existe: "+code);
+            startScanner();
         }
+
+
     }
 }

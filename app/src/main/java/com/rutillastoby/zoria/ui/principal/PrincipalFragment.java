@@ -19,11 +19,15 @@ import com.rutillastoby.zoria.QuestionsFragment;
 import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
+import com.rutillastoby.zoria.dao.competicion.Jugador;
+
+import java.util.Map;
 
 public class PrincipalFragment extends Fragment {
     //Referencias
-    private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart;
-    private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin;
+    private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart,
+                     tvL1PointsPrin, tvL2PointsPrin, tvL3PointsPrin, tvL4PointsPrin, tvTotalPointsPrin;
+    private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, bRankingPrin;
     private ProgressBar pbToStart;
     private GeneralActivity ga;
 
@@ -61,6 +65,13 @@ public class PrincipalFragment extends Fragment {
         pbToStart = view.findViewById(R.id.pbToStart);
         bMapPrin = view.findViewById(R.id.bMapPrin);
         bQuestionPrin = view.findViewById(R.id.bQuestionPrin);
+        bRankingPrin = view.findViewById(R.id.bRankingPrin);
+        tvL1PointsPrin = view.findViewById(R.id.tvL1PointsPrin);
+        tvL2PointsPrin = view.findViewById(R.id.tvL2PointsPrin);
+        tvL3PointsPrin = view.findViewById(R.id.tvL3PointsPrin);
+        tvL4PointsPrin = view.findViewById(R.id.tvL4PointsPrin);
+        tvTotalPointsPrin = view.findViewById(R.id.tvTotalPointsPrin);
+
 
         //Clicks de botones
         bMapPrin.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +87,15 @@ public class PrincipalFragment extends Fragment {
             public void onClick(View v) {
                 //Boton preguntas en fragmento principal
                 ga.showQuestionsFragment();
+            }
+        });
+
+        bRankingPrin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Boton preguntas en fragmento principal
+                ga.showRankingFragment();
+                ga.getRankF().autoScroll(ga.getPosMyUserRanking()); //Auto-scroll hasta mi posicion
             }
         });
     }
@@ -98,8 +118,21 @@ public class PrincipalFragment extends Fragment {
         //Establecer datos al fragmento del mapa
         mapF.loadPoints(competition.getPuntos(), competition.getJugadores().get(myUser.getUid()).getPuntos());
 
-        //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
-        checkTime(competition.getHora().getInicio(), competition.getHora().getFin());
+        //Comprobar si el jugado ha atrapado la bandera
+        boolean userFinish=false;
+        for (Map.Entry<String, Jugador> player : competition.getJugadores().entrySet()) {
+            if(myUser.getUid().equals(player.getKey()) && player.getValue().isGetFlag()){
+                userFinish=true;
+            }
+        }
+
+        //Comprobar si la partida ha finalizado para el usuario
+        if(userFinish){
+            //Mostrar panel de final de competicion
+        }else {
+            //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
+            checkTime(competition.getHora().getInicio(), competition.getHora().getFin(), competition);
+        }
     }
 
     //----------------------------------------------------------------------------------------------
@@ -108,7 +141,7 @@ public class PrincipalFragment extends Fragment {
      * METODO PARA COMPARAR LA HORA ACTUAL CON LA DE INICIO/FIN DE LA
      * COMPETICION Y ACTUAR EN FUNCION DE ELLO
      */
-    private void checkTime(final long startTime, final long finishTime){
+    private void checkTime(final long startTime, final long finishTime, final CompeticionDao competition){
         long currentTime = ga.getCurrentMilliseconds();
         //Inicializar layouts
         lyInProgress.setVisibility(View.GONE);
@@ -119,6 +152,12 @@ public class PrincipalFragment extends Fragment {
         if(currentTime>finishTime){
             //COMPETICION FINALIZADA
 
+            //Comprobar si se pueden mostrar los resultados de la competicion
+            if(competition.getHist()==1){
+                //MOSTRAR PANEL DE HISTORIAL
+            }else{
+                //Mostrar panel de finalización
+            }
         }else{
             //COMPETICION NO INICIADA O EN CURSO
 
@@ -158,7 +197,7 @@ public class PrincipalFragment extends Fragment {
                     lyInProgress.setVisibility(View.GONE);
                     lyToStart.setVisibility(View.GONE);
                     //Rellamar a la funcion para actuar
-                    checkTime(startTime, finishTime);
+                    checkTime(startTime, finishTime, competition);
                 }
             }.start();
         }
@@ -193,6 +232,19 @@ public class PrincipalFragment extends Fragment {
         tvSecToStart.setText(String.format("%02d", seconds));
         //Actualizar progresbar
         pbToStart.setProgress(seconds);
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ESTABLECER EL MARCADOR DE PUNTOS PROPIO DE LA VISTA PRINCIPAL
+     */
+    public void setPointMarker(int total, int l1, int l2, int l3, int l4){
+        tvL1PointsPrin.setText("x "+l1);
+        tvL2PointsPrin.setText("x "+l2);
+        tvL3PointsPrin.setText("x "+l3);
+        tvL4PointsPrin.setText("x "+l4);
+        tvTotalPointsPrin.setText(total+"");
     }
 
 
