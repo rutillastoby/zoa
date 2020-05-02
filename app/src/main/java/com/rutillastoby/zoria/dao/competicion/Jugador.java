@@ -6,7 +6,7 @@ public class Jugador {
     private String tipo;
     private HashMap<String, Integer> preguntas;
     private HashMap<String, String> puntos;
-    private boolean getFlag; //Indicar si ha cogido la bandera
+    private int fin; //0 no ha finalizado, 1 si ha finalizado
 
     public String getTipo() {
         return tipo;
@@ -36,11 +36,11 @@ public class Jugador {
         this.puntos = puntos;
     }
 
-    public boolean isGetFlag() {
-        return getFlag;
+    public int getFin() {
+        return fin;
     }
 
-    public void setGetFlag(boolean getFlag) {
-        this.getFlag = getFlag;
+    public void setFin(int fin) {
+        this.fin = fin;
     }
 }

@@ -84,10 +84,7 @@ public class RankingFragment extends Fragment {
                     case 2: uL2++; break; //TIPO 2
                     case 3: uL3++; break; //TIPO 3
                     case 5: uL4++; break; //TIPO 4 (Pregunta)
-                    case 10:
-                        u.setFlag(true);
-                        player.getValue().setGetFlag(true); //Marcar que ha atrapado la bandera
-                        break; //TIPO 5 (bandera)
+                    case 10: u.setFlag(true); break; //TIPO 5 (bandera)
                 }
                 //Sumar puntos al total
                 total+=value;

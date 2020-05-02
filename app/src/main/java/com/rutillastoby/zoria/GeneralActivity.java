@@ -68,7 +68,7 @@ public class GeneralActivity extends AppCompatActivity {
     private long currentMilliseconds;
     private CompeticionDao competitionShow = new CompeticionDao();//Datos de la competicion que se esta visualizando en este momento
     private UsuarioDao myUser;
-    private boolean getCompetitions=false, getUsers=false; //Variables para determinar cuando se han recuperado los datos
+    private boolean getCompetitions=false, getUsers=false, initExecute=true; //Variables para determinar cuando se han recuperado los datos
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
 
     //----------------------------------------------------------------------------------------------
@@ -254,8 +254,8 @@ public class GeneralActivity extends AppCompatActivity {
         //Enviar los datos de la competicion
         for(int i=0; i<competitionsList.size();i++){
             if(competitionsList.get(i).getId() == id) {
-                prinF.setDataCompetition(competitionsList.get(i), questF, mapF, myUser);
                 competitionShow = competitionsList.get(i); //Establecer los datos de la competicion que se está visualizando
+                prinF.setDataCompetition(competitionsList.get(i), questF, mapF, myUser);
                 rankF.loadRanking(competitionsList.get(i), usersList);
             }
         }
@@ -264,14 +264,31 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO QUE SE EJECUTA AL RECUPERAR TODOS LOS DATOS, TANTO COMPETICIONES COMO USUARIOS
-     * Y EN POSTERIORES CAMBIOS EN LOS DATOS
+     * METODO PARA CARGAR LOS PUNTOS EN EL MAPA POR PRIMERA VEZ UNA VEZ INICIADO ESTE
      */
-    public void loadAllData(){
-        //Actualizar datos de ranking
-        rankF.loadRanking(competitionShow, usersList);
+    public void initLoadPointsMap(){
+        //Cargar siempre y cuando el mapa se inicie despues de cargar todos los datos, si no es así
+        // el metodo @chargeAll se encargará de cargarlos
+        if(!initExecute){
+            //A traves de este metodo se cargan los puntos
+            prinF.setDataCompetition(competitionShow, questF, mapF, myUser);
+        }
+    }
 
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO QUE SE EJECUTA AL RECUPERAR TODOS LOS DATOS, TANTO COMPETICIONES COMO USUARIOS AL INICIO
+     * ES LLAMADO DESDE EL FRAGMENTO RANKING QUE ES DONDE SE OBTIENE SI EL USUARIO HA OBTENIDO LA BANDERA
+     * FINAL DE PARTIDA
+     */
+    public void chargeAll(){
+        initExecute=false; //Marcar como ejecutado
+        //Cargar el fragment con la competición marcada como activa
+        checkFragmentCurrent();
         //Desbloquear estado de carga de los fragmentos principales
+
+
         //////////////////
         // INSERTAR AQUI
         //////////////////
@@ -348,19 +365,22 @@ public class GeneralActivity extends AppCompatActivity {
                     competitionsList.add(c);
 
                     //Comprobar si la competicion que ha cambiado es la que se esta mostrando en fragment para actualizar los cambios
-                    if(c.getId()==showingCompeId) {
-                        prinF.setDataCompetition(c, questF, mapF,myUser); //Establecemos los datos al fragmento principal de la competicion
+                    //Si es la primera ejecucion no actuamos
+                    if(c.getId()==showingCompeId && !initExecute) {
                         competitionShow = c; //Establecer los datos de la competicion que se está visualizando
+                        prinF.setDataCompetition(c, questF, mapF,myUser); //Establecemos los datos al fragmento principal de la competicion
+                        rankF.loadRanking(c, usersList); //Actualizar datos del ranking
                     }
                 }
 
                 //Establecer el nuevos valores para el fragmento del listado de competiciones
                 compF.setCompetitionsList(competitionsList);
 
-                //Ejecutar metodo si se han cargado los datos de los usuarios
+                //Obtener el ranking tras cargar estos datos y los de usuario ya que necesita ambos
                 getCompetitions=true;
-                if(getUsers)
-                    loadAllData();
+                if(getUsers && initExecute) {
+                    chargeAll();
+                }
             }
 
             @Override
@@ -404,10 +424,11 @@ public class GeneralActivity extends AppCompatActivity {
                     }
                 }
 
-                //Ejecutar metodo si se han cargado los datos de las competiciones
+                //Cargar datos del ranking al recuperar los usuarios y competiciones ya que necesita ambos
                 getUsers=true;
-                if(getCompetitions)
-                    loadAllData();
+                if(getCompetitions && initExecute) {
+                    chargeAll();
+                }
             }
 
             @Override
@@ -420,6 +441,9 @@ public class GeneralActivity extends AppCompatActivity {
     //                         GUARDAR INFORMACION EN LA BASE DE DATOS                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * METODO PARA ALMACENAR LA RESPUESTA A UNA PREGUNTA EN LA BASE DE DATOS
+     */
     public void sendResponseQuestion(String idQuestion, int idResponse, boolean correct){
         db.getReference("competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion)
                 .setValue(idResponse);
@@ -433,10 +457,13 @@ public class GeneralActivity extends AppCompatActivity {
 
     //----------------------------------------------------------------------------------------------
 
-    public void sendPointScann(String idPoint, int level, int points){
+    /**
+     * METODO PARA ALMACENAR EL REGISTRO DE UN CODIGO EN LA BASE DE DATOS
+     */
+    public void sendPointScann(String idPoint, int level, int points) {
 
-        db.getReference("competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/puntos/"+idPoint)
-                .setValue(points+"-"+currentMilliseconds);
+        db.getReference("competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint)
+                .setValue(points + "-" + currentMilliseconds);
 
         //Si es un codigo de pregunta buscar la pregunta para desbloquearla
         if(level==4){
@@ -448,6 +475,18 @@ public class GeneralActivity extends AppCompatActivity {
             }
         }
     }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA INDICAR EN BASE DE DATOS QUE SE HA ATRAPADO LA BANDERA
+     * COMPETICION FINALIZADA PARA EL USUARIO
+     */
+    public void sendGetFlag(){
+        db.getReference("competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/fin")
+                .setValue(1);
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                      GETS + SETS                                           //
@@ -550,5 +589,15 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public int getPosMyUserRanking() {
         return posMyUserRanking;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA SABER SI EL METODO DE INICIALIZACIÓN SE HA OBTENIDO
+     * @return
+     */
+    public boolean isInitExecute() {
+        return initExecute;
     }
 }

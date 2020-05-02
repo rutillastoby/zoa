@@ -27,7 +27,8 @@ public class PrincipalFragment extends Fragment {
     //Referencias
     private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart,
                      tvL1PointsPrin, tvL2PointsPrin, tvL3PointsPrin, tvL4PointsPrin, tvTotalPointsPrin;
-    private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, bRankingPrin;
+    private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, bRankingPrin, lyFinishPrin,
+                             lyResultPrin;
     private ProgressBar pbToStart;
     private GeneralActivity ga;
 
@@ -60,6 +61,8 @@ public class PrincipalFragment extends Fragment {
         tvSecPrin = view.findViewById(R.id.tvSecPrin);
         lyInProgress = view.findViewById(R.id.lyInProgress);
         lyToStart = view.findViewById(R.id.lyToStart);
+        lyFinishPrin = view.findViewById(R.id.lyFinishPrin);
+        lyResultPrin = view.findViewById(R.id.lyResultPrin);
         tvHourMinToStart = view.findViewById(R.id.tvHourMinToStart);
         tvSecToStart = view.findViewById(R.id.tvSecToStart);
         pbToStart = view.findViewById(R.id.pbToStart);
@@ -71,7 +74,6 @@ public class PrincipalFragment extends Fragment {
         tvL3PointsPrin = view.findViewById(R.id.tvL3PointsPrin);
         tvL4PointsPrin = view.findViewById(R.id.tvL4PointsPrin);
         tvTotalPointsPrin = view.findViewById(R.id.tvTotalPointsPrin);
-
 
         //Clicks de botones
         bMapPrin.setOnClickListener(new View.OnClickListener() {
@@ -107,9 +109,13 @@ public class PrincipalFragment extends Fragment {
      */
     public void setDataCompetition(CompeticionDao competition, QuestionsFragment questF, MapFragment mapF,
                                    UsuarioDao myUser){
-        //Obtener tiempo del servidor
-        Log.d("aaa", ""+competition.getHora().getInicio());
+        //Inicializar layouts
+        lyInProgress.setVisibility(View.GONE);
+        lyToStart.setVisibility(View.GONE);
+        lyFinishPrin.setVisibility(View.GONE);
+        lyResultPrin.setVisibility(View.GONE);
 
+        //Establecer datos
         tvTitlePrincipalCompe.setText(competition.getNombre());
 
         //Establecer datos al fragmento de preguntas para crear listado con las preguntas de la competicion
@@ -121,7 +127,7 @@ public class PrincipalFragment extends Fragment {
         //Comprobar si el jugado ha atrapado la bandera
         boolean userFinish=false;
         for (Map.Entry<String, Jugador> player : competition.getJugadores().entrySet()) {
-            if(myUser.getUid().equals(player.getKey()) && player.getValue().isGetFlag()){
+            if(myUser.getUid().equals(player.getKey()) && player.getValue().getFin()==1){
                 userFinish=true;
             }
         }
@@ -129,6 +135,7 @@ public class PrincipalFragment extends Fragment {
         //Comprobar si la partida ha finalizado para el usuario
         if(userFinish){
             //Mostrar panel de final de competicion
+            lyFinishPrin.setVisibility(View.VISIBLE);
         }else {
             //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
             checkTime(competition.getHora().getInicio(), competition.getHora().getFin(), competition);
@@ -143,10 +150,6 @@ public class PrincipalFragment extends Fragment {
      */
     private void checkTime(final long startTime, final long finishTime, final CompeticionDao competition){
         long currentTime = ga.getCurrentMilliseconds();
-        //Inicializar layouts
-        lyInProgress.setVisibility(View.GONE);
-        lyToStart.setVisibility(View.GONE);
-
 
         //Comprobar si no ha comenzado, si ha finalizado o si esta en curso
         if(currentTime>finishTime){
@@ -154,9 +157,13 @@ public class PrincipalFragment extends Fragment {
 
             //Comprobar si se pueden mostrar los resultados de la competicion
             if(competition.getHist()==1){
-                //MOSTRAR PANEL DE HISTORIAL
+                //MOSTRAR PANEL DE CON RESULTADOS DE COMPETICION
+                //////////
+                // insertar aqui
+                //////////
             }else{
                 //Mostrar panel de finalización
+                lyFinishPrin.setVisibility(View.VISIBLE);
             }
         }else{
             //COMPETICION NO INICIADA O EN CURSO

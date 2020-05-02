@@ -175,39 +175,42 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         //Mostrar mi ubicación en el mapa
         map.setMyLocationEnabled(true);
+
+        //Al cargar el mapa inicialmente llamar al metodo para cargar los puntos
+        ga.initLoadPointsMap();
     }
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA CARGAR EN EL MAPA AQUELLOS PUNTOS QUE NO TENGAMOS REGISTRADOS
+     * METODO PARA MOSTRAR EN EL MAPA AQUELLOS PUNTOS QUE NO TENGAMOS REGISTRADOS
      * @param allPoints
      * @param myPoints
      */
-    public void loadPoints(HashMap<String, Punto> allPoints, HashMap<String, String> myPoints){
+    public void loadPoints(HashMap<String, Punto> allPoints, HashMap<String, String> myPoints) {
         //Resetear todos los puntos agregados anteriormente
-        for(int i =0; i<instanciatedMarker.size(); i++){
+        for (int i = 0; i < instanciatedMarker.size(); i++) {
             instanciatedMarker.get(i).remove();
         }
 
         //Recorrer el listado completo de preguntas y comprobar cuales de ellas estan disponibles para el usuario
         for (Map.Entry<String, Punto> point : allPoints.entrySet()) {
-            boolean show=true;
+            boolean show = true;
             for (Map.Entry<String, String> mPoint : myPoints.entrySet()) {
                 //Si el punto en cuestion lo tenemos en posesion no lo mostraremos en el mapa
-                if(point.getKey().equals(mPoint.getKey())){
+                if (point.getKey().equals(mPoint.getKey())) {
                     show = false;
                     //break;
                 }
             }
 
             //Si no tenemos el punto escaneado, lo agregamos al mapa
-            if(show){
+            if (show) {
                 //Generar la ubicacion del punto
                 LatLng locationPoint = new LatLng(point.getValue().getLat(), point.getValue().getLon());
                 BitmapDescriptor icon = null;
 
                 //Seleccionar icono del punto
-                switch (point.getValue().getNivel()){
+                switch (point.getValue().getNivel()) {
                     case 1:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level1);
                         break;
@@ -219,18 +222,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         break;
                     case 4:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_qp);
+                        break;
                     case 5:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_flag);
                 }
 
                 //Anadir marcador al mapa
-                instanciatedMarker.add(
-                    map.addMarker(new MarkerOptions()
-                        .position(locationPoint)
-                        .title(point.getValue().getNombre())
-                        .icon(icon)
-                        .anchor(0.5f,0.5f))
-                );
+                if (map != null) {
+                    instanciatedMarker.add(
+                            map.addMarker(new MarkerOptions()
+                                    .position(locationPoint)
+                                    .title(point.getValue().getNombre())
+                                    .icon(icon)
+                                    .anchor(0.5f, 0.5f))
+                    );
+                }
             }
         }
     }
@@ -323,12 +329,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             builder = new AlertDialog.Builder(getContext());
 
             builder.setView(dialog)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //MARCAR COMPETICION COMO FINALIZADA PARA MI UNICAMENTE
-                        }
-                    });
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    //Marcar la competicion como finalizada para mi unicamente
+                    ga.sendGetFlag();
+                    ga.checkFragmentCurrent(); //Volver a la vista de competicion
+                    }
+                });
 
         }else {
             //CODIGO NORMAL
