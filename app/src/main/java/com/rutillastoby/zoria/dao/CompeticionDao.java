@@ -13,7 +13,8 @@ public class CompeticionDao {
     private Hora hora;
     private int id;
     private int tipo; //Tipo: 0 diurno, 1 nocturno.
-    private int hist; //Historial: 0 no mostrar en historial, 1 si mostrar en historial
+    private int res; //Resultados: 0 no mostrar resultados, 1 si mostrar resultados
+    private int ubi; //0 No obtener ubicaciones usuarios, 1 Obtener ubicaciones usuarios
     private HashMap<String, Pregunta> preguntas;
     private HashMap<String, Jugador> jugadores;
     private HashMap<String, Punto> puntos;
@@ -67,12 +68,12 @@ public class CompeticionDao {
         this.tipo = tipo;
     }
 
-    public int getHist() {
-        return hist;
+    public int getRes() {
+        return res;
     }
 
-    public void setHist(int hist) {
-        this.hist = hist;
+    public void setRes(int res) {
+        this.res = res;
     }
 
     public HashMap<String, Pregunta> getPreguntas() {
@@ -103,5 +104,13 @@ public class CompeticionDao {
 
     public void setPuntos(HashMap<String, Punto> puntos) {
         this.puntos = puntos;
+    }
+
+    public int getUbi() {
+        return ubi;
+    }
+
+    public void setUbi(int ubi) {
+        this.ubi = ubi;
     }
 }

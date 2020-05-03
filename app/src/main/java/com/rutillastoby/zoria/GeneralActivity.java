@@ -1,5 +1,6 @@
 package com.rutillastoby.zoria;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.MenuItem;
@@ -235,7 +236,12 @@ public class GeneralActivity extends AppCompatActivity {
         ////// AQUI
 
         //Mostrar la vista de la competicion activa
-        if(currentCompeId!=-1) showMainViewCompetition(currentCompeId);
+        if(currentCompeId!=-1){
+            showMainViewCompetition(currentCompeId);
+        }else{
+            prinF.setViewNotRegister();
+        }
+
     }
 
     //----------------------------------------------------------------------------------------------
@@ -269,7 +275,7 @@ public class GeneralActivity extends AppCompatActivity {
     public void initLoadPointsMap(){
         //Cargar siempre y cuando el mapa se inicie despues de cargar todos los datos, si no es así
         // el metodo @chargeAll se encargará de cargarlos
-        if(!initExecute){
+        if(!initExecute && currentCompeId!=-1){
             //A traves de este metodo se cargan los puntos
             prinF.setDataCompetition(competitionShow, questF, mapF, myUser);
         }
@@ -302,6 +308,8 @@ public class GeneralActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
+        //Enviar ubicación nula
+        sendLocation(null);
         //En funcion del fragmento activo actuaremos
         switch (active.getTag()){
             //MAP FRAGMENT, QUESTIONS FRAGMENT, RANKING FRAGMENT
@@ -487,6 +495,21 @@ public class GeneralActivity extends AppCompatActivity {
                 .setValue(1);
     }
 
+    /**
+     * METODO PARA ENVIAR MI UBICACIÓN A LA BASE DE DATOS
+     */
+    public void sendLocation(Location location){
+        //Comprobar si esta seleccionado el envio de ubicacion
+        if(competitionShow.getUbi()==1){
+            if(location==null){
+                db.getReference("usuarios/" + user.getUid() + "ubi/lat").setValue("0");
+                db.getReference("usuarios/" + user.getUid() + "ubi/lon").setValue("0");
+            }else{
+                db.getReference("usuarios/" + user.getUid() + "ubi/lat").setValue(location.getLatitude());
+                db.getReference("usuarios/" + user.getUid() + "ubi/lon").setValue(location.getLongitude());
+            }
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                      GETS + SETS                                           //

@@ -8,7 +8,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,15 +109,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onLocationChanged(Location location) {
                 currentLocation = location;
-                Log.d("aaa", "ubicacion change" + location);
+                ga.sendLocation(location);
             }
 
             @Override
             public void onProviderDisabled(String provider) {
                 currentLocation = null;
+                ga.sendLocation(null);
                 //Mostrar mensaje de gps desactivado
                 lyWarningGPS.setVisibility(View.VISIBLE);
-                fabCurrentPosition.hide(); //Ocultar boton de ir a mi ubicacion
+                fabCurrentPosition.hide();
             }
 
             @Override
@@ -230,11 +230,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //Anadir marcador al mapa
                 if (map != null) {
                     instanciatedMarker.add(
-                            map.addMarker(new MarkerOptions()
-                                    .position(locationPoint)
-                                    .title(point.getValue().getNombre())
-                                    .icon(icon)
-                                    .anchor(0.5f, 0.5f))
+                        map.addMarker(new MarkerOptions()
+                            .position(locationPoint)
+                            .title(point.getValue().getNombre())
+                            .icon(icon)
+                            .anchor(0.5f, 0.5f))
                     );
                 }
             }

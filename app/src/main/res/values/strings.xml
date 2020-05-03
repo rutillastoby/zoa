@@ -24,6 +24,12 @@
     <string name="titleRanking">CLASIFICACIÓN</string>
     <string name="questEnabled">NUEVA PREGUNTA DESBLOQUEADA</string>
     <string name="duplicateScenned">ESTE CÓDIGO YA LO HAS REGISTRADO...</string>
-    <string name="getFlagText">CÓDIGO BANDERA REGISTRADO\nSuerte para la casificación!</string>
+    <string name="getFlagText">CÓDIGO BANDERA REGISTRADO</string>
     <string name="pointsFlag">+10 puntos.</string>
+    <string name="endCompetition">COMPETICIÓN FINALIZADA.</string>
+    <string name="endCompetitionExtra">Suerte para la calsificación, pronto sabremos los resultados! </string>
+    <string name="notRegister">Hora de demostrar tu nivel de orientación!</string>
+    <string name="notRegisterExtra">Parece que no estas registrad@ en una competición.</string>
+    <string name="textToStart">Preparados, listos...</string>
+    <string name="buttonShowCompe">TODAS LAS COMPETICIONES</string>
 </resources>

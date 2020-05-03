@@ -28,7 +28,7 @@ public class PrincipalFragment extends Fragment {
     private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart,
                      tvL1PointsPrin, tvL2PointsPrin, tvL3PointsPrin, tvL4PointsPrin, tvTotalPointsPrin;
     private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, bRankingPrin, lyFinishPrin,
-                             lyResultPrin;
+                             lyResultPrin, lyNotRegisPrin;
     private ProgressBar pbToStart;
     private GeneralActivity ga;
 
@@ -74,6 +74,7 @@ public class PrincipalFragment extends Fragment {
         tvL3PointsPrin = view.findViewById(R.id.tvL3PointsPrin);
         tvL4PointsPrin = view.findViewById(R.id.tvL4PointsPrin);
         tvTotalPointsPrin = view.findViewById(R.id.tvTotalPointsPrin);
+        lyNotRegisPrin = view.findViewById(R.id.lyNotRegisPrin);
 
         //Clicks de botones
         bMapPrin.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +106,20 @@ public class PrincipalFragment extends Fragment {
     //----------------------------------------------------------------------------------------------
 
     /**
+     * METODO PARA MOSTRAR EL PANEL INICIAL INDICANDO QUE NO SE ESTA REGISTRADO EN NINGUNA COMPETICION
+     */
+    public void setViewNotRegister() {
+        //Mostrar layout correspondiente
+        lyInProgress.setVisibility(View.GONE);
+        lyToStart.setVisibility(View.GONE);
+        lyFinishPrin.setVisibility(View.GONE);
+        lyResultPrin.setVisibility(View.GONE);
+        lyNotRegisPrin.setVisibility(View.VISIBLE);
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
      * METODO PARA ESTABLECER LOS DATOS DE LA COMPETICION EN EL FRAGMENTO
      */
     public void setDataCompetition(CompeticionDao competition, QuestionsFragment questF, MapFragment mapF,
@@ -114,6 +129,7 @@ public class PrincipalFragment extends Fragment {
         lyToStart.setVisibility(View.GONE);
         lyFinishPrin.setVisibility(View.GONE);
         lyResultPrin.setVisibility(View.GONE);
+        lyNotRegisPrin.setVisibility(View.GONE);
 
         //Establecer datos
         tvTitlePrincipalCompe.setText(competition.getNombre());
@@ -156,7 +172,7 @@ public class PrincipalFragment extends Fragment {
             //COMPETICION FINALIZADA
 
             //Comprobar si se pueden mostrar los resultados de la competicion
-            if(competition.getHist()==1){
+            if(competition.getRes()==1){
                 //MOSTRAR PANEL DE CON RESULTADOS DE COMPETICION
                 //////////
                 // insertar aqui
@@ -253,6 +269,4 @@ public class PrincipalFragment extends Fragment {
         tvL4PointsPrin.setText("x "+l4);
         tvTotalPointsPrin.setText(total+"");
     }
-
-
 }
