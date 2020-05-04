@@ -1,5 +1,6 @@
 package com.rutillastoby.zoria;
 
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,6 +124,11 @@ public class RankingElement extends RecyclerView.Adapter<RankingElement.RankingI
             //Estado inicial
             dividerRanking.setVisibility(View.GONE);
             lyPointsRanking.setVisibility(View.GONE);
+
+            //Compatibilidad de bordes redondeados en versiones antiguas
+            if (Build.VERSION.SDK_INT <= 22) {
+                itemView.findViewById(R.id.ivBorderRadiusOld2).setVisibility(View.VISIBLE);
+            }
         }
     }
 }

@@ -3,12 +3,14 @@ package com.rutillastoby.zoria;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -77,6 +79,7 @@ public class GeneralActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true); //Soporte SVG api 19
 
         //Establecer vita
         setContentView(R.layout.activity_general);
@@ -218,6 +221,8 @@ public class GeneralActivity extends AppCompatActivity {
     public void showPrincActivityNotChange(){
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
+        //Detener el scanner al cambiar de fragmento por si estaba iniciado
+        scanF.stopScanner();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -499,14 +504,16 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA ENVIAR MI UBICACIÓN A LA BASE DE DATOS
      */
     public void sendLocation(Location location){
+        Log.d("ppp", "ubiPrev");
         //Comprobar si esta seleccionado el envio de ubicacion
         if(competitionShow.getUbi()==1){
+            Log.d("ppp", "ubi");
             if(location==null){
-                db.getReference("usuarios/" + user.getUid() + "ubi/lat").setValue("0");
-                db.getReference("usuarios/" + user.getUid() + "ubi/lon").setValue("0");
+                db.getReference("usuarios/" + user.getUid() + "/ubi/lat").setValue("0");
+                db.getReference("usuarios/" + user.getUid() + "/ubi/lon").setValue("0");
             }else{
-                db.getReference("usuarios/" + user.getUid() + "ubi/lat").setValue(location.getLatitude());
-                db.getReference("usuarios/" + user.getUid() + "ubi/lon").setValue(location.getLongitude());
+                db.getReference("usuarios/" + user.getUid() + "/ubi/lat").setValue(location.getLatitude());
+                db.getReference("usuarios/" + user.getUid() + "/ubi/lon").setValue(location.getLongitude());
             }
         }
     }

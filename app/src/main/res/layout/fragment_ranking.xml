@@ -11,7 +11,7 @@
         android:layout_width="38dp"
         android:layout_height="38dp"
         android:layout_marginStart="8dp"
-        android:src="@drawable/ic_backarrow50dp"
+        app:srcCompat="@drawable/ic_backarrow50dp"
         app:layout_constraintBottom_toBottomOf="@+id/tvTitleRanking"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvTitleRanking" />

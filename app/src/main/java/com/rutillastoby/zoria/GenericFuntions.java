@@ -10,8 +10,6 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
 
-import androidx.core.content.ContextCompat;
-
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.material.snackbar.Snackbar;
@@ -62,7 +60,7 @@ public class GenericFuntions {
      */
     public static void errorSnack(View view, String text, Context context){
         //Creación del snackbar
-        Snackbar snackbar = Snackbar.make(view, text, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(view.findViewById(R.id.container_fragment), text, Snackbar.LENGTH_LONG);
         View snackBarView = snackbar.getView();
         snackBarView.setBackgroundColor(view.getResources().getColor(R.color.error));
         snackbar.show();
@@ -101,7 +99,7 @@ public class GenericFuntions {
      * @return
      */
     public static BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        Drawable vectorDrawable = context.getResources().getDrawable(vectorResId);
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);

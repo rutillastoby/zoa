@@ -138,7 +138,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         //Suscribir el escuchador previamente instanciado para que actualice posicion cada 3 segundos y 20 metros
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 20, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 2, locationListener);
 
         //Si la ubicacion está desactivada mostramos mensaje visual
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {

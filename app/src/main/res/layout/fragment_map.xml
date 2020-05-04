@@ -21,14 +21,14 @@
         android:id="@+id/fabScanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:background="@color/colorPrimary"
         android:clickable="true"
+        app:srcCompat="@drawable/ic_camera50dp"
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/ic_camera50dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/ivBackMap"
@@ -38,18 +38,18 @@
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/ic_backarrow50dp" />
+        app:srcCompat="@drawable/ic_backarrow50dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabCurrentPosition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
+        android:layout_marginBottom="82dp"
         android:clickable="true"
-        android:src="@drawable/ic_mylocation24dp"
+        app:srcCompat="@drawable/ic_mylocation24dp"
         app:backgroundTint="@color/background"
         app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fabScanner"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/fabScanner"
         app:layout_constraintStart_toStartOf="@+id/fabScanner" />
 
@@ -72,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="1dp"
-            android:src="@drawable/ic_gpsoff24dp"
+            app:srcCompat="@drawable/ic_gpsoff24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

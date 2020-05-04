@@ -21,7 +21,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="16dp"
-            android:src="@drawable/ic_qp"
+            app:srcCompat="@drawable/ic_qp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -59,7 +59,7 @@
             android:layout_height="45dp"
             android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
-            android:src="@drawable/ic_level1"
+            app:srcCompat="@drawable/ic_level1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -109,7 +109,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="16dp"
-            android:src="@drawable/ic_warning"
+            app:srcCompat="@drawable/ic_warning"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

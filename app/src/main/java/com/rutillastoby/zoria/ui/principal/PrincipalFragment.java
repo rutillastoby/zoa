@@ -180,6 +180,8 @@ public class PrincipalFragment extends Fragment {
             }else{
                 //Mostrar panel de finalización
                 lyFinishPrin.setVisibility(View.VISIBLE);
+                //Mostrar fragment principal
+                ga.showPrincActivityNotChange();
             }
         }else{
             //COMPETICION NO INICIADA O EN CURSO

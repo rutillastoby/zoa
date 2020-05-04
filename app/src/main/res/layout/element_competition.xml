@@ -2,14 +2,15 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardCompetition"
     android:layout_width="match_parent"
     android:layout_height="130dp"
     android:layout_marginLeft="32dp"
     android:layout_marginRight="32dp"
     android:layout_marginBottom="15dp"
-    app:cardBackgroundColor="#00FFFFFF"
+    android:background="@color/background"
     app:cardCornerRadius="10dp"
-    app:cardElevation="0dp">
+    app:cardPreventCornerOverlap="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/LayoutEleCompe"
@@ -71,7 +72,7 @@
                     android:id="@+id/icDateCompe"
                     android:layout_width="wrap_content"
                     android:layout_height="22dp"
-                    android:src="@drawable/ic_eventok24dp" />
+                    app:srcCompat="@drawable/ic_eventok24dp" />
 
                 <TextView
                     android:id="@+id/tvDateCompe"
@@ -99,7 +100,7 @@
                     android:id="@+id/icDateFinishCompe"
                     android:layout_width="wrap_content"
                     android:layout_height="22dp"
-                    android:src="@drawable/ic_eventno24dp" />
+                    app:srcCompat="@drawable/ic_eventno24dp" />
 
                 <TextView
                     android:id="@+id/tvFinishCompe"
