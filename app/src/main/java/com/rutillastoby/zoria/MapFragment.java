@@ -368,4 +368,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         builder.show();
     }
 
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA HABILITAR O DESHABILITAR DE LOS BOTONES FLOTANTES DEL MAPA
+     * @param status
+     */
+    public void setActiveFloatButtons(boolean status){
+        fabScanner.setEnabled(status);
+        //Cambiar color del boton
+        if(status){
+            fabScanner.setBackgroundTintList(getContext().getResources().getColorStateList(R.color.colorPrimary));
+        }else{
+            fabScanner.setBackgroundTintList(getContext().getResources().getColorStateList(R.color.gray));
+        }
+    }
 }

@@ -264,6 +264,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             Intent i = new Intent(context, GeneralActivity.class);
                             i.putExtra("currentTime", currentMilliseconds);
                             startActivity(i);
+                            finish();
                         }
                     });
 
@@ -324,5 +325,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         }
         return true;
+    }
+
+
+    @Override
+    protected void onResume() {
+        Log.d("ppp", "loginResume");
+
+        super.onResume();
     }
 }

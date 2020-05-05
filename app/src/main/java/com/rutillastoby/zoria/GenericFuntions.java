@@ -60,7 +60,7 @@ public class GenericFuntions {
      */
     public static void errorSnack(View view, String text, Context context){
         //Creación del snackbar
-        Snackbar snackbar = Snackbar.make(view.findViewById(R.id.container_fragment), text, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(view, text, Snackbar.LENGTH_LONG);
         View snackBarView = snackbar.getView();
         snackBarView.setBackgroundColor(view.getResources().getColor(R.color.error));
         snackbar.show();

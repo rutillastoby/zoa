@@ -44,7 +44,7 @@ public class GeneralActivity extends AppCompatActivity {
     final Fragment questionsFragment = new QuestionsFragment();
     final Fragment rankingFragment = new RankingFragment();
     final FragmentManager fm = getSupportFragmentManager();
-    Fragment active;
+    private Fragment active;
 
     //Firebase
     private FirebaseAuth firebaseAuth;
@@ -73,6 +73,7 @@ public class GeneralActivity extends AppCompatActivity {
     private UsuarioDao myUser;
     private boolean getCompetitions=false, getUsers=false, initExecute=true; //Variables para determinar cuando se han recuperado los datos
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
+    private CountDownTimer countOffApp=null; //Variable para contabilizar un tiempo máximo de funcionamiento de la aplicacion en suspensión
 
     //----------------------------------------------------------------------------------------------
 
@@ -308,6 +309,44 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
+     * METODO QUE SE EJECUTA AL PASAR APP A SEGUNDO PLANO (APAGAR O CAMBIAR DE APLICACION)
+     * INICIAMOS CONTADOR QUE CERRARÁ LA APLICACIÓN SI PASA MAS DE 20 MINUTOS
+     */
+    @Override
+    protected void onPause() {
+        countOffApp = new CountDownTimer(1200000,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) { }
+            @Override
+            public void onFinish() {
+                Log.d("ppp", "final");
+                //Cerrar aplicación pasados 20 min de inactividad
+                finish();
+            }
+        }.start();
+
+        super.onPause();
+
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO QUE SE EJECUTA AL VOLVER DEL ESTADO DE PAUSE
+     * DESACTIVAREMOS EL CONTADOR DE CIERRE POR SUSPENSION
+     */
+    @Override
+    protected void onResume() {
+        if(countOffApp!=null){
+            countOffApp.cancel();
+            countOffApp=null;
+        }
+        super.onResume();
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
      * SOBREESCRITURA DEL METODO QUE SE ACCIONA AL PULSAR EN EL BOTON DE VOLVER.
      * CIERRA LA APLICACIÓN EN LUGAR DE VOLVER A CARGAR LA ACTIVITY DE LOGIN
      */
@@ -330,7 +369,7 @@ public class GeneralActivity extends AppCompatActivity {
                 break;
             //OTRO FRAGMENT
             default:
-                finishAffinity(); //Cerrar aplicacion directamente
+                finish(); //Cerrar aplicacion directamente
                 break;
         }
     }
@@ -629,5 +668,15 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public boolean isInitExecute() {
         return initExecute;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA RECUPERAR EL FRAGMENTO ACTIVO
+     * @return
+     */
+    public Fragment getActive() {
+        return active;
     }
 }

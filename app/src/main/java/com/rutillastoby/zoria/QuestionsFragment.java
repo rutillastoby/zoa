@@ -49,7 +49,7 @@ public class QuestionsFragment extends Fragment{
     /**
      * METODO PARA CARGAR EL LISTADO DE PREGUNTAS EN LA VISTA DEL FRAGMENTO
      */
-    public void loadQuestions(HashMap<String, Pregunta> questionsList, HashMap<String, Integer> myQuestions){
+    public void loadQuestions(HashMap<String, Pregunta> questionsList, HashMap<String, Integer> myQuestions, boolean lockSendButton){
         //Establecer el listado de preguntas disponibles
         ArrayList<Pregunta> questionsListAvailable = new ArrayList<Pregunta>(); //Listado de preguntas disponibles para el usuario
 
@@ -68,8 +68,10 @@ public class QuestionsFragment extends Fragment{
         }
 
         //Asignar listado al recyclerview
-        adapter = new QuestionElement(questionsListAvailable, thisClass);
+        adapter = new QuestionElement(questionsListAvailable, thisClass, lockSendButton);
         rvQuestions.setLayoutManager(new LinearLayoutManager(getContext()));
         rvQuestions.setAdapter(adapter);
     }
+
+
 }

@@ -26,9 +26,10 @@ import java.util.Map;
 public class PrincipalFragment extends Fragment {
     //Referencias
     private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart,
-                     tvL1PointsPrin, tvL2PointsPrin, tvL3PointsPrin, tvL4PointsPrin, tvTotalPointsPrin;
+                     tvL1PointsPrin, tvL2PointsPrin, tvL3PointsPrin, tvL4PointsPrin, tvTotalPointsPrin,
+                     tvFinishCompetitionPrin;
     private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, bRankingPrin, lyFinishPrin,
-                             lyResultPrin, lyNotRegisPrin;
+                             lyResultPrin, lyNotRegisPrin, lyClockCurrent;
     private ProgressBar pbToStart;
     private GeneralActivity ga;
 
@@ -62,7 +63,7 @@ public class PrincipalFragment extends Fragment {
         lyInProgress = view.findViewById(R.id.lyInProgress);
         lyToStart = view.findViewById(R.id.lyToStart);
         lyFinishPrin = view.findViewById(R.id.lyFinishPrin);
-        lyResultPrin = view.findViewById(R.id.lyResultPrin);
+        lyResultPrin = view.findViewById(R.id.lyCharginPrin);
         tvHourMinToStart = view.findViewById(R.id.tvHourMinToStart);
         tvSecToStart = view.findViewById(R.id.tvSecToStart);
         pbToStart = view.findViewById(R.id.pbToStart);
@@ -75,6 +76,8 @@ public class PrincipalFragment extends Fragment {
         tvL4PointsPrin = view.findViewById(R.id.tvL4PointsPrin);
         tvTotalPointsPrin = view.findViewById(R.id.tvTotalPointsPrin);
         lyNotRegisPrin = view.findViewById(R.id.lyNotRegisPrin);
+        tvFinishCompetitionPrin = view.findViewById(R.id.tvFinishCompetitionPrin);
+        lyClockCurrent = view.findViewById(R.id.lyClockCurrent);
 
         //Clicks de botones
         bMapPrin.setOnClickListener(new View.OnClickListener() {
@@ -130,17 +133,23 @@ public class PrincipalFragment extends Fragment {
         lyFinishPrin.setVisibility(View.GONE);
         lyResultPrin.setVisibility(View.GONE);
         lyNotRegisPrin.setVisibility(View.GONE);
+        //Estado inicial vista
+        tvFinishCompetitionPrin.setVisibility(View.GONE);
+        lyClockCurrent.setVisibility(View.VISIBLE);
+        ga.getMapF().setActiveFloatButtons(true);
 
         //Establecer datos
         tvTitlePrincipalCompe.setText(competition.getNombre());
 
         //Establecer datos al fragmento de preguntas para crear listado con las preguntas de la competicion
-        questF.loadQuestions(competition.getPreguntas(), competition.getJugadores().get(myUser.getUid()).getPreguntas());
+        //(Indicando si el boton de enviar respuesta estará habilitado)
+        questF.loadQuestions(competition.getPreguntas(), competition.getJugadores().get(myUser.getUid()).getPreguntas(),
+                competition.getRes()==1);
 
         //Establecer datos al fragmento del mapa
         mapF.loadPoints(competition.getPuntos(), competition.getJugadores().get(myUser.getUid()).getPuntos());
 
-        //Comprobar si el jugado ha atrapado la bandera
+        //Comprobar si el jugador ha atrapado la bandera
         boolean userFinish=false;
         for (Map.Entry<String, Jugador> player : competition.getJugadores().entrySet()) {
             if(myUser.getUid().equals(player.getKey()) && player.getValue().getFin()==1){
@@ -148,10 +157,19 @@ public class PrincipalFragment extends Fragment {
             }
         }
 
-        //Comprobar si la partida ha finalizado para el usuario
-        if(userFinish){
+        //Comprobar si la partida ha finalizado para el usuario (Atrapada la bandera)
+        if(userFinish) {
             //Mostrar panel de final de competicion
             lyFinishPrin.setVisibility(View.VISIBLE);
+
+        //Comprobar si la competición está en estado de visualización de resultados (FINALIZADA y ENTREGADOS PREMIOS)
+        }else if(competition.getRes()==1){
+            //Visualizar resultados competición sin poder hacer cambios (registrar puntos/Contestar preguntas)
+            tvFinishCompetitionPrin.setVisibility(View.VISIBLE); //Mostrar mensaje
+            lyClockCurrent.setVisibility(View.GONE); //Ocultar marcador
+            ga.getMapF().setActiveFloatButtons(false); //Deshabilitar boton de escaneo
+            lyInProgress.setVisibility(View.VISIBLE); //Reutilizamos la vista
+
         }else {
             //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
             checkTime(competition.getHora().getInicio(), competition.getHora().getFin(), competition);
@@ -169,20 +187,13 @@ public class PrincipalFragment extends Fragment {
 
         //Comprobar si no ha comenzado, si ha finalizado o si esta en curso
         if(currentTime>finishTime){
-            //COMPETICION FINALIZADA
+            //COMPETICION POR TIEMPO FINALIZADA
 
-            //Comprobar si se pueden mostrar los resultados de la competicion
-            if(competition.getRes()==1){
-                //MOSTRAR PANEL DE CON RESULTADOS DE COMPETICION
-                //////////
-                // insertar aqui
-                //////////
-            }else{
-                //Mostrar panel de finalización
-                lyFinishPrin.setVisibility(View.VISIBLE);
-                //Mostrar fragment principal
-                ga.showPrincActivityNotChange();
-            }
+            //Mostrar panel de finalizacion
+            lyFinishPrin.setVisibility(View.VISIBLE);
+            //Mostrar fragment principal
+            ga.showPrincActivityNotChange();
+
         }else{
             //COMPETICION NO INICIADA O EN CURSO
 
@@ -214,6 +225,16 @@ public class PrincipalFragment extends Fragment {
                     }else{
                         //Competicion en curso
                         updateCount(millisUntilFinished);
+
+                        //Cerrar la clasificación 30 minutos antes de que finalice la competicion
+                        if (remainingTime<1800000){
+                            bRankingPrin.setEnabled(false);
+                            if(ga.getActive().getTag().equals("7")){
+                                ga.showPrincActivityNotChange();
+                            }
+                        }else{
+                            bRankingPrin.setEnabled(true);
+                        }
                     }
                 }
                 @Override

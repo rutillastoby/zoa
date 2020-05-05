@@ -65,8 +65,6 @@ public class PrincipalActivity extends AppCompatActivity {
     private Vibrator v;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

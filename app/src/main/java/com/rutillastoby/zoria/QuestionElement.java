@@ -23,13 +23,15 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
 
     private ArrayList<Pregunta> questionList;
     private QuestionsFragment context;
+    private boolean lockButtonSend;
 
     /**
      * CONSTRUCTOR POR DEFECTO
      */
-    public QuestionElement(ArrayList<Pregunta> questionList, QuestionsFragment context){
+    public QuestionElement(ArrayList<Pregunta> questionList, QuestionsFragment context, boolean lockButtonSend){
         this.questionList = questionList;
         this.context = context;
+        this.lockButtonSend = lockButtonSend;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -201,6 +203,15 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
             instance.tvResp3.setOnClickListener(null); instance.tvResp4.setOnClickListener(null);
             //Cambiar colores de lasrespuestas segun si es correcta o incorrecta
             checkResponses(instance, questionList.get(i).getSolu(), questionList.get(i).getResponseSend());
+        }
+
+        //7. Deshabilitar el boton de enviar respuesta si así se ha indicado en el constructor
+        if(lockButtonSend){
+            instance.bAceptResponse.setEnabled(false);
+            instance.bAceptResponse.setBackground(context.getResources().getDrawable(R.drawable.boton_b));
+            //Desactivar seleccion de opciones
+            instance.tvResp1.setOnClickListener(null); instance.tvResp2.setOnClickListener(null);
+            instance.tvResp3.setOnClickListener(null); instance.tvResp4.setOnClickListener(null);
         }
     }
 

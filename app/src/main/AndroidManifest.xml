@@ -12,7 +12,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".GeneralActivity"
-            android:label="@string/title_activity_general"></activity>
+            android:label="@string/title_activity_general"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ClasificacionActivity"
             android:screenOrientation="portrait" />
