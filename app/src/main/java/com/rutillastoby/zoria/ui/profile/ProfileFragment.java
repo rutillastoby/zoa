@@ -18,7 +18,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,16 +32,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rutillastoby.zoria.GenericFuntions;
 import com.rutillastoby.zoria.R;
+import com.rutillastoby.zoria.RecordElement;
+import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ProfileFragment extends Fragment {
     //Referencias
     private ImageView ivProfile, ivLogout;
     private EditText etNickNameProfile, etEmailProfile;
     private ProgressBar pbNickProfile;
+    private RecyclerView rvRecordList;
+    private ConstraintLayout lyEmptyRecord;
 
     //Firebase
     private FirebaseAuth firebaseAuth;
@@ -47,6 +55,8 @@ public class ProfileFragment extends Fragment {
     //Variables
     private UsuarioDao myUser;
     private String nickUser;
+    private RecyclerView.Adapter adapter; //Crear un contenedor de vistas de cada competicion
+    private ProfileFragment thisClass;
 
 
     @Nullable
@@ -69,7 +79,8 @@ public class ProfileFragment extends Fragment {
      */
     private void initVar(View v){
         final View view = v;
-        //Obtener usuario y base de datos
+        thisClass = this;
+        //Obtener usuario y base de datoS
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
         db = FirebaseDatabase.getInstance();
@@ -78,6 +89,8 @@ public class ProfileFragment extends Fragment {
         etNickNameProfile = view.findViewById(R.id.etNickName);
         etEmailProfile = view.findViewById(R.id.etEmailProfile);
         pbNickProfile = view.findViewById(R.id.pbNickProfile);
+        rvRecordList = view.findViewById(R.id.rvRecordList);
+        lyEmptyRecord = view.findViewById(R.id.lyEmptyRecord);
         ivLogout = getActivity().findViewById(R.id.ivLogout);
 
         //Onclick boton cerrar sesion
@@ -186,6 +199,43 @@ public class ProfileFragment extends Fragment {
     //----------------------------------------------------------------------------------------------
 
     /**
+     * METODO PARA CARGAR EL HISTORIAL DE COMPETICIONES
+     */
+    public void loadRecordCompetition(ArrayList<CompeticionDao> allCompe){
+
+        ArrayList<CompeticionDao> competitionsList=new ArrayList<CompeticionDao>();
+
+        for(int i=0; i<allCompe.size();i++){
+            //Comprobar si la competicion esta marcada como historial y se pueden ver los resultados
+            if(allCompe.get(i).getRes()==1) {
+                for (Map.Entry<String, Integer> compeRegister : myUser.getCompeticiones().entrySet()) {
+                    //Comprobar si el usuario esta registrado en la competicion
+                    if (allCompe.get(i).getId() == compeRegister.getValue()) {
+                        competitionsList.add(allCompe.get(i));
+                    }
+                }
+            }
+        }
+
+        //Comprobar si existen competiciones
+        if(competitionsList.size()>0) {
+            //Ocultar panel sin competiciones
+            lyEmptyRecord.setVisibility(View.GONE);
+            rvRecordList.setVisibility(View.VISIBLE);
+            //Asignar listado al recyclerview de historial de competiciones
+            adapter = new RecordElement(competitionsList, thisClass);
+            rvRecordList.setLayoutManager(new LinearLayoutManager(getContext()));
+            rvRecordList.setAdapter(adapter);
+        }else{
+            //Si no existen competiciones, mostrar panel
+            lyEmptyRecord.setVisibility(View.VISIBLE);
+            rvRecordList.setVisibility(View.GONE);
+        }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
      * METODO PARA CERRAR SESIÓN Y LA APLICACIÓN
      * @param view
      */
@@ -225,4 +275,6 @@ public class ProfileFragment extends Fragment {
         nickUser = myUser.getNombre();
         etNickNameProfile.setText(nickUser);
     }
+
+
 }

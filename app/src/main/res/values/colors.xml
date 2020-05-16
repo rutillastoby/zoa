@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#fffe00</color>
-    <color name="colorPrimaryDark">#fffe00</color>
+    <color name="colorPrimary">#FFEB3B</color>
+    <color name="colorPrimaryDark">#FFEB3B</color>
     <color name="colorAccent">#000000</color>
     <color name="background">#F8F8F8</color>
     <color name="gray">#CDCDCD</color>
     <color name="error">#FF0000</color>
     <!--COLORES DE LOS PUNTOS-->
     <color name="pointBlue">#2DAECD</color>
-    <color name="pointYellow">#fffe00</color>
+    <color name="pointYellow">#FFEB3B</color>
     <color name="pointRed">#EC3960</color>
+    <!--Antiguo tono amarillo: fffe00-->
 </resources>
 
 

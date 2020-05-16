@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -28,8 +29,10 @@ public class PrincipalFragment extends Fragment {
     private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart,
                      tvL1PointsPrin, tvL2PointsPrin, tvL3PointsPrin, tvL4PointsPrin, tvTotalPointsPrin,
                      tvFinishCompetitionPrin;
-    private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, bRankingPrin, lyFinishPrin,
+    private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, lyRankingPrin, lyFinishPrin,
                              lyResultPrin, lyNotRegisPrin, lyClockCurrent;
+    private LinearLayout lyShowRankingPrin;
+    private View dividerRanking;
     private ProgressBar pbToStart;
     private GeneralActivity ga;
 
@@ -69,7 +72,7 @@ public class PrincipalFragment extends Fragment {
         pbToStart = view.findViewById(R.id.pbToStart);
         bMapPrin = view.findViewById(R.id.bMapPrin);
         bQuestionPrin = view.findViewById(R.id.bQuestionPrin);
-        bRankingPrin = view.findViewById(R.id.bRankingPrin);
+        lyRankingPrin = view.findViewById(R.id.lyRankingPrin);
         tvL1PointsPrin = view.findViewById(R.id.tvL1PointsPrin);
         tvL2PointsPrin = view.findViewById(R.id.tvL2PointsPrin);
         tvL3PointsPrin = view.findViewById(R.id.tvL3PointsPrin);
@@ -78,6 +81,8 @@ public class PrincipalFragment extends Fragment {
         lyNotRegisPrin = view.findViewById(R.id.lyNotRegisPrin);
         tvFinishCompetitionPrin = view.findViewById(R.id.tvFinishCompetitionPrin);
         lyClockCurrent = view.findViewById(R.id.lyClockCurrent);
+        lyShowRankingPrin = view.findViewById(R.id.lyShowRankingPrin);
+        dividerRanking = view.findViewById(R.id.dividerRanking);
 
         //Clicks de botones
         bMapPrin.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +101,7 @@ public class PrincipalFragment extends Fragment {
             }
         });
 
-        bRankingPrin.setOnClickListener(new View.OnClickListener() {
+        lyRankingPrin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Boton preguntas en fragmento principal
@@ -228,12 +233,16 @@ public class PrincipalFragment extends Fragment {
 
                         //Cerrar la clasificación 30 minutos antes de que finalice la competicion
                         if (remainingTime<1800000){
-                            bRankingPrin.setEnabled(false);
-                            if(ga.getActive().getTag().equals("7")){
+                            lyRankingPrin.setEnabled(false);
+                            dividerRanking.setVisibility(View.GONE);
+                            lyShowRankingPrin.setVisibility(View.GONE);
+                            if(ga.getActive().getTag().equals("7")){ //Si esta mostrandose el fragmento lo ocultamos
                                 ga.showPrincActivityNotChange();
                             }
                         }else{
-                            bRankingPrin.setEnabled(true);
+                            lyRankingPrin.setEnabled(true);
+                            dividerRanking.setVisibility(View.VISIBLE);
+                            lyShowRankingPrin.setVisibility(View.VISIBLE);
                         }
                     }
                 }

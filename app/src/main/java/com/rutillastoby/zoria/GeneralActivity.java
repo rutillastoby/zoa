@@ -1,5 +1,8 @@
 package com.rutillastoby.zoria;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -238,10 +241,7 @@ public class GeneralActivity extends AppCompatActivity {
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
 
-        //INSERTAR AQUI CODIGO PARA MOSTRAR PANEL DE NO REGISTRADO EN NINGUNA COMPETICION
-        ////// AQUI
-
-        //Mostrar la vista de la competicion activa
+        //Mostrar la vista de la competicion activa, si no hay ninguna mostramos panel de no registrado
         if(currentCompeId!=-1){
             showMainViewCompetition(currentCompeId);
         }else{
@@ -276,11 +276,12 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA CARGAR LOS PUNTOS EN EL MAPA POR PRIMERA VEZ UNA VEZ INICIADO ESTE
+     * METODO PARA CARGAR LOS PUNTOS EN EL MAPA POR PRIMERA VEZ CUANDO ESTE SE INICIA POSTERIORMENTE
+     * A LA RECUPERACION DE LOS DATOS (PUNTOS + USUARIOS)
      */
     public void initLoadPointsMap(){
         //Cargar siempre y cuando el mapa se inicie despues de cargar todos los datos, si no es así
-        // el metodo @chargeAll se encargará de cargarlos
+        // el metodo @chargeAll se encargará de cargarlos de forma explicita a traves del metodo @checkFragmentCurrent
         if(!initExecute && currentCompeId!=-1){
             //A traves de este metodo se cargan los puntos
             prinF.setDataCompetition(competitionShow, questF, mapF, myUser);
@@ -290,15 +291,60 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO QUE SE EJECUTA AL RECUPERAR TODOS LOS DATOS, TANTO COMPETICIONES COMO USUARIOS AL INICIO
-     * ES LLAMADO DESDE EL FRAGMENTO RANKING QUE ES DONDE SE OBTIENE SI EL USUARIO HA OBTENIDO LA BANDERA
-     * FINAL DE PARTIDA
+     * METODO QUE SE EJECUTA AL RECUPERAR TODOS LOS DATOS, CARGA EL FRAGMENTO PRINCIPAL CON LA COMPETICION ACTIVA
      */
     public void chargeAll(){
         initExecute=false; //Marcar como ejecutado
         //Cargar el fragment con la competición marcada como activa
         checkFragmentCurrent();
-        //Desbloquear estado de carga de los fragmentos principales
+        //Cargar el historial de competiciones en el fragmento del perfil
+        profF.loadRecordCompetition(competitionsList);
+        //Desbloquear estado de carga de los 3 fragmentos principales
+        //+ Resubida de datos almacenados en local sin respaldo online
+
+
+
+        //Comprobar si quedan elementos por subir a la base de datos para enviarlos
+        if(countRowsData()>0){
+
+            //Declarar base de datos y tabla con la que utilizar
+            AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
+            SQLiteDatabase dbLocal = asoh.getReadableDatabase();
+            Cursor cursor = dbLocal.rawQuery("select * from data",null);
+
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    final int id = cursor.getInt(cursor.getColumnIndex("id"));
+                    String path = cursor.getString(cursor.getColumnIndex("path"));
+                    String value = cursor.getString(cursor.getColumnIndex("value"));
+                    //Obtener el tipo de dato 0->texto, 1->int.
+                    int typeValue  = cursor.getInt(cursor.getColumnIndex("typevalue"));
+
+                    Log.d("txt", "resubir dato "+id);
+                    //Resubir datos como texto o numero en funcion del tipo de dato guardado en local
+                    db.getReference(path)
+                        .setValue(typeValue==1?Integer.parseInt(value):value, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
+                                if (databaseError == null) {
+                                    removeALine(id);
+                                    //En el momento en el que no quede ningun dato por respaldar mostramos paneles
+                                    if(countRowsData()==0){
+                                        Log.d("txt", "DESBLOQUEAR ");
+                                    }
+                                }
+                            }
+                        });
+                    cursor.moveToNext();
+                }
+            }
+
+            //Cerrar conexiones
+            dbLocal.close();
+            cursor.close();
+        }
+
 
 
         //////////////////
@@ -319,7 +365,6 @@ public class GeneralActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) { }
             @Override
             public void onFinish() {
-                Log.d("ppp", "final");
                 //Cerrar aplicación pasados 20 min de inactividad
                 finish();
             }
@@ -497,8 +542,23 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA ALMACENAR LA RESPUESTA A UNA PREGUNTA EN LA BASE DE DATOS
      */
     public void sendResponseQuestion(String idQuestion, int idResponse, boolean correct){
-        db.getReference("competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion)
-                .setValue(idResponse);
+        final String path = "competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion;
+
+        //Guardar datos en fichero local indicado el tipo de value 0->texto, 1->int
+        final int idInserted = saveDataOnLocal(path, idResponse+"", 1);
+
+        //Guardar datos en base de datos local
+        db.getReference(path)
+                .setValue(idResponse, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
+                        if (databaseError == null) {
+                            //Llamada al metodo para eliminar la linea previamente introducida
+                            removeALine(idInserted);
+                        }
+                    }
+                });
 
         //Establecer la puntuación obtenida al resolver la pregunta
         if(correct){
@@ -513,9 +573,27 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA ALMACENAR EL REGISTRO DE UN CODIGO EN LA BASE DE DATOS
      */
     public void sendPointScann(String idPoint, int level, int points) {
+        final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint;
+        final String value = points + "-" + currentMilliseconds;
 
-        db.getReference("competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint)
-                .setValue(points + "-" + currentMilliseconds);
+        //Guardar datos en fichero local indicado el tipo de value 0->texto, 1->int
+        final int idInserted = saveDataOnLocal(path, value, 0);
+        testFile();
+
+        //Guardar datos en base de datos
+        db.getReference(path)
+            .setValue(value, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
+                    if (databaseError == null) {
+                        //Llamada al metodo para eliminar la linea previamente introducida
+                        boolean correct = removeALine(idInserted);
+                        Log.d("txt", "eliminar ->"+correct);
+                        testFile();
+                    }
+                }
+            });
 
         //Si es un codigo de pregunta buscar la pregunta para desbloquearla
         if(level==4){
@@ -526,6 +604,7 @@ public class GeneralActivity extends AppCompatActivity {
                 }
             }
         }
+        //deleteAll();testFile();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -535,15 +614,30 @@ public class GeneralActivity extends AppCompatActivity {
      * COMPETICION FINALIZADA PARA EL USUARIO
      */
     public void sendGetFlag(){
-        db.getReference("competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/fin")
-                .setValue(1);
+        final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/fin";
+
+        //Guardar datos en fichero local para respaldar problemas de conexion indicado el tipo de value 0->texto, 1->int
+        final int idInserted = saveDataOnLocal(path, "1", 1);
+
+        //Almacenar datos en la base de datos
+        db.getReference(path)
+            .setValue(1, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    //Si se ha guardado correctamente el valor, eliminamos el dato del fichero local de seguridad
+                    if (databaseError == null) {
+                        removeALine(idInserted);
+                    }
+                }
+            });
     }
+
+    //----------------------------------------------------------------------------------------------
 
     /**
      * METODO PARA ENVIAR MI UBICACIÓN A LA BASE DE DATOS
      */
     public void sendLocation(Location location){
-        Log.d("ppp", "ubiPrev");
         //Comprobar si esta seleccionado el envio de ubicacion
         if(competitionShow.getUbi()==1){
             Log.d("ppp", "ubi");
@@ -557,6 +651,97 @@ public class GeneralActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * METODO PARA ALMACENAR INFORMACIÓN EN FICHERO LOCAL Y NO PERDER DATOS EN CASO DE DESCONEXIÓN
+     * @return Identificador del dato insertado en la tabla de datos local
+     */
+    public int saveDataOnLocal(String path, String value, int typeValue){
+
+        //Declarar la base de datos que se utilizara
+        AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
+        //Declarar objeto para escribir/leer en la base de datos
+        SQLiteDatabase dbLocal = asoh.getWritableDatabase();
+        //Crear la fila de datos que vamos a agregar a la tabla de la base de datos
+        ContentValues rowData = new ContentValues();
+        rowData.put("path", path);
+        rowData.put("value", value);
+        rowData.put("typevalue", typeValue); //texto:0, int:1
+        //Insertar el dato
+        long id = dbLocal.insert("data", null, rowData);
+        dbLocal.close();//Cerrar transaccion
+
+        //Devolver valor id del elemento insertado
+        return (int) id;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ELIMINAR UNA LINEA DEL FICHERO DE RESPALDO DE DATOS
+     * @param id
+     * @return
+     */
+    public boolean removeALine(int id){
+        //Declarar la base de datos que se utilizara
+        AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
+        //Declarar objeto para escribir/leer en la base de datos
+        SQLiteDatabase dbLocal = asoh.getWritableDatabase();
+
+        //Eliminar dato utilizando el id, devolver booleano indicando si se ha eliminado
+        if(dbLocal.delete("data","id=?",new String[]{id+""})>0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER EL NUMERO DE ELEMENTOS RESTANTES POR RESPALDAR EN LA BASE DE DATOS
+     * (ENTRADAS EXISTENTES EN LA TABLA DATA)
+     */
+    public int countRowsData(){
+        //Obtener el numero de elementos pendientes por subir a la base de datos
+        AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
+        SQLiteDatabase dbLocal = asoh.getReadableDatabase();
+        Cursor cursor = dbLocal.rawQuery("select  * from data", null);
+        int count = cursor.getCount();
+        //Cerrar conexiones
+        dbLocal.close();
+        cursor.close();
+        //Devolver numero de elementos en la tabla data
+        return count;
+    }
+    //----------------------------------------------------------------------------------------------
+
+    public void testFile(){
+        //Declarar la base de datos que se utilizara
+        AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
+        //Declarar objeto para escribir/leer en la base de datos
+        SQLiteDatabase bdLocal = asoh.getWritableDatabase();
+        //Recorrer el contenido
+        Cursor cursor = bdLocal.rawQuery("select * from data",null);
+        Log.d("txt", "-------------------------");
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                int id = cursor.getInt(cursor.getColumnIndex("id"));
+                String path = cursor.getString(cursor.getColumnIndex("path"));
+                String value = cursor.getString(cursor.getColumnIndex("value"));
+                Log.d("txt", id+": "+path+" "+value);
+                cursor.moveToNext();
+            }
+        }
+        Log.d("txt", "-------------------------");
+    }
+
+    public void deleteAll(){
+        //Declarar la base de datos que se utilizara
+        AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
+        //Declarar objeto para escribir/leer en la base de datos
+        SQLiteDatabase dbLocal = asoh.getWritableDatabase();
+        dbLocal.execSQL("delete from data");
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                      GETS + SETS                                           //
     ////////////////////////////////////////////////////////////////////////////////////////////////

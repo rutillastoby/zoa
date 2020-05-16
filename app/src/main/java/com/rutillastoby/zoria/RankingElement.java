@@ -119,7 +119,7 @@ public class RankingElement extends RecyclerView.Adapter<RankingElement.RankingI
             tvNameUserRanking = itemView.findViewById(R.id.tvNameUserRanking);
             lyPointsRanking = itemView.findViewById(R.id.lyPointsRanking);
             dividerRanking = itemView.findViewById(R.id.dividerRanking);
-            lyRanking = itemView.findViewById(R.id.lyRanking);
+            lyRanking = itemView.findViewById(R.id.lyRankingPrin);
 
             //Estado inicial
             dividerRanking.setVisibility(View.GONE);
