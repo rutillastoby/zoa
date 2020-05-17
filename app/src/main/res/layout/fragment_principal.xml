@@ -336,7 +336,7 @@
                     android:id="@+id/imageView11"
                     android:layout_width="24dp"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_ranking" />
+                    app:srcCompat="@drawable/ic_ranking" />
 
                 <TextView
                     android:id="@+id/textView11"

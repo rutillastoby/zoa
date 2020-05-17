@@ -22,7 +22,6 @@
             android:layout_width="55dp"
             android:layout_height="55dp"
             android:layout_marginStart="4dp"
-            android:foreground="@drawable/res_border_radius_white"
             app:srcCompat="@drawable/ic_userprofile"
             app:layout_constraintStart_toEndOf="@+id/tvPositionRanking"
             app:layout_constraintTop_toTopOf="parent" />
@@ -178,16 +177,6 @@
                 app:layout_constraintVertical_bias="1.0" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageView
-            android:id="@+id/ivBorderRadiusOld2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/ivProfileImageRanking"
-            app:layout_constraintEnd_toEndOf="@+id/ivProfileImageRanking"
-            app:layout_constraintStart_toStartOf="@+id/ivProfileImageRanking"
-            app:layout_constraintTop_toTopOf="@+id/ivProfileImageRanking"
-            app:srcCompat="@drawable/ic_border_radius_white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

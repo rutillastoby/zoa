@@ -3,7 +3,6 @@ package com.rutillastoby.zoria.ui.profile;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -35,7 +34,6 @@ import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.RecordElement;
 import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -66,8 +64,6 @@ public class ProfileFragment extends Fragment {
 
         //Iniciar variables
         initVar(view);
-        //Cargar informacion del usuario
-        loadInformation(view);
 
         return view;
     }
@@ -101,66 +97,48 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        //Compatibilidad de bordes redondeados en versiones antiguas
-        if (Build.VERSION.SDK_INT <= 22) {
-            view.findViewById(R.id.ivBorderRadiusOld).setVisibility(View.VISIBLE);
-        }
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
-     * METODO PARA CARGAR LA INFORMACION DEL USUARIO EN LA VISTA
-     */
-    private void loadInformation(View v){
-        final View view = v;
-
-        ////// Cargar foto y email
-        Picasso.get().load(user.getPhotoUrl()).into(ivProfile);
-        etEmailProfile.setText(user.getEmail());
-
         ////// Funcionalidad para cambiar nombre de usuario al pulsar done del teclado
         etNickNameProfile.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    //Si es diferente que el actual lo cambiamos
-                    final String newNick = etNickNameProfile.getText().toString().trim();
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                //Si es diferente que el actual lo cambiamos
+                final String newNick = etNickNameProfile.getText().toString();
 
-                    if (!newNick.equals(nickUser)) {
-                        pbNickProfile.setVisibility(View.VISIBLE);//Activar la barra de progreso
-                        //Obtener los nombre de usuario
-                        db.getReference("usuarios").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                //Listado
-                                ArrayList<String> nombresUsados = new ArrayList<String>();
+                if (!newNick.equals(nickUser)) {
+                    pbNickProfile.setVisibility(View.VISIBLE);//Activar la barra de progreso
+                    //Obtener los nombre de usuario
+                    db.getReference("usuarios").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            //Listado
+                            ArrayList<String> nombresUsados = new ArrayList<String>();
 
-                                //Obtener datos de nombres
-                                for(DataSnapshot usu : dataSnapshot.getChildren()) {
-                                    for(DataSnapshot dato : usu.getChildren()){
-                                        if(dato.getKey().equalsIgnoreCase("nombre")){
-                                            nombresUsados.add(dato.getValue().toString().toLowerCase());
-                                        }
+                            //Obtener datos de nombres
+                            for(DataSnapshot usu : dataSnapshot.getChildren()) {
+                                for(DataSnapshot dato : usu.getChildren()){
+                                    if(dato.getKey().equalsIgnoreCase("nombre")){
+                                        nombresUsados.add(dato.getValue().toString().toLowerCase());
                                     }
                                 }
+                            }
 
-                                //Comprobar si el usuario es valido
-                                if(GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados)=="true"){
-                                    updateName(view, newNick);
-                                }else{
-                                    GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick, nombresUsados),getContext());
-                                    //Ocultar barra de progreso
-                                    pbNickProfile.setVisibility(View.GONE);
-                                }
+                            //Comprobar si el usuario es valido
+                            if(GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados)=="true"){
+                                updateName(view, newNick);
+                            }else{
+                                GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick, nombresUsados),getContext());
+                                //Ocultar barra de progreso
+                                pbNickProfile.setVisibility(View.GONE);
                             }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                            }
-                        });
-                    }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
                 }
-                return true; //El true deja el teclado abierto
+            }
+            return true; //El true deja el teclado abierto
             }
         });
     }
@@ -267,6 +245,7 @@ public class ProfileFragment extends Fragment {
 
     /**
      * METODO PARA ESTABLECER LA INFORMACION ALMACENADA EN LA BASE DE DATOS SOBRE MI USUARIO
+     * + CARGAR DATOS DEL MISMO SOBRE LA VISTA
      * @param myUser
      */
     public void setMyUser(UsuarioDao myUser) {
@@ -274,6 +253,16 @@ public class ProfileFragment extends Fragment {
         //Establecer el nombre en el campo de texto
         nickUser = myUser.getNombre();
         etNickNameProfile.setText(nickUser);
+
+        ////// Cargar foto y email
+        GenericFuntions.chargeImageRound(getContext(), myUser.getFoto(), ivProfile);
+        etEmailProfile.setText(user.getEmail());
+
+        //Si mi imagen ha cambiado actualizar datos en base de datos
+        String bigPhoto = user.getPhotoUrl().toString().replace("s96-c", "s320-c");
+        if(!myUser.getFoto().equals(bigPhoto)){
+            db.getReference("/usuarios/"+user.getUid()+"/foto").setValue(bigPhoto);
+        }
     }
 
 

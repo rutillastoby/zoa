@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ActivityNuevoUsu"
+            android:name=".NewUserActivity"
             android:screenOrientation="portrait" />
 
         <meta-data

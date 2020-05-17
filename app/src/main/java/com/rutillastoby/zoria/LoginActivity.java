@@ -216,12 +216,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             //Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = firebaseAuth.getCurrentUser();
                             logueado(user);
-                            Snackbar.make(findViewById(R.id.LayoutEleCompe), "Entrando en el sistema...", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(R.id.lyNewUser), "Entrando en el sistema...", Snackbar.LENGTH_SHORT).show();
 
                         } else {
                             // If sign in fails, display a message to the user.
                             //Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Snackbar.make(findViewById(R.id.LayoutEleCompe), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(R.id.lyNewUser), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                             //updateUI(null);
                         }
 
@@ -272,8 +272,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     //Abrir activity nuevo usuario
                         //View contextView = findViewById(R.id.LayoutEleCompe);
                         //Snackbar.make(contextView, "nuevo", Snackbar.LENGTH_SHORT).show();
-                    Intent i = new Intent(context, ActivityNuevoUsu.class);
+                    Intent i = new Intent(context, NewUserActivity.class);
                     startActivity(i);
+                    finish();
                 }
             }
 

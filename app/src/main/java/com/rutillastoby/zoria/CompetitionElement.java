@@ -119,7 +119,7 @@ public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.
             //Referencias
             tvNombre = (TextView) itemView.findViewById(R.id.tvTituloComp);
             ivCompe = (ImageView) itemView.findViewById(R.id.ivBackCompeElement);
-            layoutElemCompe = (ConstraintLayout) itemView.findViewById(R.id.LayoutEleCompe);
+            layoutElemCompe = (ConstraintLayout) itemView.findViewById(R.id.lyNewUser);
             lyDateAvailable = itemView.findViewById(R.id.lyDateAvailable);
             lyDateFinish = itemView.findViewById(R.id.lyDateFinish);
             tvDateCompe = itemView.findViewById(R.id.tvDateCompe);

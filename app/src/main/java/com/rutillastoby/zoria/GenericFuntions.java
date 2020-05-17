@@ -4,15 +4,22 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
+import android.widget.ImageView;
+
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.material.snackbar.Snackbar;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -41,7 +48,7 @@ public class GenericFuntions {
                 if(nick.length()>=5 && nick.length()<=12){
                   return "true";
                 }else{
-                    return("Tu nombre debe tener entre 5 Y 12 caracteres");
+                    return("Tu nombre debe tener entre 5 y 12 caracteres");
                 }
             }else{
                return("Debes introducir un nombre.");
@@ -105,5 +112,28 @@ public class GenericFuntions {
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ESTABLECER UNA IMAGEN DE PERFIL CON BORDES REDONDEADOS EN LA VISTA A PARTIR DE UNA URL
+     * @param context
+     * @param url Direccion de la imagen a cargar
+     * @param imageView Elemento sobre el que cargar la imagen
+     */
+    public static void chargeImageRound(final Context context, String url, final ImageView imageView){
+        Picasso.get().load(url).into(imageView, new Callback() {
+            @Override
+            public void onSuccess() {
+                Bitmap source = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                RoundedBitmapDrawable drawable =
+                        RoundedBitmapDrawableFactory.create(context.getResources(), source);
+                drawable.setCircular(true);
+                drawable.setCornerRadius(Math.max(source.getWidth() / 2.0f, source.getHeight() / 2.0f));
+                imageView.setImageDrawable(drawable);
+            }
+            @Override public void onError(Exception e) {}
+        });
     }
 }

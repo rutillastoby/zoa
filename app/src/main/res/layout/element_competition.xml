@@ -13,7 +13,7 @@
     app:cardPreventCornerOverlap="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/LayoutEleCompe"
+        android:id="@+id/lyNewUser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">

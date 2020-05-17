@@ -122,7 +122,7 @@ public class RankingFragment extends Fragment {
         }
 
         //3. Asignar listado al recyclerview
-        adapter = new RankingElement(rankingList, thisClass);
+        adapter = new RankingElement(rankingList, thisClass.getContext());
         rvRanking.setLayoutManager(new LinearLayoutManager(getContext()));
         rvRanking.setAdapter(adapter);
 

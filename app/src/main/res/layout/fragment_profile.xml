@@ -19,7 +19,8 @@
         android:layout_marginEnd="32dp"
         android:ems="10"
         android:imeOptions="actionDone"
-        android:inputType="textPersonName"
+        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
+        android:inputType="textFilter"
         android:text="Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -45,8 +46,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:foreground="@drawable/res_border_radius"
-        android:foregroundGravity="center|fill"
         app:srcCompat="@drawable/ic_userprofile"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/guideline5"
@@ -54,18 +53,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/ivBorderRadiusOld"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/ivPhotoProfile"
-        app:layout_constraintEnd_toEndOf="@+id/ivPhotoProfile"
-        app:layout_constraintStart_toStartOf="@+id/ivPhotoProfile"
-        app:layout_constraintTop_toTopOf="@+id/ivPhotoProfile"
-        app:srcCompat="@drawable/ic_border_radius" />
-
-    <ImageView
-        android:id="@+id/imageView6"
+        android:id="@+id/ivGoogleLogo"
         android:layout_width="28dp"
         android:layout_height="28dp"
         app:srcCompat="@drawable/ic_google"
@@ -107,10 +95,14 @@
         android:id="@+id/lyEmptyRecord"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/rvRecordList"
-        app:layout_constraintEnd_toEndOf="@+id/rvRecordList"
-        app:layout_constraintStart_toStartOf="@+id/rvRecordList"
-        app:layout_constraintTop_toTopOf="@+id/rvRecordList">
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleHistory">
 
         <ImageView
             android:id="@+id/imageView7"
@@ -144,14 +136,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.27" />
+        app:layout_constraintGuide_percent="0.27010623" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.32360098" />
+        app:layout_constraintGuide_percent="0.32603407" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline5"

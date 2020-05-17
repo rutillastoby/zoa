@@ -1,6 +1,6 @@
 package com.rutillastoby.zoria;
 
-import android.os.Build;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,20 +12,19 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.rutillastoby.zoria.dao.RankingUserData;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Formatter;
 
 public class RankingElement extends RecyclerView.Adapter<RankingElement.RankingInstance>{
     private ArrayList<RankingUserData> rankingList;
-    private RankingFragment context;
+    final private Context context;
 
 
     /**
      * CONSTRUCTOR PARAMETRIZADO
      */
-    public RankingElement(ArrayList<RankingUserData> rl, RankingFragment c){
+    public RankingElement(ArrayList<RankingUserData> rl, Context c){
         rankingList=rl;
         context=c;
     }
@@ -71,7 +70,7 @@ public class RankingElement extends RecyclerView.Adapter<RankingElement.RankingI
             instance.ivFlagRanking.setImageResource(R.drawable.ic_flag);
         }
         //Cargar imagen de perfil
-        Picasso.get().load(rankingList.get(i).getImageProfile()).into(instance.ivProfileImageRanking);
+        GenericFuntions.chargeImageRound(context, rankingList.get(i).getImageProfile(), instance.ivProfileImageRanking);
         //Indicar posicion en el ranking
         instance.tvPositionRanking.setText(new Formatter().format("%02d",i+1)+"");
 
@@ -124,11 +123,6 @@ public class RankingElement extends RecyclerView.Adapter<RankingElement.RankingI
             //Estado inicial
             dividerRanking.setVisibility(View.GONE);
             lyPointsRanking.setVisibility(View.GONE);
-
-            //Compatibilidad de bordes redondeados en versiones antiguas
-            if (Build.VERSION.SDK_INT <= 22) {
-                itemView.findViewById(R.id.ivBorderRadiusOld2).setVisibility(View.VISIBLE);
-            }
         }
     }
 }
