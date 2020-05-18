@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +20,10 @@ import java.util.Map;
 public class QuestionsFragment extends Fragment{
     //Referencias
     private RecyclerView rvQuestions;
+    private GeneralActivity ga;
+    private ImageView ivBackQuestions;
+    private ConstraintLayout lyNotQuestions;
+
     //Variables
     private RecyclerView.Adapter adapter; //Crear un contenedor de vistas de cada competicion
     private QuestionsFragment thisClass;
@@ -41,7 +47,18 @@ public class QuestionsFragment extends Fragment{
     private void initVar(View view){
         thisClass = this;
         //Referencias
+        ga =  ((GeneralActivity)getActivity());
         rvQuestions = view.findViewById(R.id.rvQuestions);
+        ivBackQuestions = view.findViewById(R.id.ivBackQuestions);
+        lyNotQuestions = view.findViewById(R.id.lyNotQuestions);
+
+        //Boton para volver a la vista de la competicion
+        ivBackQuestions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ga.showPrincActivityNotChange();
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -65,6 +82,15 @@ public class QuestionsFragment extends Fragment{
                     questionsListAvailable.add(quest.getValue());
                 }
             }
+        }
+
+        //Mostrar panel sin respuestas si no hay ninguna disponible
+        if(questionsListAvailable.size()==0){
+            lyNotQuestions.setVisibility(View.VISIBLE);
+            rvQuestions.setVisibility(View.GONE);
+        }else{
+            lyNotQuestions.setVisibility(View.GONE);
+            rvQuestions.setVisibility(View.VISIBLE);
         }
 
         //Asignar listado al recyclerview

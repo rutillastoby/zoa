@@ -57,7 +57,7 @@ public class GeneralActivity extends AppCompatActivity {
     //Referencias
     private BottomNavigationView navigation;
     private Toolbar toolbar;
-    private ImageView ivLogout;
+    private ImageView ivLogout, ivInfoRanking, ivInfoGeneral;
     private CompetitionsFragment compF;
     private ProfileFragment profF;
     private PrincipalFragment prinF;
@@ -77,6 +77,7 @@ public class GeneralActivity extends AppCompatActivity {
     private boolean getCompetitions=false, getUsers=false, initExecute=true; //Variables para determinar cuando se han recuperado los datos
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
     private CountDownTimer countOffApp=null; //Variable para contabilizar un tiempo máximo de funcionamiento de la aplicacion en suspensión
+    private boolean isInitLoad=false; //Variable para establecer cuando se carga la informacion de las vistas inicialmente
 
     //----------------------------------------------------------------------------------------------
 
@@ -111,6 +112,8 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Referencias
         ivLogout = findViewById(R.id.ivLogout);
+        ivInfoRanking = findViewById(R.id.ivInfoRanking);
+        ivInfoGeneral = findViewById(R.id.ivInfoGeneral);
         compF = (CompetitionsFragment) competitionsFrag;
         profF = (ProfileFragment) profileFrag;
         prinF = (PrincipalFragment) principalFrag;
@@ -127,6 +130,11 @@ public class GeneralActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
         db = FirebaseDatabase.getInstance();
+
+        //Estado inicial
+        ivLogout.setVisibility(View.GONE);
+        ivInfoRanking.setVisibility(View.GONE);
+        ivInfoGeneral.setVisibility(View.GONE);
 
         //Inicializar escucha de datos
         getCompetitions();
@@ -151,8 +159,8 @@ public class GeneralActivity extends AppCompatActivity {
                 case R.id.navigation_competitions:
                     fm.beginTransaction().hide(active).show(competitionsFrag).commit();
                     active = competitionsFrag;
-                    //Ocultar boton cerrar sesion
-                    ivLogout.setVisibility(View.GONE);
+                    //Ocultar botones toolbar
+                    hideToolbarButtons();
                     return true;
 
                 case R.id.navigation_current:
@@ -165,8 +173,10 @@ public class GeneralActivity extends AppCompatActivity {
                 case R.id.navigation_profile:
                     fm.beginTransaction().hide(active).show(profileFrag).commit();
                     active = profileFrag;
-                    //Mostrar boton cerrar sesion
+                    //Mostrar botones correspondientes toolbar
                     ivLogout.setVisibility(View.VISIBLE);
+                    ivInfoGeneral.setVisibility(View.VISIBLE);
+                    ivInfoRanking.setVisibility(View.GONE);
                     return true;
             }
             return false;
@@ -176,11 +186,28 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
+     * METODO PARA MOSTRAR EL FRAGMENTO DE COMPETICIONES
+     */
+    public void showCompetitionsFragment(){
+        fm.beginTransaction().hide(active).show(competitionsFrag).commit();
+        navigation.getMenu().findItem(R.id.navigation_competitions).setChecked(true);
+        active = competitionsFrag;
+        //Ocultar botones toolbar
+        hideToolbarButtons();
+    }
+
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
      * METODO PARA MOSTRAR EL FRAGMENTO DE TIPO RANKING
      */
     public void showRankingFragment(){
         fm.beginTransaction().hide(active).show(rankingFragment).commit();
         active = rankingFragment;
+        //Mostrar boton de informacion
+        hideToolbarButtons();
+        ivInfoRanking.setVisibility(View.VISIBLE);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -193,6 +220,8 @@ public class GeneralActivity extends AppCompatActivity {
         active = mapFragment;
         //Detener el scanner al cambiar de fragmento por si estaba iniciado
         scanF.stopScanner();
+        //Ocultar botones toolbar
+        hideToolbarButtons();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -215,6 +244,8 @@ public class GeneralActivity extends AppCompatActivity {
     public void showQuestionsFragment(){
         fm.beginTransaction().hide(active).show(questionsFragment).commit();
         active = questionsFragment;
+        //Ocultar botones toolbar
+        hideToolbarButtons();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -227,6 +258,8 @@ public class GeneralActivity extends AppCompatActivity {
         active = principalFrag;
         //Detener el scanner al cambiar de fragmento por si estaba iniciado
         scanF.stopScanner();
+        //Ocultar botones toolbar
+        hideToolbarButtons();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -240,12 +273,17 @@ public class GeneralActivity extends AppCompatActivity {
         navigation.getMenu().findItem(R.id.navigation_current).setChecked(true);
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
+        //Ocultar botones toolbar
+        hideToolbarButtons();
 
         //Mostrar la vista de la competicion activa, si no hay ninguna mostramos panel de no registrado
-        if(currentCompeId!=-1){
-            showMainViewCompetition(currentCompeId);
-        }else{
-            prinF.setViewNotRegister();
+        //Comprobando si se han cargado los datos iniciales
+        if(isInitLoad){
+            if(currentCompeId!=-1){
+                showMainViewCompetition(currentCompeId);
+            }else{
+                prinF.setViewNotRegister();
+            }
         }
 
     }
@@ -291,20 +329,12 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO QUE SE EJECUTA AL RECUPERAR TODOS LOS DATOS, CARGA EL FRAGMENTO PRINCIPAL CON LA COMPETICION ACTIVA
+     * METODO QUE SE EJECUTA AL RECUPERAR TODOS LOS DATOS, SE ENCARGA DEL RESPALDO DE DATOS GUARDADOS EN LOCAL
      */
     public void chargeAll(){
         initExecute=false; //Marcar como ejecutado
-        //Cargar el fragment con la competición marcada como activa
-        checkFragmentCurrent();
-        //Cargar el historial de competiciones en el fragmento del perfil
-        profF.loadRecordCompetition(competitionsList);
-        //Desbloquear estado de carga de los 3 fragmentos principales
-        //+ Resubida de datos almacenados en local sin respaldo online
 
-
-
-        //Comprobar si quedan elementos por subir a la base de datos para enviarlos
+        //Comprobar si quedan elementos en local por subir a la base de datos
         if(countRowsData()>0){
 
             //Declarar base de datos y tabla con la que utilizar
@@ -329,9 +359,10 @@ public class GeneralActivity extends AppCompatActivity {
                                 //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
                                 if (databaseError == null) {
                                     removeALine(id);
-                                    //En el momento en el que no quede ningun dato por respaldar mostramos paneles
+                                    //En el momento en el que no quede ningun dato por respaldar cargamos la informacion inicial
                                     if(countRowsData()==0){
                                         Log.d("txt", "DESBLOQUEAR ");
+                                        initLoad();
                                     }
                                 }
                             }
@@ -343,13 +374,69 @@ public class GeneralActivity extends AppCompatActivity {
             //Cerrar conexiones
             dbLocal.close();
             cursor.close();
+
+        }else{
+           //Si no hay datos que reespaldar directamente cargamos la informacion en la vistas
+           initLoad();
         }
+    }
 
+    //----------------------------------------------------------------------------------------------
 
+    /**
+     * METODO PARA CARGAR LA INFORMACION INICIAL EN LAS VISTAS
+     */
+    public void initLoad(){
+        isInitLoad = true;
+        //Ocultar paneles de carga
+        changeVisibilityLoad(false);
+        //Cargar el fragment con la competición marcada como activa
+        checkFragmentCurrent();
+        //Cargar el historial de competiciones en el fragmento del perfil
+        profF.loadRecordCompetition(competitionsList);
+    }
 
-        //////////////////
-        // INSERTAR AQUI
-        //////////////////
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ACTIVAR / DESACTIVAR LA VISTA DE CARGA DE LOS 3 FRAGMENTOS DE LA APLICACION
+     * @param status
+     */
+    public void changeVisibilityLoad(boolean status){
+        prinF.visibilityLyLoad(status);
+        compF.visibilityLyLoad(status);
+        profF.visibilityLyLoad(status);
+        Log.d("aaab", "desbloqueo");
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA COMPROBAR SI UNA COMPETICION HA FINALIZADO Y SE MUESTRAN LOS RESULTADOS
+     * @param id
+     * @return
+     */
+    public boolean competitionFinish(int id){
+        for(int i=0; i<competitionsList.size();i++){
+            if(competitionsList.get(i).getId() == id){
+                if(competitionsList.get(i).getRes()==1){
+                   return true;
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OCULTAR LOS BOTONES DE TOOLBAR
+     */
+    public void hideToolbarButtons(){
+        ivInfoGeneral.setVisibility(View.GONE);
+        ivLogout.setVisibility(View.GONE);
+        ivInfoRanking.setVisibility(View.GONE);
     }
 
     //----------------------------------------------------------------------------------------------

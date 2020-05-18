@@ -208,23 +208,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //Generar la ubicacion del punto
                 LatLng locationPoint = new LatLng(point.getValue().getLat(), point.getValue().getLon());
                 BitmapDescriptor icon = null;
-
+                String nameComplement = " | ";
                 //Seleccionar icono del punto
                 switch (point.getValue().getNivel()) {
                     case 1:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level1);
+                        nameComplement+="1 punto";
                         break;
                     case 2:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level2);
+                        nameComplement+="2 puntos";
                         break;
                     case 3:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level3);
+                        nameComplement+="3 puntos";
                         break;
                     case 4:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_qp);
+                        nameComplement+="5 puntos";
                         break;
                     case 5:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_flag);
+                        nameComplement+="10 puntos";
                 }
 
                 //Anadir marcador al mapa
@@ -232,7 +237,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     instanciatedMarker.add(
                         map.addMarker(new MarkerOptions()
                             .position(locationPoint)
-                            .title(point.getValue().getNombre())
+                            .title(point.getValue().getNombre()+nameComplement)
                             .icon(icon)
                             .anchor(0.5f, 0.5f))
                     );

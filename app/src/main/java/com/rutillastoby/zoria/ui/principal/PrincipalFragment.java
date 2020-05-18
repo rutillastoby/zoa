@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,8 +31,9 @@ public class PrincipalFragment extends Fragment {
                      tvL1PointsPrin, tvL2PointsPrin, tvL3PointsPrin, tvL4PointsPrin, tvTotalPointsPrin,
                      tvFinishCompetitionPrin;
     private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, lyRankingPrin, lyFinishPrin,
-                             lyResultPrin, lyNotRegisPrin, lyClockCurrent;
+                             lyLoadPrin, lyNotRegisPrin, lyClockCurrent;
     private LinearLayout lyShowRankingPrin;
+    private Button bAllCompetitions;
     private View dividerRanking;
     private ProgressBar pbToStart;
     private GeneralActivity ga;
@@ -66,7 +68,7 @@ public class PrincipalFragment extends Fragment {
         lyInProgress = view.findViewById(R.id.lyInProgress);
         lyToStart = view.findViewById(R.id.lyToStart);
         lyFinishPrin = view.findViewById(R.id.lyFinishPrin);
-        lyResultPrin = view.findViewById(R.id.lyCharginPrin);
+        lyLoadPrin = view.findViewById(R.id.lyLoadPrin);
         tvHourMinToStart = view.findViewById(R.id.tvHourMinToStart);
         tvSecToStart = view.findViewById(R.id.tvSecToStart);
         pbToStart = view.findViewById(R.id.pbToStart);
@@ -83,30 +85,40 @@ public class PrincipalFragment extends Fragment {
         lyClockCurrent = view.findViewById(R.id.lyClockCurrent);
         lyShowRankingPrin = view.findViewById(R.id.lyShowRankingPrin);
         dividerRanking = view.findViewById(R.id.dividerRanking);
+        bAllCompetitions = view.findViewById(R.id.bAllCompetitions);
+
+        //Estado inicial
+        lyLoadPrin.setVisibility(View.VISIBLE);
 
         //Clicks de botones
+
+        //Boton mapa en fragmento principal
         bMapPrin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Boton mapa en fragmento principal
                 ga.showMapFragment();
             }
         });
-
+        //Boton preguntas en fragmento principal
         bQuestionPrin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Boton preguntas en fragmento principal
                 ga.showQuestionsFragment();
             }
         });
-
+        //Boton ranking en fragmento principal
         lyRankingPrin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Boton preguntas en fragmento principal
                 ga.showRankingFragment();
                 ga.getRankF().autoScroll(ga.getPosMyUserRanking()); //Auto-scroll hasta mi posicion
+            }
+        });
+        //Boton ver todas las competiciones (fragmento principal sin registrarse en competicion)
+        bAllCompetitions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ga.showCompetitionsFragment();
             }
         });
     }
@@ -121,7 +133,7 @@ public class PrincipalFragment extends Fragment {
         lyInProgress.setVisibility(View.GONE);
         lyToStart.setVisibility(View.GONE);
         lyFinishPrin.setVisibility(View.GONE);
-        lyResultPrin.setVisibility(View.GONE);
+        lyLoadPrin.setVisibility(View.GONE);
         lyNotRegisPrin.setVisibility(View.VISIBLE);
     }
 
@@ -136,7 +148,6 @@ public class PrincipalFragment extends Fragment {
         lyInProgress.setVisibility(View.GONE);
         lyToStart.setVisibility(View.GONE);
         lyFinishPrin.setVisibility(View.GONE);
-        lyResultPrin.setVisibility(View.GONE);
         lyNotRegisPrin.setVisibility(View.GONE);
         //Estado inicial vista
         tvFinishCompetitionPrin.setVisibility(View.GONE);
@@ -300,5 +311,18 @@ public class PrincipalFragment extends Fragment {
         tvL3PointsPrin.setText("x "+l3);
         tvL4PointsPrin.setText("x "+l4);
         tvTotalPointsPrin.setText(total+"");
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ESTABLECER VISIBILIDAD DEL PANEL DE CARGA DEL FRAGMENTO
+     */
+    public void visibilityLyLoad(boolean status) {
+        if(status){
+            lyLoadPrin.setVisibility(View.VISIBLE);
+        }else {
+            lyLoadPrin.setVisibility(View.GONE);
+        }
     }
 }

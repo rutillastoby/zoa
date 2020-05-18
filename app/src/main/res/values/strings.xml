@@ -1,4 +1,5 @@
 <resources>
+    <string name="version">ZOA 2020 | Versión: 2.0</string>
     <string name="app_name">Zoa</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="bLogin">ACCEDER</string>
@@ -35,4 +36,18 @@
     <string name="buttonShowCompe">TODAS LAS COMPETICIONES</string>
     <string name="hello">Hola 👋</string>
     <string name="welcomeZoa">Antes de nada debes establecer el nombre con el que te verán el resto de usuarios.</string>
+    <string name="nowRegisterCompe">Ya estas registrado en una competicion activa</string>
+    <string name="notQuestions">No hay ninguna pregunta disponible.\nEscanea los codigos de tipo pregunta para obtener nuevas.</string>
+    <string name="titleDialogRankingInfo">Valor de los códigos</string>
+    <string name="yellowRankingInfo"><b>1 punto.</b></string>
+    <string name="blueRankingInfo"><b>2 puntos.</b></string>
+    <string name="redRankingInfo"><b>3 puntos.</b></string>
+    <string name="questRankingInfo"><b>6 puntos.</b><i>\n(Pregunta correcta)</i></string>
+    <string name="flagRankingInfo"><b>10 puntos.</b><i>\n(Bandera final)</i></string>
+    <string name="infoTitle">Aplicación desarrollada por</string>
+    <string name="rutillasToby">Rutillas Toby</string>
+    <string name="rateApp1">¿TE GUSTA ZOA?</string>
+    <string name="rateApp2">Puedes ayudarnos valorando la aplicación en Google Play.</string>
+    <string name="close">CERRAR</string>
+
 </resources>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="clip_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivIconInfo1"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_weight="4"
+                app:srcCompat="@drawable/ic_level1" />
+
+            <TextView
+                android:id="@+id/tvIconInfo1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:gravity="center_vertical"
+                android:text="@string/yellowRankingInfo"
+                android:textAlignment="gravity"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="clip_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivIconInfo2"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_weight="4"
+                app:srcCompat="@drawable/ic_level2" />
+
+            <TextView
+                android:id="@+id/tvIconInfo2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:gravity="center_vertical"
+                android:text="@string/blueRankingInfo"
+                android:textAlignment="gravity"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_weight="4"
+            android:gravity="clip_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivIconInfo3"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_weight="4"
+                app:srcCompat="@drawable/ic_level3" />
+
+            <TextView
+                android:id="@+id/tvIconInfo3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:gravity="center_vertical"
+                android:text="@string/redRankingInfo"
+                android:textAlignment="gravity"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_weight="4"
+            android:gravity="clip_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivIconInfo4"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_weight="4"
+                app:srcCompat="@drawable/ic_qp" />
+
+            <TextView
+                android:id="@+id/tvIconInfo4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:gravity="center_vertical"
+                android:text="@string/questRankingInfo"
+                android:textAlignment="gravity"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_weight="4"
+            android:gravity="clip_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivIconInfo5"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_weight="4"
+                app:srcCompat="@drawable/ic_flag" />
+
+            <TextView
+                android:id="@+id/tvIconInfo5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:gravity="center_vertical"
+                android:text="@string/flagRankingInfo"
+                android:textAlignment="gravity"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

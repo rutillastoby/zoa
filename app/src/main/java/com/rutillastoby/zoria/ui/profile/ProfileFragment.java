@@ -1,8 +1,11 @@
 package com.rutillastoby.zoria.ui.profile;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -10,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -40,11 +44,11 @@ import java.util.Map;
 
 public class ProfileFragment extends Fragment {
     //Referencias
-    private ImageView ivProfile, ivLogout;
+    private ImageView ivProfile, ivLogout, ivInfoGeneral;
     private EditText etNickNameProfile, etEmailProfile;
     private ProgressBar pbNickProfile;
     private RecyclerView rvRecordList;
-    private ConstraintLayout lyEmptyRecord;
+    private ConstraintLayout lyEmptyRecord, lyLoadProfile;
 
     //Firebase
     private FirebaseAuth firebaseAuth;
@@ -75,6 +79,7 @@ public class ProfileFragment extends Fragment {
      */
     private void initVar(View v){
         final View view = v;
+        final Context context = getContext();
         thisClass = this;
         //Obtener usuario y base de datoS
         firebaseAuth = FirebaseAuth.getInstance();
@@ -88,6 +93,11 @@ public class ProfileFragment extends Fragment {
         rvRecordList = view.findViewById(R.id.rvRecordList);
         lyEmptyRecord = view.findViewById(R.id.lyEmptyRecord);
         ivLogout = getActivity().findViewById(R.id.ivLogout);
+        ivInfoGeneral = getActivity().findViewById(R.id.ivInfoGeneral);
+        lyLoadProfile = view.findViewById(R.id.lyLoadProfile);
+
+        //Estado inicial
+        lyLoadProfile.setVisibility(View.VISIBLE);
 
         //Onclick boton cerrar sesion
         ivLogout.setOnClickListener(new View.OnClickListener() {
@@ -139,6 +149,40 @@ public class ProfileFragment extends Fragment {
                 }
             }
             return true; //El true deja el teclado abierto
+            }
+        });
+
+        ///// Funcionalidad al hacer click sobre boton de info general
+        ivInfoGeneral.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Creación de la ventana modal con la informacion
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                View dialog = inflater.inflate(R.layout.dialog_info_general, null);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                //Funcionalidad boton valorar del dialogo
+                Button bRate = dialog.findViewById(R.id.bRate);
+                bRate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Abrir google play para valorar app
+                        Uri uri = Uri.parse("market://details?id=" + context.getPackageName());
+                        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                        try {
+                            startActivity(goToMarket);
+                        } catch (ActivityNotFoundException e) {
+                            startActivity(new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse("http://play.google.com/store/apps/details?id=" + context.getPackageName())));
+                        }
+                    }
+                });
+
+                builder.setView(dialog)
+                    .show();
             }
         });
     }
@@ -265,5 +309,16 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    //----------------------------------------------------------------------------------------------
 
+    /**
+     * METODO PARA ESTABLECER VISIBILIDAD DEL PANEL DE CARGA DEL FRAGMENTO
+     */
+    public void visibilityLyLoad(boolean status) {
+        if(status){
+            lyLoadProfile.setVisibility(View.VISIBLE);
+        }else {
+            lyLoadProfile.setVisibility(View.GONE);
+        }
+    }
 }
