@@ -1,11 +1,14 @@
 package com.rutillastoby.zoria;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -135,5 +138,26 @@ public class GenericFuntions {
             }
             @Override public void onError(Exception e) {}
         });
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA ABRIR LA PAGINA DE LA APLICACION DE GOOGLE PLAY
+     * @param context
+     */
+    public static void openPlayStore(Context context){
+        //Abrir google play para valorar app
+        Uri uri = Uri.parse("market://details?id=" + context.getPackageName());
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        try {
+            context.startActivity(goToMarket);
+        } catch (ActivityNotFoundException e) {
+            context.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + context.getPackageName())));
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.rutillastoby.zoria;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,10 +8,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -42,8 +41,6 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
 
-    public static Activity inicio;
-
     // Permisos =================================================
     private boolean hasPermissions=true;
     int PERMISSION_ALL = 333;
@@ -51,15 +48,14 @@ public class LoginActivity extends AppCompatActivity {
     // Base de datos ============================================
     private FirebaseDatabase db;
 
-    // Variables ====================================================
-    private boolean registerInDB; //Variable para determinar si el usuario esta ya registrado en la base de datos o no
+    //Referencias ===============================================
     public static Context context;
-    private ProgressBar pbCargando;
-    private Button bAcceder;
+    private ProgressBar pbLoadingLogin;
+    private Button bLogin;
+    private ConstraintLayout lyOldVersion, lyUpdateApp;
 
-
-
-
+    // Variables ================================================
+    private boolean registerInDB; //Variable para determinar si el usuario esta ya registrado en la base de datos o no
 
 
     //----------------------------------------------------------------------------------------------
@@ -72,14 +68,18 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        inicio = this;
 
         //Referencias
         context=this;
-        pbCargando = (ProgressBar) findViewById(R.id.pbcarga2);
-        pbCargando.setVisibility(View.VISIBLE);
-        bAcceder = (Button) findViewById(R.id.bLogin);
-        bAcceder.setVisibility(View.INVISIBLE);
+        pbLoadingLogin = findViewById(R.id.pbLoadingLogin);
+        bLogin = findViewById(R.id.bLogin);
+        lyOldVersion = findViewById(R.id.lyOldVersion);
+        lyUpdateApp = findViewById(R.id.lyUpdateApp);
+
+        //Estado inicial
+        changeVisibilityButton(1); //Mostrar cargando
+        lyOldVersion.setVisibility(View.GONE);
+
         //Firebase
         db = FirebaseDatabase.getInstance();
 
@@ -111,6 +111,21 @@ public class LoginActivity extends AppCompatActivity {
             //Comprobar version de la base de datos
             checkVersionDB();
         }
+
+        //////////////////////////// Botones //////////////////////////////
+        lyUpdateApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GenericFuntions.openPlayStore(context);
+            }
+        });
+
+        bLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
                     //Comprobar si el usuario tiene una sesión de login previa guardada
                     checkOldLogin();
                 }else{
-                    Toast.makeText(context, "Version antigua, actualiza la aplicacion", Toast.LENGTH_SHORT).show();
+                    lyOldVersion.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -144,11 +159,16 @@ public class LoginActivity extends AppCompatActivity {
 
     //Metodo para comprobar si el usuario ya se ha registrado de forma previa
     private void checkOldLogin() {
-        super.onStart();
+        //Obtener usuario previamente logueado
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         // Comprobar si el usuario ya esta logueado
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        //Llamada al metodo que accede a traves de firebase con la cuenta de google
-        firebaseAuthWithGoogle(account);
+        if(currentUser!=null){
+            //Acceder al sistema
+            login(currentUser);
+        }else{
+            //Activamos el boton de login
+            changeVisibilityButton(2);
+        }
     }
 
     //----------------------------------------------------------------------------------------------
@@ -157,6 +177,9 @@ public class LoginActivity extends AppCompatActivity {
      * METODO PARA ABRIR VENTA DE SELECCION DE CUENTA DE USUARIO DE GOOGLE
      */
     private void signIn() {
+        //Mostrar barra de carga
+        changeVisibilityButton(1);
+        //Abrir intent con cuentas de google del telefono
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -190,9 +213,12 @@ public class LoginActivity extends AppCompatActivity {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             //Completar logueo a traves de firebase a partir de la cuenta de google obtenida
             firebaseAuthWithGoogle(account);
+            //Mensaje inicial
+            GenericFuntions.snack(findViewById(R.id.lyLogin), "Estamos preparando todo!");
         } catch (ApiException e) {
             //Error al iniciar sesion
             GenericFuntions.errorSnack(findViewById(R.id.lyLogin), "Error al iniciar sesión. x001", this);
+            changeVisibilityButton(2); //Mostrar boton de login
         }
     }
 
@@ -217,6 +243,7 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         //Error al iniciar sesion
                         GenericFuntions.errorSnack(findViewById(R.id.lyLogin), "Error al iniciar sesión. x002", context);
+                        changeVisibilityButton(2); //Mostrar boton de login
                     }
 
                 }
@@ -231,9 +258,6 @@ public class LoginActivity extends AppCompatActivity {
     public void login(final FirebaseUser user){
         registerInDB=false;
 
-        //Mensaje inicial
-        GenericFuntions.errorSnack(findViewById(R.id.lyLogin), "Estamos preparando todo!", context);
-
         // Poner a la escucha el nodo de usuarios
         db.getReference("usuarios").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -244,34 +268,34 @@ public class LoginActivity extends AppCompatActivity {
                         registerInDB=true;
                     }
                 }
-            }
-            @Override public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });
 
-        //Cargamos la activity correspondiente segun si es un usuario nuevo o no
-        if(registerInDB){
-            //Obtener la hora de la base de datos para pasarla a la activity general
-            FirebaseFunctions.getInstance("europe-west1").getHttpsCallable("getTime")
-                    .call().addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                @Override
-                public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                    //Datos obtenidos
-                    long currentMilliseconds = (long) httpsCallableResult.getData();
+                //Cargamos la activity correspondiente segun si es un usuario nuevo o no
+                if(registerInDB){
+                    //Obtener la hora de la base de datos para pasarla a la activity general
+                    FirebaseFunctions.getInstance("europe-west1").getHttpsCallable("getTime")
+                            .call().addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                        @Override
+                        public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                            //Datos obtenidos
+                            long currentMilliseconds = (long) httpsCallableResult.getData();
 
-                    //Abrir activity general
-                    Intent i = new Intent(context, GeneralActivity.class);
-                    i.putExtra("currentTime", currentMilliseconds);
+                            //Abrir activity general
+                            Intent i = new Intent(context, GeneralActivity.class);
+                            i.putExtra("currentTime", currentMilliseconds);
+                            startActivity(i);
+                            finish();
+                        }
+                    });
+
+                }else{
+                    //Abrir activity nuevo usuario
+                    Intent i = new Intent(context, NewUserActivity.class);
                     startActivity(i);
                     finish();
                 }
-            });
-
-        }else{
-            //Abrir activity nuevo usuario
-            Intent i = new Intent(context, NewUserActivity.class);
-            startActivity(i);
-            finish();
-        }
+            }
+            @Override public void onCancelled(@NonNull DatabaseError databaseError) { }
+        });
     }
 
 
@@ -322,5 +346,30 @@ public class LoginActivity extends AppCompatActivity {
             finishAffinity();
         }
 
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                          OTROS                                             //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * METODO PARA CAMBIAR LA VISIBILIDAD DEL BOTON DE LOGIN Y CARGA
+     * @param status 0-> no mostrar nada, 1 -> Mostrar boton login, 2-> mostrar barra progreso
+     */
+    public void changeVisibilityButton(int status){
+        switch (status){
+            case 0:
+                pbLoadingLogin.setVisibility(View.INVISIBLE);
+                bLogin.setVisibility(View.INVISIBLE);
+                break;
+            case 1:
+                pbLoadingLogin.setVisibility(View.VISIBLE);
+                bLogin.setVisibility(View.INVISIBLE);
+                break;
+            case 2:
+                pbLoadingLogin.setVisibility(View.INVISIBLE);
+                bLogin.setVisibility(View.VISIBLE);
+        }
     }
 }

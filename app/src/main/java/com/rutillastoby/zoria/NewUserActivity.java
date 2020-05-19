@@ -37,7 +37,7 @@ public class NewUserActivity extends AppCompatActivity {
 
     //Referencias
     private EditText etNickNewUser;
-    private Button bOkNewUser;
+    private Button bOkNewUser, bCancelNewUser;
     private ImageView ivPhotoProfileNewUser;
     private ProgressBar pbNickNewUser;
 
@@ -71,16 +71,23 @@ public class NewUserActivity extends AppCompatActivity {
     private void initVar(){
         final Context context = this;
 
-        //Obtner referencias
+        //Obtener referencias
         etNickNewUser = findViewById(R.id.etNickNewUser);
         bOkNewUser = findViewById(R.id.bOkNewUser);
+        bCancelNewUser = findViewById(R.id.bCancelNewUser);
         ivPhotoProfileNewUser = findViewById(R.id.ivPhotoProfileNewUser);
         pbNickNewUser = findViewById(R.id.pbNickNewUser);
+
+        //Ocultar botones toolbar
+        findViewById(R.id.ivLogout).setVisibility(View.GONE);
+        findViewById(R.id.ivInfoRanking).setVisibility(View.GONE);
+        findViewById(R.id.ivInfoGeneral).setVisibility(View.GONE);
 
         //Cargar la imagen de perfil del usuario
         String bigPhoto = user.getPhotoUrl().toString().replace("s96-c", "s320-c");
         GenericFuntions.chargeImageRound(context, bigPhoto, ivPhotoProfileNewUser);
 
+        //Funcionalidad al pulsar el boton de aceptar
         bOkNewUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +98,17 @@ public class NewUserActivity extends AppCompatActivity {
                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(findViewById(R.id.lyNewUser).getWindowToken(), 0);
                 etNickNewUser.clearFocus();
+            }
+        });
+
+        //Funcionalidad al pulsar el boton de cancelar
+        bCancelNewUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Cerrar sesion
+                FirebaseAuth.getInstance().signOut();
+                //Cerrar aplicacion
+                finishAffinity();
             }
         });
 

@@ -51,5 +51,6 @@
     <string name="rateApp1">¿TE GUSTA ZOA?</string>
     <string name="rateApp2">Puedes ayudarnos valorando la aplicación en Google Play.</string>
     <string name="close">CERRAR</string>
-
+    <string name="oldVersion"><b>Oh vaya!</b>\nEstas usando una versión antigua. Actualiza la aplicación para continuar... </string>
+    <string name="update">ACTUALIZAR</string>
 </resources>

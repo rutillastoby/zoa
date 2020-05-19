@@ -1,11 +1,8 @@
 package com.rutillastoby.zoria.ui.profile;
 
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -166,18 +163,7 @@ public class ProfileFragment extends Fragment {
                 bRate.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //Abrir google play para valorar app
-                        Uri uri = Uri.parse("market://details?id=" + context.getPackageName());
-                        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
-                        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
-                                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
-                                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                        try {
-                            startActivity(goToMarket);
-                        } catch (ActivityNotFoundException e) {
-                            startActivity(new Intent(Intent.ACTION_VIEW,
-                                    Uri.parse("http://play.google.com/store/apps/details?id=" + context.getPackageName())));
-                        }
+                        GenericFuntions.openPlayStore(context);
                     }
                 });
 
@@ -275,11 +261,17 @@ public class ProfileFragment extends Fragment {
         builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                firebaseAuth.signOut();
+                //Cerrar sesion
+                FirebaseAuth.getInstance().signOut();
+                //Cerrar aplicacion
                 getActivity().finishAffinity();
+                //El codigo comentado es para abrir de nuevo la ventana de login, preferible cerrar app
+                //para evitar problemas al quedarse activity funcionando en segundo plano o similar
+                /*Intent i = new Intent(getContext(), LoginActivity.class);
+                startActivity(i);
+                getActivity().finish();*/
             }
         });
-
 
         AlertDialog dialog = builder.create();
         dialog.show();
