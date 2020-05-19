@@ -4,7 +4,6 @@
     package="com.rutillastoby.zoria">
 
     <application
-        android:name=".Reloj"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -17,28 +16,7 @@
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity"></activity>
-        <activity
-            android:name=".ClasificacionActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name=".ScanerActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
 
-        <activity
-            android:name=".MapaActivity"
-            android:label="@string/title_activity_mapa"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name=".PrincipalActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name=".ActivityCompeticiones"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait"
