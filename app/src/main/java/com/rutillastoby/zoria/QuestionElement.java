@@ -208,7 +208,7 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
         //7. Deshabilitar el boton de enviar respuesta si así se ha indicado en el constructor
         if(lockButtonSend){
             instance.bAceptResponse.setEnabled(false);
-            instance.bAceptResponse.setBackground(context.getResources().getDrawable(R.drawable.boton_b));
+            instance.bAceptResponse.setBackground(context.getResources().getDrawable(R.drawable.button_b));
             //Desactivar seleccion de opciones
             instance.tvResp1.setOnClickListener(null); instance.tvResp2.setOnClickListener(null);
             instance.tvResp3.setOnClickListener(null); instance.tvResp4.setOnClickListener(null);

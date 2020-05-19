@@ -250,7 +250,8 @@ public class ProfileFragment extends Fragment {
     private void logout(View view){
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setCancelable(true);
-        builder.setTitle(R.string.logoutText);
+        builder.setTitle(R.string.titleLogout);
+        builder.setMessage(R.string.logoutText);
         //builder.setMessage("Message");
         builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
             @Override

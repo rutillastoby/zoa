@@ -3,7 +3,9 @@
     <string name="versionDB">1</string>
     <string name="version">ZOA 2020 | Versión: 2.0</string>
     <string name="app_name">Zoa</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="rutillasToby">Rutillas Toby</string>
+    <string name="byRutillasToby">by <b>Rutillas Toby</b></string>
+
     <string name="bLogin">ACCEDER</string>
     <string name="nomCompe">ZOA</string>
     <string name="title_activity_mapa">Map</string>
@@ -14,6 +16,7 @@
     <string name="competitionsTitle">COMPETICIONES</string>
     <string name="profileHistory">Mi historia</string>
     <string name="profileNotHistory">Vaya! Parece que aun no has participado en ninguna competición...</string>
+    <string name="titleLogout">Cerrar sesión y salir</string>
     <string name="logoutText">¿Desea cerrar la sesión?</string>
     <string name="competitionFinishText">Finalizada</string>
     <string name="titleDialogRegister">Acceso a la competición:</string>
@@ -47,7 +50,6 @@
     <string name="questRankingInfo"><b>6 puntos.</b><i>\n(Pregunta correcta)</i></string>
     <string name="flagRankingInfo"><b>10 puntos.</b><i>\n(Bandera final)</i></string>
     <string name="infoTitle">Aplicación desarrollada por</string>
-    <string name="rutillasToby">Rutillas Toby</string>
     <string name="rateApp1">¿TE GUSTA ZOA?</string>
     <string name="rateApp2">Puedes ayudarnos valorando la aplicación en Google Play.</string>
     <string name="close">CERRAR</string>
