@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
+import com.rutillastoby.zoria.dao.competicion.Hora;
 import com.rutillastoby.zoria.dao.competicion.Pregunta;
 import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
 import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
@@ -501,7 +502,7 @@ public class GeneralActivity extends AppCompatActivity {
                 break;
             //OTRO FRAGMENT
             default:
-                finish(); //Cerrar aplicacion directamente
+                //finish(); //Cerrar aplicacion directamente
                 break;
         }
     }
@@ -545,6 +546,14 @@ public class GeneralActivity extends AppCompatActivity {
                     CompeticionDao c = compe.getValue(CompeticionDao.class); //Rellenar objeto de tipo competicion
                     c.setId(Integer.parseInt(compe.getKey()));
 
+                    //Si es el tutorial, cambiamos las fechas
+                    if(c.getId()==1){
+                        Hora hour = new Hora();
+                        hour.setInicio(currentMilliseconds-1200000); //Hora actual menos 20 minutos
+                        hour.setFin(currentMilliseconds+28800000); //Hora actual mas 8 horas
+                        c.setHora(hour);
+                    }
+
                     //Agregamos a la lista de competiciones
                     competitionsList.add(c);
 
@@ -557,8 +566,12 @@ public class GeneralActivity extends AppCompatActivity {
                     }
                 }
 
-                //Establecer el nuevos valores para el fragmento del listado de competiciones
+                //Establecer los nuevos valores para el fragmento del listado de competiciones
                 compF.setCompetitionsList(competitionsList);
+                //Cargar el historial de competiciones en el fragmento del perfil
+                if(getUsers) {
+                    profF.loadRecordCompetition(competitionsList);
+                }
 
                 //Obtener el ranking tras cargar estos datos y los de usuario ya que necesita ambos
                 getCompetitions=true;
@@ -636,21 +649,21 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Guardar datos en base de datos local
         db.getReference(path)
-                .setValue(idResponse, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
-                        if (databaseError == null) {
-                            //Llamada al metodo para eliminar la linea previamente introducida
-                            removeALine(idInserted);
-                        }
+            .setValue(idResponse, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
+                    if (databaseError == null) {
+                        //Llamada al metodo para eliminar la linea previamente introducida
+                        removeALine(idInserted);
                     }
-                });
+                }
+            });
 
         //Establecer la puntuación obtenida al resolver la pregunta
         if(correct){
             String idPointAssociated = competitionShow.getPreguntas().get(idQuestion).getIdPunto();
-            sendPointScann(idPointAssociated, -1, 5); //El nivel lo establecemos en -1 para no resetear de nuevo la pregunta
+            sendPointScann(idPointAssociated, -1, 6); //El nivel lo establecemos en -1 para no resetear de nuevo la pregunta
         }
     }
 
@@ -665,7 +678,6 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Guardar datos en fichero local indicado el tipo de value 0->texto, 1->int
         final int idInserted = saveDataOnLocal(path, value, 0);
-        testFile();
 
         //Guardar datos en base de datos
         db.getReference(path)
@@ -677,7 +689,6 @@ public class GeneralActivity extends AppCompatActivity {
                         //Llamada al metodo para eliminar la linea previamente introducida
                         boolean correct = removeALine(idInserted);
                         Log.d("txt", "eliminar ->"+correct);
-                        testFile();
                     }
                 }
             });
@@ -691,7 +702,6 @@ public class GeneralActivity extends AppCompatActivity {
                 }
             }
         }
-        //deleteAll();testFile();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -737,6 +747,12 @@ public class GeneralActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //              GUARDAR INFORMACION DE FORMA LOCAL COMO RESPALDO ANTE DESCONEXION             //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     /**
      * METODO PARA ALMACENAR INFORMACIÓN EN FICHERO LOCAL Y NO PERDER DATOS EN CASO DE DESCONEXIÓN
@@ -800,8 +816,12 @@ public class GeneralActivity extends AppCompatActivity {
         //Devolver numero de elementos en la tabla data
         return count;
     }
+
     //----------------------------------------------------------------------------------------------
 
+    /**
+     * METODO PARA VISUALIZAR DATOS DE LA TABLA PARA DEPURACION
+     */
     public void testFile(){
         //Declarar la base de datos que se utilizara
         AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
@@ -822,6 +842,9 @@ public class GeneralActivity extends AppCompatActivity {
         Log.d("txt", "-------------------------");
     }
 
+    /**
+     * METODO PARA ELIMINAR EL CONTENIDO POR COMPLETO DE LA TABLA, PARA PRUEBAS
+     */
     public void deleteAll(){
         //Declarar la base de datos que se utilizara
         AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
@@ -829,6 +852,8 @@ public class GeneralActivity extends AppCompatActivity {
         SQLiteDatabase dbLocal = asoh.getWritableDatabase();
         dbLocal.execSQL("delete from data");
     }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                      GETS + SETS                                           //
     ////////////////////////////////////////////////////////////////////////////////////////////////

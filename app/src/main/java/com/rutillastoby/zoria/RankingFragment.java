@@ -3,6 +3,7 @@ package com.rutillastoby.zoria;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -116,7 +117,7 @@ public class RankingFragment extends Fragment {
                     case 1: uL1++; break; //TIPO 1
                     case 2: uL2++; break; //TIPO 2
                     case 3: uL3++; break; //TIPO 3
-                    case 5: uL4++; break; //TIPO 4 (Pregunta)
+                    case 6: uL4++; break; //TIPO 4 (Pregunta)
                     case 10: u.setFlag(true); break; //TIPO 5 (bandera)
                 }
                 //Sumar puntos al total
@@ -169,12 +170,15 @@ public class RankingFragment extends Fragment {
      * @param position
      */
     public void autoScroll(final int position){
-        new Runnable() {
+        final int speedScroll = 250;
+        final Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                // Call smooth scroll
                 rvRanking.smoothScrollToPosition(position);
             }
         };
+
+        handler.postDelayed(runnable,speedScroll);
     }
 }

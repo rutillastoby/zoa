@@ -93,6 +93,7 @@ public class CompetitionsFragment extends Fragment{
     public void checkAccess(int id){
         //Seguridad para evitar problemas de inicialización
         if(competitionsRegisteredList!=null) {
+            GeneralActivity ga = ((GeneralActivity)getActivity());
             boolean access = false;
             //Comprobar si estamos registrados en esa competicion
             for (int i = 0; i < competitionsRegisteredList.size(); i++) {
@@ -104,7 +105,6 @@ public class CompetitionsFragment extends Fragment{
             //Segun si tenemos accesso o no
             if (access) {
                 ///////////// ACCEDER A COMPETICION ////////////////
-                GeneralActivity ga = ((GeneralActivity)getActivity());
 
                 // Si la competicion presionada es la que esta activa mostramos directamente el panel
                 if(id==ga.getCurrentCompeId()){
@@ -112,18 +112,19 @@ public class CompetitionsFragment extends Fragment{
 
                 // Si es diferente al tutorial y la competicion no ha finalizado
                 // la marcamos como competicion activa y la abrimos en seccion current
-                } else if((id!=1 && !ga.competitionFinish(id))){
-                    String myUid = ((GeneralActivity)getActivity()).getMyUser().getUid();
-                    db.getReference("usuarios/"+myUid+"/compeActiva").setValue(id);
+                } else if((id!=1 && !ga.competitionFinish(id))) {
+                    String myUid = ((GeneralActivity) getActivity()).getMyUser().getUid();
+                    db.getReference("usuarios/" + myUid + "/compeActiva").setValue(id);
                     ga.checkFragmentCurrent();
 
                 }else{
-                    //Si es el tutorial lo abrimos en la propia seccion de competiciones
+                    //En otro caso mostramos directamente la competicion en el fragmento actual sin cambiar de menu
                     ga.showMainViewCompetition(id);
                 }
 
-            } else {
-                ///////////// SOLICITAR ACCESO /////////////////
+            } else if(!ga.competitionFinish(id)){
+                ///////////// SOLICITAR ACCESO SI NO ES UNA COMPETICION FINALIZADA /////////////////
+
                 //Solicitar Contraseña con una ventana emergente
                 for (int i = 0; i < competitionsList.size(); i++) {
                     if (competitionsList.get(i).getId() == id) {
@@ -149,7 +150,7 @@ public class CompetitionsFragment extends Fragment{
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         builder.setView(dialog)
-                .setTitle(compeId==1? getString(R.string.titleDialogRegister)+" (0000)" : getString(R.string.titleDialogRegister))
+                .setTitle(compeId==1? getString(R.string.titleDialogRegister)+" (1234)" : getString(R.string.titleDialogRegister))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     //Al hacer clic en aceptar
                     @Override

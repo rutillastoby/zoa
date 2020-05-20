@@ -17,8 +17,9 @@ public class Jugador {
     }
 
     public HashMap<String, Integer> getPreguntas() {
-        if (preguntas == null)
+        if (preguntas == null) {
             return new HashMap<String, Integer>();
+        }
         return preguntas;
     }
 

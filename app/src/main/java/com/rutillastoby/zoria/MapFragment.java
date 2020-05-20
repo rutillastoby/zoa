@@ -225,7 +225,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         break;
                     case 4:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_qp);
-                        nameComplement+="5 puntos";
+                        nameComplement+="6 puntos";
                         break;
                     case 5:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_flag);
@@ -237,7 +237,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     instanciatedMarker.add(
                         map.addMarker(new MarkerOptions()
                             .position(locationPoint)
-                            .title(point.getValue().getNombre()+nameComplement)
+                            .title("Código "+point.getValue().getNombre()+nameComplement)
                             .icon(icon)
                             .anchor(0.5f, 0.5f))
                     );

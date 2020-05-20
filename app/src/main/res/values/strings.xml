@@ -1,11 +1,9 @@
 <resources>
 
-    <string name="versionDB">1</string>
+    <string name="versionDB">2.0</string>
     <string name="version">ZOA 2020 | Versión: 2.0</string>
     <string name="app_name">Zoa</string>
     <string name="rutillasToby">Rutillas Toby</string>
-    <string name="byRutillasToby">by <b>Rutillas Toby</b></string>
-
     <string name="bLogin">ACCEDER</string>
     <string name="nomCompe">ZOA</string>
     <string name="title_activity_mapa">Map</string>
@@ -18,7 +16,7 @@
     <string name="profileNotHistory">Vaya! Parece que aun no has participado en ninguna competición...</string>
     <string name="titleLogout">Cerrar sesión y salir</string>
     <string name="logoutText">¿Desea cerrar la sesión?</string>
-    <string name="competitionFinishText">Finalizada</string>
+    <string name="competitionFinishText">FINALIZADA</string>
     <string name="titleDialogRegister">Acceso a la competición:</string>
     <string name="pwdFail">Contraseña incorrecta :(</string>
     <string name="myPointsCurrent">Mi puntuación</string>
@@ -33,7 +31,6 @@
     <string name="duplicateScenned">ESTE CÓDIGO YA LO HAS REGISTRADO...</string>
     <string name="getFlagText">CÓDIGO BANDERA REGISTRADO</string>
     <string name="pointsFlag">+10 puntos.</string>
-    <string name="endCompetition">COMPETICIÓN FINALIZADA.</string>
     <string name="endCompetitionExtra">Suerte para la calsificación, pronto sabremos los resultados! </string>
     <string name="notRegister">Demuestra tu nivel de orientación!</string>
     <string name="notRegisterExtra">Parece que no estas registrad@ en una competición.</string>

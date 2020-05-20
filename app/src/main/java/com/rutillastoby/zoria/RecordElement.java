@@ -21,14 +21,16 @@ import java.util.TimeZone;
 
 public class RecordElement extends RecyclerView.Adapter<RecordElement.CompetitionRecordInstance>{
     private ArrayList<CompeticionDao> competitionsList;
-    ProfileFragment context;
+    private ProfileFragment context;
+    private GeneralActivity ga;
 
     /**
      * CONSTRUCTOR PARAMETRIZADO
      */
-    public RecordElement(ArrayList<CompeticionDao> c, ProfileFragment cc){
+    public RecordElement(ArrayList<CompeticionDao> c, ProfileFragment cc, GeneralActivity g){
         competitionsList =c;
         context =cc;
+        ga = g;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -43,7 +45,7 @@ public class RecordElement extends RecyclerView.Adapter<RecordElement.Competitio
     @Override
     public CompetitionRecordInstance onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         //Crear la vista con el layout correspondiente a la plantilla de la competicion
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.element_competition, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.element_record, viewGroup, false);
         //Crear objeto de tipo viewHolder de la clase interna con la vista creada anteriormente
         CompetitionRecordInstance example = new CompetitionRecordInstance(view);
         //Devolver el objeto de la fila creado
@@ -68,14 +70,15 @@ public class RecordElement extends RecyclerView.Adapter<RecordElement.Competitio
         Date now = new Date(competitionsList.get(i).getHora().getInicio());
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
         cal.setTime(now);
-        instance.tvDateRecord.setText(cal.get(Calendar.DAY_OF_MONTH)+"/"+cal.get(Calendar.MONTH)
+        instance.tvDateRecord.setText(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH))+"/"+(String.format("%02d", cal.get(Calendar.MONTH)+1))
                 +"/"+cal.get(Calendar.YEAR));
 
         //4. Accion al presionar la competicion
         instance.lyCompeRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               //Abrir competicion en modo historial
+            //Abrir competicion en modo historial sin cambiar de menu
+            ga.showMainViewCompetition(competitionsList.get(i).getId());
             }
         });
     }

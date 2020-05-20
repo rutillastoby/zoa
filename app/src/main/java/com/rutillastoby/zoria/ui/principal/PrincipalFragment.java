@@ -29,7 +29,7 @@ public class PrincipalFragment extends Fragment {
     //Referencias
     private TextView tvTitlePrincipalCompe, tvSecPrin, tvHourMinPrin, tvHourMinToStart, tvSecToStart,
                      tvL1PointsPrin, tvL2PointsPrin, tvL3PointsPrin, tvL4PointsPrin, tvTotalPointsPrin,
-                     tvFinishCompetitionPrin;
+                     tvFinishCompetitionPrin, tvNameToFinishCompe;
     private ConstraintLayout lyInProgress, lyToStart, bMapPrin, bQuestionPrin, lyRankingPrin, lyFinishPrin,
                              lyLoadPrin, lyNotRegisPrin, lyClockCurrent;
     private LinearLayout lyShowRankingPrin;
@@ -86,6 +86,7 @@ public class PrincipalFragment extends Fragment {
         lyShowRankingPrin = view.findViewById(R.id.lyShowRankingPrin);
         dividerRanking = view.findViewById(R.id.dividerRanking);
         bAllCompetitions = view.findViewById(R.id.bAllCompetitions);
+        tvNameToFinishCompe = view.findViewById(R.id.tvNameToFinishCompe);
 
         //Estado inicial
         lyLoadPrin.setVisibility(View.VISIBLE);
@@ -156,6 +157,7 @@ public class PrincipalFragment extends Fragment {
 
         //Establecer datos
         tvTitlePrincipalCompe.setText(competition.getNombre());
+        tvNameToFinishCompe.setText("COMPETICIÓN "+competition.getNombre()+" FINALIZADA.");
 
         //Establecer datos al fragmento de preguntas para crear listado con las preguntas de la competicion
         //(Indicando si el boton de enviar respuesta estará habilitado)
@@ -172,9 +174,9 @@ public class PrincipalFragment extends Fragment {
                 userFinish=true;
             }
         }
-
+        Log.d("nnn","pues aqui0");
         //Comprobar si la partida ha finalizado para el usuario (Atrapada la bandera)
-        if(userFinish) {
+        if(userFinish && competition.getRes()==0) {
             //Mostrar panel de final de competicion
             lyFinishPrin.setVisibility(View.VISIBLE);
 
@@ -188,7 +190,7 @@ public class PrincipalFragment extends Fragment {
 
         }else {
             //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
-            checkTime(competition.getHora().getInicio(), competition.getHora().getFin(), competition);
+            checkTime(competition.getHora().getInicio(), competition.getHora().getFin());
         }
     }
 
@@ -198,13 +200,14 @@ public class PrincipalFragment extends Fragment {
      * METODO PARA COMPARAR LA HORA ACTUAL CON LA DE INICIO/FIN DE LA
      * COMPETICION Y ACTUAR EN FUNCION DE ELLO
      */
-    private void checkTime(final long startTime, final long finishTime, final CompeticionDao competition){
+    private void checkTime(final long startTime, final long finishTime){
         long currentTime = ga.getCurrentMilliseconds();
-
+        Log.d("aaa", "curr "+currentTime);
+        Log.d("aaa", "fin "+finishTime);
         //Comprobar si no ha comenzado, si ha finalizado o si esta en curso
-        if(currentTime>finishTime){
+        if(currentTime>=finishTime){
             //COMPETICION POR TIEMPO FINALIZADA
-
+            Log.d("aaa", "aaaaquiiiiii1");
             //Mostrar panel de finalizacion
             lyFinishPrin.setVisibility(View.VISIBLE);
             //Mostrar fragment principal
@@ -212,7 +215,7 @@ public class PrincipalFragment extends Fragment {
 
         }else{
             //COMPETICION NO INICIADA O EN CURSO
-
+            Log.d("aaa", "alliii");
             //0. Saber si ha comenzado o si esta en curso
             final int statusCompe = currentTime<startTime? 0:1; //0->No iniciada | 1->Iniciada
             //1. Resetear valores
@@ -243,7 +246,7 @@ public class PrincipalFragment extends Fragment {
                         updateCount(millisUntilFinished);
 
                         //Cerrar la clasificación 30 minutos antes de que finalice la competicion
-                        if (remainingTime<1800000){
+                        if (millisUntilFinished<1800000){
                             lyRankingPrin.setEnabled(false);
                             dividerRanking.setVisibility(View.GONE);
                             lyShowRankingPrin.setVisibility(View.GONE);
@@ -263,7 +266,7 @@ public class PrincipalFragment extends Fragment {
                     lyInProgress.setVisibility(View.GONE);
                     lyToStart.setVisibility(View.GONE);
                     //Rellamar a la funcion para actuar
-                    checkTime(startTime, finishTime, competition);
+                    checkTime(startTime, finishTime);
                 }
             }.start();
         }
@@ -279,7 +282,7 @@ public class PrincipalFragment extends Fragment {
         int seconds = (int) (time / 1000) % 60 ;
         int minutes = (int) ((time / (1000*60)) % 60);
         int hours   = (int) ((time / (1000*60*60)) % 24);
-        tvHourMinPrin.setText(hours+":"+String.format("%02d", minutes));
+        tvHourMinPrin.setText(String.format("%02d", hours)+":"+String.format("%02d", minutes));
         tvSecPrin.setText(String.format("%02d", seconds));
     }
 

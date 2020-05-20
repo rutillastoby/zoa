@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.rutillastoby.zoria.GeneralActivity;
 import com.rutillastoby.zoria.GenericFuntions;
 import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.RecordElement;
@@ -138,6 +139,12 @@ public class ProfileFragment extends Fragment {
                                 //Ocultar barra de progreso
                                 pbNickProfile.setVisibility(View.GONE);
                             }
+
+                            //Cerrar teclado
+                            final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            nickUser = newNick;
+                            imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+                            etNickNameProfile.clearFocus();
                         }
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
@@ -190,12 +197,8 @@ public class ProfileFragment extends Fragment {
                     GenericFuntions.errorSnack(view,"Error al guardar", getContext());
                 } else {
                     //Cambios guardados
+
                     GenericFuntions.snack(view, "Nombre actualizado");
-                    //Cerrar teclado
-                    final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    nickUser = newNick;
-                    imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
-                    etNickNameProfile.clearFocus();
                 }
 
                 //Ocultar barra de progreso
@@ -231,7 +234,7 @@ public class ProfileFragment extends Fragment {
             lyEmptyRecord.setVisibility(View.GONE);
             rvRecordList.setVisibility(View.VISIBLE);
             //Asignar listado al recyclerview de historial de competiciones
-            adapter = new RecordElement(competitionsList, thisClass);
+            adapter = new RecordElement(competitionsList, thisClass, ((GeneralActivity)getActivity()));
             rvRecordList.setLayoutManager(new LinearLayoutManager(getContext()));
             rvRecordList.setAdapter(adapter);
         }else{

@@ -75,7 +75,7 @@ public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.
             Date now = new Date(competitionsList.get(i).getHora().getFin());
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
             cal.setTime(now);
-            instance.tvDateCompe.setText(cal.get(Calendar.DAY_OF_MONTH)+"/"+cal.get(Calendar.MONTH)
+            instance.tvDateCompe.setText(cal.get(Calendar.DAY_OF_MONTH)+"/"+(cal.get(Calendar.MONTH)+1)
                                             +"/"+cal.get(Calendar.YEAR));
         }
         //3. Comprobar si es el tutorial para modificarlo
