@@ -96,7 +96,7 @@
         android:id="@+id/lyInProgress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -256,10 +256,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toTopOf="@+id/tvL1PointsPrin"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView16"
                 app:layout_constraintEnd_toStartOf="@+id/imageView16"
-                app:layout_constraintTop_toTopOf="@+id/imageView13"
-                app:layout_constraintVertical_bias="0.40"
+                app:layout_constraintTop_toTopOf="@+id/imageView16"
                 app:srcCompat="@drawable/ic_level3" />
 
             <ImageView
@@ -267,10 +266,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/imageView13"
                 app:layout_constraintEnd_toStartOf="@+id/imageView14"
-                app:layout_constraintTop_toTopOf="@+id/imageView13"
-                app:layout_constraintVertical_bias="0.40"
+                app:layout_constraintTop_toTopOf="@+id/imageView14"
                 app:srcCompat="@drawable/ic_level2" />
 
             <ImageView
@@ -278,10 +275,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:layout_marginEnd="24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/imageView13"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/imageView13"
-                app:layout_constraintVertical_bias="0.40"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.22000003"
                 app:srcCompat="@drawable/ic_qp" />
 
             <ImageView
@@ -289,10 +286,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/tvTotalPointsPrin"
                 app:layout_constraintEnd_toStartOf="@+id/imageView15"
-                app:layout_constraintTop_toTopOf="@+id/tvTotalPointsPrin"
-                app:layout_constraintVertical_bias="0.25"
+                app:layout_constraintTop_toTopOf="@+id/imageView15"
                 app:srcCompat="@drawable/ic_level1" />
 
             <LinearLayout
@@ -465,7 +460,7 @@
         android:id="@+id/lyFinishPrin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -474,7 +469,7 @@
         <ImageView
             android:id="@+id/imageView18"
             android:layout_width="0dp"
-            android:layout_height="140dp"
+            android:layout_height="150dp"
             android:layout_marginStart="40dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="40dp"

@@ -9,12 +9,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,6 +29,7 @@
                 android:id="@+id/ivIconInfo1"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
+                android:layout_gravity="clip_vertical"
                 android:layout_weight="4"
                 app:srcCompat="@drawable/ic_level1" />
 
@@ -39,7 +42,7 @@
                 android:text="@string/yellowRankingInfo"
                 android:textAlignment="gravity"
                 android:textColor="#000000"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -53,6 +56,7 @@
                 android:id="@+id/ivIconInfo2"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
+                android:layout_gravity="clip_vertical"
                 android:layout_weight="4"
                 app:srcCompat="@drawable/ic_level2" />
 
@@ -65,7 +69,7 @@
                 android:text="@string/blueRankingInfo"
                 android:textAlignment="gravity"
                 android:textColor="#000000"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -80,6 +84,7 @@
                 android:id="@+id/ivIconInfo3"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
+                android:layout_gravity="clip_vertical"
                 android:layout_weight="4"
                 app:srcCompat="@drawable/ic_level3" />
 
@@ -92,7 +97,7 @@
                 android:text="@string/redRankingInfo"
                 android:textAlignment="gravity"
                 android:textColor="#000000"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -107,19 +112,20 @@
                 android:id="@+id/ivIconInfo4"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="4"
                 app:srcCompat="@drawable/ic_qp" />
 
             <TextView
                 android:id="@+id/tvIconInfo4"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:gravity="center_vertical"
                 android:text="@string/questRankingInfo"
                 android:textAlignment="gravity"
                 android:textColor="#000000"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -134,20 +140,37 @@
                 android:id="@+id/ivIconInfo5"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="4"
                 app:srcCompat="@drawable/ic_flag" />
 
             <TextView
                 android:id="@+id/tvIconInfo5"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:gravity="center_vertical"
                 android:text="@string/flagRankingInfo"
                 android:textAlignment="gravity"
                 android:textColor="#000000"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/titleDialogRankingInfo"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -76,7 +76,6 @@ public class RankingFragment extends Fragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
                 builder.setView(dialog)
-                    .setTitle(getString(R.string.titleDialogRankingInfo))
                     .setPositiveButton(getString(R.string.close), new DialogInterface.OnClickListener() {
                         @Override public void onClick(DialogInterface dialog, int which) {}
                     })
