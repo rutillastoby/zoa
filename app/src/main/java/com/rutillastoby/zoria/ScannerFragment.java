@@ -26,6 +26,7 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
 
     //Variables
     private ZXingScannerView scanner;
+    private boolean visible;
 
 
 
@@ -55,6 +56,8 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         ga = ((GeneralActivity) getActivity());
         mapF = ga.getMapF();
         ivBackScanner = view.findViewById(R.id.ivBackScanner);
+        //Variables
+        visible = false;
 
         //On clicks
         ivBackScanner.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +94,47 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         scanner.stopCamera();
         scanner.removeAllViews();
         Log.d("aaa", "finalizado scanner");
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO QUE SE EJECUTA CUANDO SE DEJA DE MOSTRAR EL FRAGMENTO
+     * @param hidden
+     */
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden) {
+            visible=false;
+            stopScanner(); //Detener camara
+        }else{
+            visible=true;
+        }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * SOBREESCRITURA DEL METODO QUE SE EJECUTA AL SALIR BLOQUEAR DISPOSITIVO O MINIMIZAR APP
+     */
+    @Override
+    public void onStop() {
+        super.onStop();
+        stopScanner(); //Detener camara
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * SOBREESCRITURA DEL METODO QUE SE EJECUTA AL VOLVER A MOSTRAR LA APP DESPUES DE UN ONSTOP
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Si el escaner estaba visible lo reabrimos
+        if(visible)
+            startScanner();
     }
 
     //----------------------------------------------------------------------------------------------

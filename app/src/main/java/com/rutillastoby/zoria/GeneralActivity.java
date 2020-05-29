@@ -153,8 +153,6 @@ public class GeneralActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            //Detener el scanner al cambiar de fragmento por si estaba iniciado
-            scanF.stopScanner();
 
             switch (item.getItemId()) {
                 case R.id.navigation_competitions:
@@ -219,8 +217,6 @@ public class GeneralActivity extends AppCompatActivity {
     public void showMapFragment(){
         fm.beginTransaction().hide(active).show(mapFragment).commit();
         active = mapFragment;
-        //Detener el scanner al cambiar de fragmento por si estaba iniciado
-        scanF.stopScanner();
         //Ocultar botones toolbar
         hideToolbarButtons();
     }
@@ -257,8 +253,6 @@ public class GeneralActivity extends AppCompatActivity {
     public void showPrincActivityNotChange(){
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
-        //Detener el scanner al cambiar de fragmento por si estaba iniciado
-        scanF.stopScanner();
         //Ocultar botones toolbar
         hideToolbarButtons();
     }
@@ -300,8 +294,6 @@ public class GeneralActivity extends AppCompatActivity {
         //Mostrar el fragmento principal de la competicion
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
-        //Detener el scanner al cambiar de fragmento por si estaba iniciado
-        scanF.stopScanner();
         //Enviar los datos de la competicion
         for(int i=0; i<competitionsList.size();i++){
             if(competitionsList.get(i).getId() == id) {
