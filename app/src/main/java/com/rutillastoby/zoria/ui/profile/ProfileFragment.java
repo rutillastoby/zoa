@@ -255,7 +255,6 @@ public class ProfileFragment extends Fragment {
         builder.setCancelable(true);
         builder.setTitle(R.string.titleLogout);
         builder.setMessage(R.string.logoutText);
-        //builder.setMessage("Message");
         builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

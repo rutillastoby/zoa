@@ -25,7 +25,7 @@ public class QuestionsFragment extends Fragment{
     private ConstraintLayout lyNotQuestions;
 
     //Variables
-    private RecyclerView.Adapter adapter; //Crear un contenedor de vistas de cada competicion
+    private RecyclerView.Adapter adapter; //Crear un contenedor de vistas de cada pregunta
     private QuestionsFragment thisClass;
 
     @Override
@@ -98,6 +98,4 @@ public class QuestionsFragment extends Fragment{
         rvQuestions.setLayoutManager(new LinearLayoutManager(getContext()));
         rvQuestions.setAdapter(adapter);
     }
-
-
 }

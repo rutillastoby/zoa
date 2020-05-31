@@ -43,11 +43,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ConstraintLayout lyWarningGPS;
 
     //Variables
-    LocationListener locationListener;
-    Location currentLocation;
-    SupportMapFragment mMapFragment;
-    GoogleMap map;
-    ArrayList<Marker> instanciatedMarker = new ArrayList<Marker>(); //Variable para almacenar los puntos instanciados en mapa
+    private LocationListener locationListener;
+    private SupportMapFragment mMapFragment;
+    private GoogleMap map;
+    private ArrayList<Marker> instanciatedMarker = new ArrayList<Marker>(); //Variable para almacenar los puntos instanciados en mapa
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -108,13 +107,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                currentLocation = location;
                 ga.sendLocation(location);
             }
 
             @Override
             public void onProviderDisabled(String provider) {
-                currentLocation = null;
                 ga.sendLocation(null);
                 //Mostrar mensaje de gps desactivado
                 lyWarningGPS.setVisibility(View.VISIBLE);
@@ -208,28 +205,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //Generar la ubicacion del punto
                 LatLng locationPoint = new LatLng(point.getValue().getLat(), point.getValue().getLon());
                 BitmapDescriptor icon = null;
-                String nameComplement = " | ";
+                String name = "Código "+point.getValue().getNombre()+" | ";
                 //Seleccionar icono del punto
                 switch (point.getValue().getNivel()) {
                     case 1:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level1);
-                        nameComplement+="1 punto";
+                        name+="1 punto";
                         break;
                     case 2:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level2);
-                        nameComplement+="2 puntos";
+                        name+="2 puntos";
                         break;
                     case 3:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_level3);
-                        nameComplement+="3 puntos";
+                        name+="3 puntos";
                         break;
                     case 4:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_qp);
-                        nameComplement+="6 puntos";
+                        name+="6 puntos";
                         break;
                     case 5:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_flag);
-                        nameComplement+="10 puntos";
+                        name+="Código Bandera | 10 puntos";
                 }
 
                 //Anadir marcador al mapa
@@ -237,7 +234,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     instanciatedMarker.add(
                         map.addMarker(new MarkerOptions()
                             .position(locationPoint)
-                            .title("Código "+point.getValue().getNombre()+nameComplement)
+                            .title(name)
                             .icon(icon)
                             .anchor(0.5f, 0.5f))
                     );

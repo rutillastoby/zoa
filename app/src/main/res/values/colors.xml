@@ -7,9 +7,9 @@
     <color name="gray">#CDCDCD</color>
     <color name="error">#FF0000</color>
     <!--COLORES DE LOS PUNTOS-->
-    <color name="pointBlue">#2DAECD</color>
+    <color name="pointBlue">#439BFF</color>
     <color name="pointYellow">#FFEB3B</color>
-    <color name="pointRed">#EC3960</color>
+    <color name="pointRed">#FF2323</color>
     <!--Antiguo tono amarillo: fffe00-->
 </resources>
 
