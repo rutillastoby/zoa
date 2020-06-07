@@ -72,7 +72,7 @@ public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.
             instance.lyDateAvailable.setVisibility(View.VISIBLE);
 
             //Establecer la fecha de la competicion
-            Date now = new Date(competitionsList.get(i).getHora().getFin());
+            Date now = new Date(competitionsList.get(i).getHora().getInicio());
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
             cal.setTime(now);
             instance.tvDateCompe.setText(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH))+"/"+

@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +32,7 @@ public class RankingFragment extends Fragment {
     //Variables
     private RecyclerView.Adapter adapter; //Crear un contenedor de vistas de cada competicion
     private RankingFragment thisClass;
+    private Parcelable recyclerViewState=null; //Almacenar estado de scroll
 
 
     @Override
@@ -97,13 +98,11 @@ public class RankingFragment extends Fragment {
             int uL1=0, uL2=0, uL3=0, uL4=0, total=0;
             RankingUserData u = new RankingUserData();
 
-            Log.d("aaa", "id: "+player.getKey());
             //Obtener nombre + foto
             for(UsuarioDao user : usersList){
                 if(user.getUid().equals(player.getKey())){
                     u.setImageProfile(user.getFoto());
                     u.setNameProfile(user.getNombre());
-                    Log.d("aaa", "nombre: "+user.getNombre());
                 }
             }
 
@@ -125,12 +124,10 @@ public class RankingFragment extends Fragment {
 
             u.setMyUser(false);
             //Comprobar si el usuario en cuestion es nuestro usuario
-            Log.d("aaa", "yo: "+ga.getMyUser().getUid());
             if(player.getKey().equals(ga.getMyUser().getUid())){
                 u.setMyUser(true);
                 //Actualizar datos del marcador principal del usuario
                 ga.getPrinF().setPointMarker(total,uL1,uL2,uL3,uL4);
-                Log.d("aaa", "mi usuario");
             }
 
             //Establecer datos de puntos
@@ -155,9 +152,18 @@ public class RankingFragment extends Fragment {
         }
 
         //3. Asignar listado al recyclerview
+
+        //Guardar estado scroll antes de posibles recargas de informacion
+        if(rvRanking.getLayoutManager()!=null)
+            recyclerViewState = rvRanking.getLayoutManager().onSaveInstanceState();
+
         adapter = new RankingElement(rankingList, thisClass.getContext());
         rvRanking.setLayoutManager(new LinearLayoutManager(getContext()));
         rvRanking.setAdapter(adapter);
+
+        // Restaurar posicion scroll (evitar desplazar a la parte superior cada recarga de datos)
+        if(recyclerViewState!=null)
+            rvRanking.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
 
     //----------------------------------------------------------------------------------------------
