@@ -7,9 +7,9 @@ android {
         applicationId "com.rutillastoby.zoria"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 3
+        versionCode 4
         multiDexEnabled true
-        versionName "1.1.2"
+        versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

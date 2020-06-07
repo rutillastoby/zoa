@@ -2,7 +2,6 @@ package com.rutillastoby.zoria.ui.principal;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -174,7 +173,7 @@ public class PrincipalFragment extends Fragment {
                 userFinish=true;
             }
         }
-        Log.d("nnn","pues aqui0");
+
         //Comprobar si la partida ha finalizado para el usuario (Atrapada la bandera)
         if(userFinish && competition.getRes()==0) {
             //Mostrar panel de final de competicion
@@ -202,12 +201,10 @@ public class PrincipalFragment extends Fragment {
      */
     private void checkTime(final long startTime, final long finishTime){
         long currentTime = ga.getCurrentMilliseconds();
-        Log.d("aaa", "curr "+currentTime);
-        Log.d("aaa", "fin "+finishTime);
         //Comprobar si no ha comenzado, si ha finalizado o si esta en curso
         if(currentTime>=finishTime){
             //COMPETICION POR TIEMPO FINALIZADA
-            Log.d("aaa", "aaaaquiiiiii1");
+
             //Mostrar panel de finalizacion
             lyFinishPrin.setVisibility(View.VISIBLE);
             //Mostrar fragment principal
@@ -215,7 +212,7 @@ public class PrincipalFragment extends Fragment {
 
         }else{
             //COMPETICION NO INICIADA O EN CURSO
-            Log.d("aaa", "alliii");
+
             //0. Saber si ha comenzado o si esta en curso
             final int statusCompe = currentTime<startTime? 0:1; //0->No iniciada | 1->Iniciada
             //1. Resetear valores
@@ -223,7 +220,7 @@ public class PrincipalFragment extends Fragment {
             //2. Calcular tiempo restante
             final long remainingTime;
             if(statusCompe==0) {
-                Log.d("aaa", "aqui");
+
                 //Competicion no iniciada
                 remainingTime = startTime - currentTime;//Tiempo restante
                 updateCountToStart(remainingTime); //Llamada inicial para establecer valores

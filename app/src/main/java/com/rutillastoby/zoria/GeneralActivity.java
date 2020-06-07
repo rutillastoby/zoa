@@ -7,7 +7,6 @@ import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -352,7 +351,6 @@ public class GeneralActivity extends AppCompatActivity {
                     //Obtener el tipo de dato 0->texto, 1->int.
                     int typeValue  = cursor.getInt(cursor.getColumnIndex("typevalue"));
 
-                    Log.d("txt", "resubir dato "+id);
                     //Resubir datos como texto o numero en funcion del tipo de dato guardado en local
                     db.getReference(path)
                         .setValue(typeValue==1?Integer.parseInt(value):value, new DatabaseReference.CompletionListener() {
@@ -363,7 +361,6 @@ public class GeneralActivity extends AppCompatActivity {
                                     removeALine(id);
                                     //En el momento en el que no quede ningun dato por respaldar cargamos la informacion inicial
                                     if(countRowsData()==0){
-                                        Log.d("txt", "DESBLOQUEAR ");
                                         initLoad();
                                     }
                                 }
@@ -408,7 +405,6 @@ public class GeneralActivity extends AppCompatActivity {
         prinF.visibilityLyLoad(status);
         compF.visibilityLyLoad(status);
         profF.visibilityLyLoad(status);
-        Log.d("aaab", "desbloqueo");
     }
 
     //----------------------------------------------------------------------------------------------
@@ -693,7 +689,6 @@ public class GeneralActivity extends AppCompatActivity {
                     if (databaseError == null) {
                         //Llamada al metodo para eliminar la linea previamente introducida
                         boolean correct = removeALine(idInserted);
-                        Log.d("txt", "eliminar ->"+correct);
                     }
                 }
             });

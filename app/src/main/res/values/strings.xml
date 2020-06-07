@@ -1,8 +1,8 @@
 <resources>
 
-    <string name="versionDB">2.0</string>
-    <string name="version">ZOA 2020 | Versión: 2.0</string>
-    <string name="app_name">Zoa</string>
+    <string name="versionDB">2.0.0</string>
+    <string name="version">ZOA© 2019-2020 | Versión: 2.0.0</string>
+    <string name="app_name">ZOA</string>
     <string name="rutillasToby">Rutillas Toby</string>
     <string name="bLogin">ACCEDER</string>
     <string name="nomCompe">ZOA</string>
@@ -13,7 +13,7 @@
     <string name="menuMyCompetition">Competición</string>
     <string name="competitionsTitle">COMPETICIONES</string>
     <string name="profileHistory">Mi historia</string>
-    <string name="profileNotHistory">Vaya! Parece que aun no has participado en ninguna competición...</string>
+    <string name="profileNotHistory">Aquí aparecerán todas las competiciones en las que has participado.</string>
     <string name="titleLogout">Cerrar sesión y salir</string>
     <string name="logoutText">¿Desea cerrar la sesión?</string>
     <string name="competitionFinishText">FINALIZADA</string>

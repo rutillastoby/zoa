@@ -76,6 +76,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         ivBackMap = view.findViewById(R.id.ivBackMap);
         lyWarningGPS = view.findViewById(R.id.lyWarningGPS);
 
+        //Estado inicial
+        lyWarningGPS.setVisibility(View.GONE);
+
         //Escuchadores de clicks
         fabScanner.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,14 +139,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         //Suscribir el escuchador previamente instanciado para que actualice posicion cada 3 segundos y 20 metros
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 2, locationListener);
-
-        //Si la ubicacion está desactivada mostramos mensaje visual
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            lyWarningGPS.setVisibility(View.VISIBLE);
-            fabCurrentPosition.hide(); //Ocultar boton de ir a mi ubicacion
-        }else{
-            lyWarningGPS.setVisibility(View.GONE);
-        }
     }
 
     //----------------------------------------------------------------------------------------------

@@ -3,7 +3,6 @@ package com.rutillastoby.zoria;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -174,7 +173,6 @@ public class NewUserActivity extends AppCompatActivity {
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 //Si se ha guardado correctamente
                 if (databaseError == null) {
-                    Log.d("aaa","A");
                     saveName=true; //Marcar que el dato se ha guardado
                     loadGeneralActivity(); //Comprobar si se han almacenado todos los datos para pasar a la siguiente activity
                 }
@@ -187,7 +185,6 @@ public class NewUserActivity extends AppCompatActivity {
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 //Si se ha guardado correctamente
                 if (databaseError == null) {
-                    Log.d("aaa","B");
                     savePhoto=true; //Marcar que el dato se ha guardado
                     loadGeneralActivity(); //Comprobar si se han almacenado todos los datos para pasar a la siguiente activity
                 }
@@ -199,7 +196,6 @@ public class NewUserActivity extends AppCompatActivity {
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 //Si se ha guardado correctamente
                 if (databaseError == null) {
-                    Log.d("aaa","C");
                     saveCompeEnab=true; //Marcar que el dato se ha guardado
                     loadGeneralActivity(); //Comprobar si se han almacenado todos los datos para pasar a la siguiente activity
                 }
@@ -214,10 +210,8 @@ public class NewUserActivity extends AppCompatActivity {
      * (REGISTRO INICIAL), ESTE ABRIRA LA SIGUIENTE ACTIVITY
      */
     public void loadGeneralActivity(){
-        Log.d("aaa","dato guardado");
         if(saveName && savePhoto && saveCompeEnab){
             //Cargar activity general tras el registro
-            Log.d("aaa", "registrado");
             final Context context = this;
 
             //Obtener la hora de la base de datos para la General Activity

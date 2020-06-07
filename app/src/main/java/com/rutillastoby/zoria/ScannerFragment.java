@@ -2,7 +2,6 @@ package com.rutillastoby.zoria;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,7 +97,6 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
     public void stopScanner(){
         scanner.stopCamera();
         scanner.removeAllViews();
-        Log.d("aaa", "finalizado scanner");
     }
 
     //----------------------------------------------------------------------------------------------
@@ -162,7 +160,6 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
 
         //Recorrer todos los puntos para comprobar si el punto escaneado existe
         for (Map.Entry<String, Punto> point : ga.getCompetitionShow().getPuntos().entrySet()) {
-            Log.d("aaa", "vuelta "+point.getKey());
             if(point.getKey().equals(code)){
                 exist = true;
                 level= point.getValue().getNivel();

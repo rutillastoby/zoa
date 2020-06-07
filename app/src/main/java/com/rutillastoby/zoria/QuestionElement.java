@@ -3,7 +3,6 @@ package com.rutillastoby.zoria;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,7 +139,6 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
         instance.bAceptResponse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("aaa", "enviarrrrrr");
                 //Comprobar que se ha seleccionado una respuesta
                 if(questionList.get(i).getRespSelect()!=-1) {
                     //Obtener el texto de la respuesta seleccionada
