@@ -158,8 +158,6 @@ public class RankingFragment extends Fragment {
         adapter = new RankingElement(rankingList, thisClass.getContext());
         rvRanking.setLayoutManager(new LinearLayoutManager(getContext()));
         rvRanking.setAdapter(adapter);
-
-        Log.d("aaa", "por aqui vamos");
     }
 
     //----------------------------------------------------------------------------------------------

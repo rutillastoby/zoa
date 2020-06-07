@@ -1,5 +1,6 @@
 package com.rutillastoby.zoria;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -82,7 +83,11 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         }else{
             scanner.setFlash(false);
         }
-        Log.d("aaa", "iniciado Scanner");
+
+        //Reproducir sonido abrir escaner
+        MediaPlayer player = MediaPlayer.create(getContext(),  R.raw.open_scan);
+        player.setVolume(50,50);
+        player.start();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -183,6 +188,11 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
             else if(level!=4)
                 points=level;
 
+            //Reproducir sonido escaneo correcto
+            MediaPlayer player = MediaPlayer.create(getContext(),  R.raw.scan);
+            player.setVolume(50,50);
+            player.start();
+
             //Llamada al metodo para almacenarlo en la base de datos
             ga.sendPointScann(code, level, points);
             mapF.alertDialogScannedPoint(namePoint, level, false); //Mostrar dialog de confirmacion de escaneo
@@ -192,6 +202,12 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         }else if(exist && escaned) {
             //EL PUNTO YA ESTA REGISTRADO
             mapF.alertDialogScannedPoint(namePoint, level, true); //Mostrar dialog indicando que esta escaneado
+
+            //Reproducir sonido escaneo erroneo
+            MediaPlayer player = MediaPlayer.create(getContext(),  R.raw.scan_error);
+            player.setVolume(50,50);
+            player.start();
+
             //Volver al mapa
             ga.showMapFragment();
 

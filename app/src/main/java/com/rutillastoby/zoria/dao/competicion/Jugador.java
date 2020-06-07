@@ -3,18 +3,9 @@ package com.rutillastoby.zoria.dao.competicion;
 import java.util.HashMap;
 
 public class Jugador {
-    private String tipo;
     private HashMap<String, Integer> preguntas;
     private HashMap<String, String> puntos;
     private int fin; //0 no ha finalizado, 1 si ha finalizado
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
 
     public HashMap<String, Integer> getPreguntas() {
         if (preguntas == null) {

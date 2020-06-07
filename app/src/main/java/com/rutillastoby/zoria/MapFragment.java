@@ -226,7 +226,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         break;
                     case 5:
                         icon = GenericFuntions.bitmapDescriptorFromVector(getContext(), R.drawable.ic_flag);
-                        name+="Código Bandera | 10 puntos";
+                        name="Código Bandera | 10 puntos";
                 }
 
                 //Anadir marcador al mapa
@@ -267,7 +267,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         //Si la ubicación se ha podido obtener movemos la vista del mapa
         if (bestLocation!=null) {
             LatLng latLng = new LatLng(bestLocation.getLatitude(), bestLocation.getLongitude());
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 14);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
             map.animateCamera(cameraUpdate);
             return true;
         }else{

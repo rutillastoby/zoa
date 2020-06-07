@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -79,6 +80,7 @@ public class GeneralActivity extends AppCompatActivity {
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
     private CountDownTimer countOffApp=null; //Variable para contabilizar un tiempo máximo de funcionamiento de la aplicacion en suspensión
     private boolean isInitLoad=false; //Variable para establecer cuando se carga la informacion de las vistas inicialmente
+    private MediaPlayer player;
 
     //----------------------------------------------------------------------------------------------
 
@@ -302,6 +304,8 @@ public class GeneralActivity extends AppCompatActivity {
                 rankF.loadRanking(competitionsList.get(i), usersList);
             }
         }
+        //Ocultar iconos toolbar
+        hideToolbarButtons();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -326,6 +330,11 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public void chargeAll(){
         initExecute=false; //Marcar como ejecutado
+
+        //Reproducir sonido de acceso
+        player = MediaPlayer.create(this,  R.raw.login);
+        player.setVolume(50,50);
+        player.start();
 
         //Comprobar si quedan elementos en local por subir a la base de datos
         if(countRowsData()>0){
@@ -451,7 +460,6 @@ public class GeneralActivity extends AppCompatActivity {
         }.start();
 
         super.onPause();
-
     }
 
     //----------------------------------------------------------------------------------------------
@@ -601,7 +609,12 @@ public class GeneralActivity extends AppCompatActivity {
                     if(u.getUid().equals(user.getUid())){
                         //Guardar los datos de mi usuario
                         myUser = u;
-                        currentCompeId = u.getCompeActiva();
+
+                        //Si cambia el current compe id, mostrar la nueva competicion en el fragmento principal
+                        if(currentCompeId!=u.getCompeActiva()){
+                            currentCompeId = u.getCompeActiva();
+                            checkFragmentCurrent();
+                        }
 
                         //Llamada al metodo para establecer las competiciones en las que el usuario esta registrado.
                         // Dentro del fragmento de competicions
@@ -728,15 +741,12 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public void sendLocation(Location location){
         //Comprobar si esta seleccionado el envio de ubicacion
-        if(competitionShow.getUbi()==1){
-            Log.d("ppp", "ubi");
-            if(location==null){
-                db.getReference("usuarios/" + user.getUid() + "/ubi/lat").setValue("0");
-                db.getReference("usuarios/" + user.getUid() + "/ubi/lon").setValue("0");
-            }else{
-                db.getReference("usuarios/" + user.getUid() + "/ubi/lat").setValue(location.getLatitude());
-                db.getReference("usuarios/" + user.getUid() + "/ubi/lon").setValue(location.getLongitude());
-            }
+        if(competitionShow.getUbi()==1 && location!=null){
+            db.getReference("usuarios/" + user.getUid() + "/ubi/lat").setValue(location.getLatitude());
+            db.getReference("usuarios/" + user.getUid() + "/ubi/lon").setValue(location.getLongitude());
+        }else{
+            db.getReference("usuarios/" + user.getUid() + "/ubi/lat").setValue(0);
+            db.getReference("usuarios/" + user.getUid() + "/ubi/lon").setValue(0);
         }
     }
 
@@ -811,9 +821,8 @@ public class GeneralActivity extends AppCompatActivity {
 
     //----------------------------------------------------------------------------------------------
 
-    /**
-     * METODO PARA VISUALIZAR DATOS DE LA TABLA PARA DEPURACION
-     */
+    /*
+    //DEPURACION: METODO PARA VISUALIZAR DATOS DE LA TABLA PARA
     public void testFile(){
         //Declarar la base de datos que se utilizara
         AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
@@ -834,9 +843,7 @@ public class GeneralActivity extends AppCompatActivity {
         Log.d("txt", "-------------------------");
     }
 
-    /**
-     * METODO PARA ELIMINAR EL CONTENIDO POR COMPLETO DE LA TABLA, PARA PRUEBAS
-     */
+    //DEPURACION: METODO PARA ELIMINAR EL CONTENIDO POR COMPLETO DE LA TABLA QUE ALMACENA DATOS SIN GUARDAR ONLINE
     public void deleteAll(){
         //Declarar la base de datos que se utilizara
         AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
@@ -844,7 +851,7 @@ public class GeneralActivity extends AppCompatActivity {
         SQLiteDatabase dbLocal = asoh.getWritableDatabase();
         dbLocal.execSQL("delete from data");
     }
-
+    */
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                      GETS + SETS                                           //
@@ -947,16 +954,6 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public int getPosMyUserRanking() {
         return posMyUserRanking;
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
-     * METODO PARA SABER SI EL METODO DE INICIALIZACIÓN SE HA OBTENIDO
-     * @return
-     */
-    public boolean isInitExecute() {
-        return initExecute;
     }
 
     //----------------------------------------------------------------------------------------------
