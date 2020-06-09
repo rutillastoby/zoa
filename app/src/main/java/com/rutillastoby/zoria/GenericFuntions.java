@@ -3,11 +3,15 @@ package com.rutillastoby.zoria;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
@@ -24,6 +28,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class GenericFuntions {
@@ -160,5 +165,27 @@ public class GenericFuntions {
             context.startActivity(new Intent(Intent.ACTION_VIEW,
                     Uri.parse("http://play.google.com/store/apps/details?id=" + context.getPackageName())));
         }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA REPRODUCIR UN SONIDO OBTENIENDO EL VOLUMEN DE TONO DE LLAMADA NO DE MULTIMEDIA
+     */
+    public static void playSound(Context context, int resource){
+        try {
+            MediaPlayer player = new MediaPlayer();
+            Resources res = context.getResources();
+            AssetFileDescriptor afd = res.openRawResourceFd(resource);
+            player.reset();
+            player.setAudioStreamType(AudioManager.STREAM_RING);
+            //Establecer el recurso pasado por parametro
+            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            player.prepare();
+            player.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

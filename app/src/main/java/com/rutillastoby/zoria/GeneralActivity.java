@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.MenuItem;
@@ -79,7 +78,6 @@ public class GeneralActivity extends AppCompatActivity {
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
     private CountDownTimer countOffApp=null; //Variable para contabilizar un tiempo máximo de funcionamiento de la aplicacion en suspensión
     private boolean isInitLoad=false; //Variable para establecer cuando se carga la informacion de las vistas inicialmente
-    private MediaPlayer player;
 
     //----------------------------------------------------------------------------------------------
 
@@ -331,9 +329,7 @@ public class GeneralActivity extends AppCompatActivity {
         initExecute=false; //Marcar como ejecutado
 
         //Reproducir sonido de acceso
-        player = MediaPlayer.create(this,  R.raw.login);
-        player.setVolume(50,50);
-        player.start();
+        GenericFuntions.playSound(this, R.raw.login);
 
         //Comprobar si quedan elementos en local por subir a la base de datos
         if(countRowsData()>0){

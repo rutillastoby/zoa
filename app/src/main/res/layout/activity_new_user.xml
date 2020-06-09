@@ -66,13 +66,13 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
-            android:background="@drawable/button_b"
+            android:background="@drawable/button_c"
             android:onClick="bAceptar"
             android:text="aceptar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bCancelNewUser"
+            app:layout_constraintTop_toBottomOf="@+id/etNickNewUser"
             tools:ignore="OnClick" />
 
         <Button
@@ -82,12 +82,12 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
-            android:background="@drawable/button_c"
+            android:background="@drawable/button_b"
             android:onClick="bAceptar"
             android:text="cancelar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etNickNewUser"
+            app:layout_constraintTop_toBottomOf="@+id/bOkNewUser"
             tools:ignore="OnClick" />
 
         <TextView
