@@ -137,8 +137,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        //Suscribir el escuchador previamente instanciado para que actualice posicion cada 3 segundos y 20 metros
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 2, locationListener);
+        //Suscribir el escuchador previamente instanciado para que actualice posicion cada 30 segundos y 450 metros
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 450, locationListener);
     }
 
     //----------------------------------------------------------------------------------------------

@@ -161,9 +161,11 @@ public class QuestionElement extends RecyclerView.Adapter<QuestionElement.Questi
                             //Mostrar mensaje segun si la respuesta es correcta o no
                             if(questionList.get(i).getSolu()==idResp) {
                                 GenericFuntions.snack(context.getView(), "Respuesta Correcta :)");
+                                GenericFuntions.playSound(context.getContext(), R.raw.scan);
                                 correct=true;
                             }else{
                                 GenericFuntions.errorSnack(context.getView(), "Respuesta Incorrecta", context.getContext());
+                                GenericFuntions.playSound(context.getContext(), R.raw.scan_error);
                                 correct=false;
                             }
 

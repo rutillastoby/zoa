@@ -2,14 +2,22 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    signingConfigs {
+        debugrutillastoby {
+            storeFile file('D:\\debugrutillastoby.jks')
+            storePassword 'Debug2020'
+            keyAlias = 'rutillastoby'
+            keyPassword 'p1W2d3'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.rutillastoby.zoria"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 4
+        versionCode 5
         multiDexEnabled true
-        versionName "2.0.0"
+        versionName "2.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -18,6 +26,9 @@ android {
             debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.debugrutillastoby
         }
     }
 }

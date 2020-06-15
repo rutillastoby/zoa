@@ -23,7 +23,7 @@
           }
         },
         {
-          "client_id": "110097188364-7qm6b45ukjtev4088sfu67vqf6drae9o.apps.googleusercontent.com",
+          "client_id": "110097188364-b84cf3rpd8ec0eangbdfomhs811ed3np.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -36,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "110097188364-7qm6b45ukjtev4088sfu67vqf6drae9o.apps.googleusercontent.com",
+              "client_id": "110097188364-b84cf3rpd8ec0eangbdfomhs811ed3np.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -52,7 +52,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "110097188364-rscsjhffe55ome691mor1bngbsdnqtjp.apps.googleusercontent.com",
+          "client_id": "110097188364-ft1ehldgg1268vnd3pr9ic444crfprvt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rutillastoby.zoria",
+            "certificate_hash": "f3587474dd5dd6cf4dc7501f96e3d7a942d8be60"
+          }
+        },
+        {
+          "client_id": "110097188364-8m0en7p2et43vj8retgocaqmhvhd2j7f.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.rutillastoby.zoria",
@@ -60,7 +68,15 @@
           }
         },
         {
-          "client_id": "110097188364-7qm6b45ukjtev4088sfu67vqf6drae9o.apps.googleusercontent.com",
+          "client_id": "110097188364-jl7i0b2sj4h04clkqr7fkm38r8i49pt9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rutillastoby.zoria",
+            "certificate_hash": "41568330f3f07936e3329e586d8204a5ad237970"
+          }
+        },
+        {
+          "client_id": "110097188364-b84cf3rpd8ec0eangbdfomhs811ed3np.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -73,7 +89,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "110097188364-7qm6b45ukjtev4088sfu67vqf6drae9o.apps.googleusercontent.com",
+              "client_id": "110097188364-b84cf3rpd8ec0eangbdfomhs811ed3np.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
