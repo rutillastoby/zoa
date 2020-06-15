@@ -139,8 +139,9 @@ public class LoginActivity extends AppCompatActivity {
         db.getReference("version").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                //Comprobar coincidencia entre version base de datos e indicada en fichero strings
-                if(dataSnapshot.getValue()!=null && dataSnapshot.getValue().toString().equals(getString(R.string.versionDB))){
+                //Comprobar si la version de la aplicacion es mayor que la minima requerida en base de datos
+                if(dataSnapshot.getValue()!=null &&
+                    Integer.parseInt(getString(R.string.versionDB)) >= Integer.parseInt(dataSnapshot.getValue().toString())){
                     //Comprobar si el usuario tiene una sesión de login previa guardada
                     checkOldLogin();
                 }else{

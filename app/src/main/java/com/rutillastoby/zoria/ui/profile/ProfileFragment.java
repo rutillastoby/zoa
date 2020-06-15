@@ -132,10 +132,10 @@ public class ProfileFragment extends Fragment {
                             }
 
                             //Comprobar si el usuario es valido
-                            if(GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados)=="true"){
+                            if(GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados).equals("true")){
                                 updateName(view, newNick);
                             }else{
-                                GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick, nombresUsados),getContext());
+                                GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados),getContext());
                                 //Ocultar barra de progreso
                                 pbNickProfile.setVisibility(View.GONE);
                             }
