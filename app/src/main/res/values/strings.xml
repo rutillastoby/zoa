@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="versionDB">6</string>
+    <string name="versionDB">7</string>
     <string name="version">ZOA© 2019-2020 | Versión: 2.0.2</string>
     <string name="app_name">ZOA</string>
     <string name="rutillasToby">Rutillas Toby</string>

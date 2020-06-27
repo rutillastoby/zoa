@@ -165,6 +165,7 @@ public class PrincipalFragment extends Fragment {
 
         //Establecer datos al fragmento del mapa
         mapF.loadPoints(competition.getPuntos(), competition.getJugadores().get(myUser.getUid()).getPuntos());
+        mapF.changeProperties(competition.getMapa());
 
         //Comprobar si el jugador ha atrapado la bandera
         boolean userFinish=false;

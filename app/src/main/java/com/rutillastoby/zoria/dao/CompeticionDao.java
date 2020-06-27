@@ -15,6 +15,7 @@ public class CompeticionDao {
     private int tipo; //Tipo: 0 diurno, 1 nocturno.
     private int res; //Resultados: 0 no mostrar resultados, 1 si mostrar resultados
     private int ubi; //0 No obtener ubicaciones usuarios, 1 Obtener ubicaciones usuarios
+    private int mapa; //Indica el tipo de mapa a utilizar: 4 Satelite, 3 Relieve
     private HashMap<String, Pregunta> preguntas;
     private HashMap<String, Jugador> jugadores;
     private HashMap<String, Punto> puntos;
@@ -74,6 +75,14 @@ public class CompeticionDao {
 
     public void setRes(int res) {
         this.res = res;
+    }
+
+    public int getMapa() {
+        return mapa;
+    }
+
+    public void setMapa(int mapa) {
+        this.mapa = mapa;
     }
 
     public HashMap<String, Pregunta> getPreguntas() {

@@ -72,7 +72,7 @@ public class GeneralActivity extends AppCompatActivity {
     private int currentCompeId=-1; //Id de la competicion que esta como activa para el usuario (Accesible desde el boton current del menu inferior)
     private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
     private long currentMilliseconds;
-    private CompeticionDao competitionShow = new CompeticionDao();//Datos de la competicion que se esta visualizando en este momento
+    private CompeticionDao competitionShow = new CompeticionDao(); //Datos de la competicion que se esta visualizando en este momento
     private UsuarioDao myUser;
     private boolean getCompetitions=false, getUsers=false, initExecute=true; //Variables para determinar cuando se han recuperado los datos
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
@@ -955,5 +955,11 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public Fragment getActive() {
         return active;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    public int getTypeMapCompe(){
+        return competitionShow.getMapa();
     }
 }

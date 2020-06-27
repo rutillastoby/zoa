@@ -148,7 +148,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.map = map;
 
         //Si no se tiene la ubicacion activada posicionar en lugar por defecto, si no en su ubicacion
-        if(!moveViewMap()){
+        if (!moveViewMap()) {
             //Posicion manual
             LatLng latLng = new LatLng(37.3996770, -2.4282695781);
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8));
@@ -162,15 +162,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // rotarlo se desplace y no se coloque con la flecha de volver
         map.setPadding(0, 100, 0, 0);
 
-        //Mapa de tipo terreno
-        map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-
-        //Mostrar mi ubicación en el mapa
-        map.setMyLocationEnabled(true);
+        //Establecer el tipo de terreno del mapa de forma inicial
+        map.setMapType(ga.getTypeMapCompe());
 
         //Al cargar el mapa inicialmente llamar al metodo para cargar los puntos
         ga.initLoadPointsMap();
+
+        //Mostrar mi ubicación en el mapa
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            map.setMyLocationEnabled(true);
+        }
     }
+
     //----------------------------------------------------------------------------------------------
 
     /**
@@ -235,6 +239,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     );
                 }
             }
+        }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA CAMBIAR POSIBLES PROPIEDADES DEL MAPA COMO EL TIPO
+     * @param mType
+     */
+    public void changeProperties(int mType){
+        //Cambiamos el tipo de mapa si el idicado es diferente al ya establecido
+        if(map!=null && mType!=map.getMapType()){
+            map.setMapType(mType);
         }
     }
 
