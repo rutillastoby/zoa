@@ -23,15 +23,13 @@ import java.util.TimeZone;
 public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.CompetitionInstance>{
     private ArrayList<CompeticionDao> competitionsList;
     CompetitionsFragment context;
-    private float currentTime;
 
     /**
      * CONSTRUCTOR PARAMETRIZADO
      */
-    public CompetitionElement(ArrayList<CompeticionDao> c, CompetitionsFragment cc, long currentTime){
+    public CompetitionElement(ArrayList<CompeticionDao> c, CompetitionsFragment cc){
         competitionsList =c;
         context =cc;
-        this.currentTime=currentTime;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -67,7 +65,7 @@ public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.
         instance.tvNombre.setText(competitionsList.get(i).getNombre());
         Picasso.get().load(competitionsList.get(i).getFoto()).error(R.color.colorPrimaryDark).into(instance.ivCompe);
         //2. Segun si la competicion ha finalizado o no mostramos un elemento u otro
-        if(currentTime<competitionsList.get(i).getHora().getFin()){
+        if(System.currentTimeMillis()<competitionsList.get(i).getHora().getFin()){
             instance.lyDateFinish.setVisibility(View.GONE); //Ocultar finalizado
             instance.lyDateAvailable.setVisibility(View.VISIBLE);
 

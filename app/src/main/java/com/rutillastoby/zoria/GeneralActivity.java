@@ -84,7 +84,6 @@ public class GeneralActivity extends AppCompatActivity {
     private UsuarioDao myUser;
     private boolean getCompetitions=false, getUsers=false, initExecute=true; //Variables para determinar cuando se han recuperado los datos
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
-    private CountDownTimer countOffApp=null; //Variable para contabilizar un tiempo máximo de funcionamiento de la aplicacion en suspensión
     private boolean isInitLoad=false; //Variable para establecer cuando se carga la informacion de las vistas inicialmente
     private AlertDialog dialogTimeSettingsError;
 
@@ -161,6 +160,7 @@ public class GeneralActivity extends AppCompatActivity {
                 case R.id.navigation_competitions:
                     fm.beginTransaction().hide(active).show(competitionsFrag).commit();
                     active = competitionsFrag;
+                    
                     //Ocultar botones toolbar
                     hideToolbarButtons();
                     return true;
@@ -442,39 +442,16 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO QUE SE EJECUTA AL PASAR APP A SEGUNDO PLANO (APAGAR O CAMBIAR DE APLICACION)
-     * INICIAMOS CONTADOR QUE CERRARÁ LA APLICACIÓN SI PASA MAS DE 20 MINUTOS
-     */
-    @Override
-    protected void onPause() {
-        /*
-        countOffApp = new CountDownTimer(1200000,1000) {
-            @Override
-            public void onTick(long millisUntilFinished) { }
-            @Override
-            public void onFinish() {
-                //Cerrar aplicación pasados 20 min de inactividad
-                finish();
-            }
-        }.start();
-*/
-        super.onPause();
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
      * METODO QUE SE EJECUTA AL VOLVER DEL ESTADO DE PAUSE
      * DESACTIVAREMOS EL CONTADOR DE CIERRE POR SUSPENSION
      */
     @Override
     protected void onResume() {
-        /*
-        if(countOffApp!=null){
-            countOffApp.cancel();
-            countOffApp=null;
+
+        //Cerrar el dialogo de error de configuracion de hora si esta abierto
+        if(dialogTimeSettingsError!=null && dialogTimeSettingsError.isShowing()) {
+            dialogTimeSettingsError.dismiss();
         }
-        */
 
         //Comprobar que los ajustes de hora se encuentren marcados como automaticos
         if(Settings.Global.getInt(getContentResolver(), Settings.Global.AUTO_TIME, 0) == 0 ||
@@ -497,10 +474,6 @@ public class GeneralActivity extends AppCompatActivity {
             dialogTimeSettingsError = builder.setView(dialog)
                                         .setCancelable(false)
                                         .show();
-
-        }else if(dialogTimeSettingsError != null){
-            //Ocultar alert dialog
-            dialogTimeSettingsError.dismiss();
         }
 
         super.onResume();
@@ -561,7 +534,7 @@ public class GeneralActivity extends AppCompatActivity {
                     if(c.getId()==1){
                         Hora hour = new Hora();
                         hour.setInicio(System.currentTimeMillis()-1200000); //Hora actual menos 20 minutos
-                        hour.setFin(System.currentTimeMillis()+10000); //Hora actual mas 8 horas
+                        hour.setFin(System.currentTimeMillis()+7200000); //Hora actual mas 2 horas
                         c.setHora(hour);
                     }
 
@@ -885,16 +858,6 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public UsuarioDao getMyUser() {
         return myUser;
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
-     * METODO PARA ESTABLECER EL VALOR DE LA COMPETICION MARCADA COMO ACTIVA
-     * @param currentCompeId
-     */
-    public void setCurrentCompeId(int currentCompeId) {
-        this.currentCompeId = currentCompeId;
     }
 
     //----------------------------------------------------------------------------------------------

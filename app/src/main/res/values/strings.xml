@@ -47,7 +47,7 @@
     <string name="questRankingInfo"><b>6 puntos.</b><i>\n(Pregunta correcta)</i></string>
     <string name="flagRankingInfo"><b>10 puntos.</b><i>\n(Bandera final)</i></string>
     <string name="errorSettingTimeTitle">Configuración de hora invalida</string>
-    <string name="errorSettingTimeText">Para usar ZOA debes tener la obtención de hora y zona en modo automático.</string>
+    <string name="errorSettingTimeText">Para usar ZOA debes tener la obtención de hora y zona horaria en modo automático.</string>
     <string name="errorSettingTimeButton">Configurar</string>
     <string name="infoTitle">Aplicación desarrollada por</string>
     <string name="rateApp1">¿TE GUSTA ZOA?</string>

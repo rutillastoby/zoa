@@ -94,9 +94,7 @@ public class PrincipalFragment extends Fragment {
         tvNameToFinishCompe = view.findViewById(R.id.tvNameToFinishCompe);
 
         //Estado inicial
-        lyLoadPrin.setVisibility(View.VISIBLE);
-
-        //Clicks de botones
+        visibilityLyLoad(true);
 
         //Boton mapa en fragmento principal
         bMapPrin.setOnClickListener(new View.OnClickListener() {
@@ -157,6 +155,7 @@ public class PrincipalFragment extends Fragment {
         lyToStart.setVisibility(View.GONE);
         lyFinishPrin.setVisibility(View.GONE);
         lyNotRegisPrin.setVisibility(View.GONE);
+        lyLoadPrin.setVisibility(View.GONE);
         //Estado inicial vista
         tvFinishCompetitionPrin.setVisibility(View.GONE);
         lyClockCurrent.setVisibility(View.VISIBLE);
@@ -168,8 +167,6 @@ public class PrincipalFragment extends Fragment {
 
         //Establecer datos al fragmento de preguntas para crear listado con las preguntas de la competicion
         //(Indicando si el boton de enviar respuesta estará habilitado)
-        System.out.println(competition.getJugadores().get(myUser.getUid()));
-
         questF.loadQuestions(competition.getPreguntas(), competition.getJugadores().get(myUser.getUid()).getPreguntas(),
                 competition.getRes()==1);
 
@@ -240,17 +237,17 @@ public class PrincipalFragment extends Fragment {
                 //Competicion esperando resultados
                 }else{
                     lyFinishPrin.setVisibility(View.VISIBLE);
-                }
 
-                //Cerrar el fragmento si alguno de la competicion esta activo
-                if(ga.getActive() == ga.getQuestF() || ga.getActive() == ga.getRankF()
-                    || ga.getActive() == ga.getMapF() ||ga.getActive() == ga.getScanF() ){
-                    ga.returnToPrincFrag();
+                    //Cerrar el fragmento si alguno de la competicion esta abierto
+                    if(ga.getActive() == ga.getQuestF() || ga.getActive() == ga.getRankF()
+                            || ga.getActive() == ga.getMapF() ||ga.getActive() == ga.getScanF() ){
+                        ga.returnToPrincFrag();
+                    }
                 }
+                visibilityLyLoad(false);
 
             //COMPETICION SIN COMENZAR
             } else if (currentTime < currentCompetition.getHora().getInicio()) {
-                System.out.println("sin comenzar");
                 //Calcular tiempo restante para inicio
                 long remainingTime = currentCompetition.getHora().getInicio() - currentTime;
                 updateCountToStart(remainingTime);
@@ -258,7 +255,6 @@ public class PrincipalFragment extends Fragment {
 
             //COMPETICION EN CURSO
             } else {
-                System.out.println("en curso");
                 //Tiempo restante para final
                 long remainingTime = currentCompetition.getHora().getFin() - currentTime;
                 updateCount(remainingTime);
@@ -267,7 +263,7 @@ public class PrincipalFragment extends Fragment {
                 lyClockCurrent.setVisibility(View.VISIBLE); //Ocultar marcador de cuenta atras
 
                 //Cerrar la clasificación 30 minutos antes de que finalice la competicion
-                if (remainingTime < 4000) {
+                if (remainingTime < 1800000) {
                     lyRankingPrin.setEnabled(false);
                     dividerRanking.setVisibility(View.GONE);
                     lyShowRankingPrin.setVisibility(View.GONE);

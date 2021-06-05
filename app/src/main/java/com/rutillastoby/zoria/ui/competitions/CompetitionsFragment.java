@@ -77,7 +77,7 @@ public class CompetitionsFragment extends Fragment{
         competitionsList.remove(competitionsList.size()-1);
 
         //Asignar listado al recyclerview
-        adapter = new CompetitionElement(competitionsList, thisClass, System.currentTimeMillis());
+        adapter = new CompetitionElement(competitionsList, thisClass);
         rvCompetitions.setLayoutManager(new LinearLayoutManager(getContext()));
         rvCompetitions.setAdapter(adapter);
     }
@@ -89,21 +89,14 @@ public class CompetitionsFragment extends Fragment{
      * @param id
      */
     public void checkAccess(int id){
-        ArrayList<Integer> competitionsRegisteredList = ((GeneralActivity)getActivity()).getMyUser().getCompetitionsRegistered();
+
+        GeneralActivity ga = ((GeneralActivity)getActivity());
 
         //Seguridad para evitar problemas de inicialización
-        if(competitionsRegisteredList!=null) {
-            GeneralActivity ga = ((GeneralActivity)getActivity());
-            boolean access = false;
-            //Comprobar si estamos registrados en esa competicion
-            for (int i = 0; i < competitionsRegisteredList.size(); i++) {
-                if (competitionsRegisteredList.get(i) == id) {
-                    access = true;
-                }
-            }
+        if(ga.getMyUser().getCompetitionsRegistered()!=null) {
 
-            //Segun si tenemos accesso o no
-            if (access) {
+            //Comprobar si estamos registrados en esa competicion
+            if (ga.getMyUser().getCompetitionsRegistered().contains(id)) {
                 ///////////// ACCEDER A COMPETICION ////////////////
 
                 // Si la competicion presionada es la que esta activa mostramos directamente el panel
@@ -123,6 +116,7 @@ public class CompetitionsFragment extends Fragment{
                 }
 
             } else if(!ga.competitionFinish(id)){
+
                 ///////////// SOLICITAR ACCESO SI NO ES UNA COMPETICION FINALIZADA /////////////////
 
                 //Solicitar Contraseña con una ventana emergente
@@ -212,10 +206,10 @@ public class CompetitionsFragment extends Fragment{
                 public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                     if (databaseError == null) {
                         //Abrir la competicion en la ventana de competicion activa (current)
-                        ga.setCurrentCompeId(id);
                         ga.showFragmentCurrent();
                         //Ocultar panel de carga al completar el registro en la nueva competicion
                         lyLoadCompe.setVisibility(View.GONE);
+                        ga.getPrinF().visibilityLyLoad(false);
                     }
                 }
             });
@@ -224,6 +218,7 @@ public class CompetitionsFragment extends Fragment{
             ga.showMainViewCompetition(id);
             //Ocultar panel de carga al completar el registro en la nueva competicion
             lyLoadCompe.setVisibility(View.GONE);
+            ga.getPrinF().visibilityLyLoad(false);
         }
     }
 
@@ -236,6 +231,7 @@ public class CompetitionsFragment extends Fragment{
     public void setCompetitionsList(ArrayList<CompeticionDao> competitionsList) {
         this.competitionsList = competitionsList;
         loadCompetitions();
+        System.out.println("AAAAAAAAAAAAa");
     }
 
     //----------------------------------------------------------------------------------------------
