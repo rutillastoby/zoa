@@ -23,6 +23,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -219,9 +222,9 @@ public class ProfileFragment extends Fragment {
         for(int i=0; i<allCompe.size();i++){
             //Comprobar si la competicion esta marcada como historial y se pueden ver los resultados
             if(allCompe.get(i).getRes()==1) {
-                for (Map.Entry<String, Integer> compeRegister : myUser.getCompeticiones().entrySet()) {
+                for (int j=0; j< myUser.getCompetitionsRegistered().size() ; j++) {
                     //Comprobar si el usuario esta registrado en la competicion
-                    if (allCompe.get(i).getId() == compeRegister.getValue()) {
+                    if (allCompe.get(i).getId() == myUser.getCompetitionsRegistered().get(j)) {
                         competitionsList.add(allCompe.get(i));
                     }
                 }
@@ -265,7 +268,12 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //Cerrar sesion
+                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build();
+                GoogleSignInClient googleSignInClient= GoogleSignIn.getClient(getContext(),gso);
+                googleSignInClient.signOut();
+
                 FirebaseAuth.getInstance().signOut();
+
                 //Cerrar aplicacion
                 getActivity().finishAffinity();
                 //El codigo comentado es para abrir de nuevo la ventana de login, preferible cerrar app

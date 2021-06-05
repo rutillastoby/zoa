@@ -1,5 +1,6 @@
 package com.rutillastoby.zoria.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UsuarioDao {
@@ -7,7 +8,11 @@ public class UsuarioDao {
     private String foto;
     private String nombre;
     private Integer compeActiva; //Competicion actual (para fragment current)
-    private HashMap<String, Integer> competiciones = new HashMap<String, Integer>();
+
+    //Parametros dinamicos (No almacenados en la base de datos)
+    private ArrayList<Integer> competitionsRegistered; //Listado con las competiciones en las que el usuario esta registrado
+
+    //------------------------------------------------------------>
 
     public String getFoto() {
         return foto;
@@ -41,11 +46,11 @@ public class UsuarioDao {
         this.compeActiva = compeActiva;
     }
 
-    public HashMap<String, Integer> getCompeticiones() {
-        return competiciones;
+    public void setCompetitionsRegistered(ArrayList<Integer> competitions) {
+        this.competitionsRegistered = competitions;
     }
 
-    public void setCompeticiones(HashMap<String, Integer> competiciones) {
-        this.competiciones = competiciones;
+    public ArrayList<Integer> getCompetitionsRegistered(){
+        return competitionsRegistered;
     }
 }

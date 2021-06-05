@@ -218,7 +218,7 @@ public class LoginActivity extends AppCompatActivity {
             GenericFuntions.snack(findViewById(R.id.lyLogin), "Estamos preparando todo!");
         } catch (ApiException e) {
             //Error al iniciar sesion
-            GenericFuntions.errorSnack(findViewById(R.id.lyLogin), "Error al iniciar sesión. x001", this);
+            GenericFuntions.errorSnack(findViewById(R.id.lyLogin), "Error al iniciar sesión. Inténtalo de nuevo (x001)", this);
             changeVisibilityButton(2); //Mostrar boton de login
         }
     }
@@ -243,7 +243,7 @@ public class LoginActivity extends AppCompatActivity {
                         login(user);
                     } else {
                         //Error al iniciar sesion
-                        GenericFuntions.errorSnack(findViewById(R.id.lyLogin), "Error al iniciar sesión. x002", context);
+                        GenericFuntions.errorSnack(findViewById(R.id.lyLogin), "Error al iniciar sesión. Inténtalo de nuevo (x002)", context);
                         changeVisibilityButton(2); //Mostrar boton de login
                     }
 

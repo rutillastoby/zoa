@@ -175,12 +175,14 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         //En funcion del estado actuamos
         if(exist && !escaned){
             //REGISTRAR PUNTO
-            int points=0;
+
             //Obtener puntos en funcion del nivel
-            if(level==5)
-                points=10;
-            else if(level!=4)
-                points=level;
+            int points=0;
+            if(level==5) {
+                points = 10;
+            }else if(level!=4) {
+                points = level;
+            }
 
             //Reproducir sonido escaneo correcto
             GenericFuntions.playSound(getContext(), R.raw.scan);

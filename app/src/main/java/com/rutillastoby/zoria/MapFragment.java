@@ -346,8 +346,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                    //Marcar la competicion como finalizada para mi unicamente
-                    ga.sendGetFlag();
                     ga.checkFragmentCurrent(); //Volver a la vista de competicion
                     }
                 });

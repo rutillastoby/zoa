@@ -38,10 +38,8 @@ public class CompetitionsFragment extends Fragment{
 
     //Variables
     private ArrayList<CompeticionDao> competitionsList;
-    private ArrayList<Integer> competitionsRegisteredList=null;
     private RecyclerView.Adapter adapter; //Crear un contenedor de vistas de cada competicion
     private CompetitionsFragment thisClass;
-    private boolean saveCompe, savePlayer;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_competitions, container, false);
@@ -91,6 +89,8 @@ public class CompetitionsFragment extends Fragment{
      * @param id
      */
     public void checkAccess(int id){
+        ArrayList<Integer> competitionsRegisteredList = ((GeneralActivity)getActivity()).getMyUser().getCompetitionsRegistered();
+
         //Seguridad para evitar problemas de inicialización
         if(competitionsRegisteredList!=null) {
             GeneralActivity ga = ((GeneralActivity)getActivity());
@@ -163,31 +163,16 @@ public class CompetitionsFragment extends Fragment{
                         //Comprobar si la contrasenna introducida es correcta
                         if(answer==pwd){
                             //Registrarse en competicion
-                            saveCompe=false;
-                            savePlayer=false;
                             final String myUid = ((GeneralActivity)getActivity()).getMyUser().getUid();
 
                             //Mostrar panel de carga
                             lyLoadCompe.setVisibility(View.VISIBLE);
-
-                            //Entrada competición listado de competiciones del usuario
-                            db.getReference("usuarios/" + myUid + "/competiciones/compe" + compeId).setValue(compeId, new DatabaseReference.CompletionListener() {
-                                @Override
-                                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                                    if (databaseError == null) {
-                                        saveCompe = true;
-                                        //Llamada al metodo de cargar competicion que se ejecutará al guardar todos los datos
-                                        openCompetitionRegister(compeId, myUid);
-                                    }
-                                }
-                            });
 
                             //Entrada jugador en la competicion
                             db.getReference("competiciones/" + compeId + "/jugadores/" + myUid + "/fin").setValue(0, new DatabaseReference.CompletionListener() {
                                 @Override
                                 public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                                     if (databaseError == null) {
-                                        savePlayer = true;
                                         //Llamada al metodo de cargar competicion que se ejecutará al guardar todos los datos
                                         openCompetitionRegister(compeId, myUid);
                                     }
@@ -217,30 +202,28 @@ public class CompetitionsFragment extends Fragment{
      * @param myUid
      */
     public void openCompetitionRegister(final int id, String myUid){
-        if(saveCompe && savePlayer){
-            final GeneralActivity ga = ((GeneralActivity)getActivity());
+        final GeneralActivity ga = ((GeneralActivity)getActivity());
 
-            //Marcar como competicion activa si no nos estamos registrando en el tutorial de forma posterior al registro ya de una
-            //competicion cualquiera (evitamos sobreescribir la competicion actual con el tutorial si el registro en este es posterior)
-            if(id!=1 || ga.getCurrentCompeId()==-1) {
-                db.getReference("usuarios/" + myUid + "/compeActiva").setValue(id, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                        if (databaseError == null) {
-                            //Abrir la competicion en la ventana de competicion activa (current)
-                            ga.setCurrentCompeId(id);
-                            ga.checkFragmentCurrent();
-                            //Ocultar panel de carga al completar el registro en la nueva competicion
-                            lyLoadCompe.setVisibility(View.GONE);
-                        }
+        //Marcar como competicion activa si no nos estamos registrando en el tutorial de forma posterior al registro ya de una
+        //competicion cualquiera (evitamos sobreescribir la competicion actual con el tutorial si el registro en este es posterior)
+        if(id!=1 || ga.getCurrentCompeId()==-1) {
+            db.getReference("usuarios/" + myUid + "/compeActiva").setValue(id, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        //Abrir la competicion en la ventana de competicion activa (current)
+                        ga.setCurrentCompeId(id);
+                        ga.checkFragmentCurrent();
+                        //Ocultar panel de carga al completar el registro en la nueva competicion
+                        lyLoadCompe.setVisibility(View.GONE);
                     }
-                });
-            }else{
-                //En caso contrario directamente mostramos la competicion en el fragmento en el que nos encontramos
-                ga.showMainViewCompetition(id);
-                //Ocultar panel de carga al completar el registro en la nueva competicion
-                lyLoadCompe.setVisibility(View.GONE);
-            }
+                }
+            });
+        }else {
+            //En caso contrario directamente mostramos la competicion en el fragmento en el que nos encontramos
+            ga.showMainViewCompetition(id);
+            //Ocultar panel de carga al completar el registro en la nueva competicion
+            lyLoadCompe.setVisibility(View.GONE);
         }
     }
 
@@ -253,16 +236,6 @@ public class CompetitionsFragment extends Fragment{
     public void setCompetitionsList(ArrayList<CompeticionDao> competitionsList) {
         this.competitionsList = competitionsList;
         loadCompetitions();
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
-     * METODO PARA ESTABLECER EL LISTADO DE COMPETICIONES A LOS QUE SE ESTÁ REGISTRADO
-     * @param competitionsRegisteredList
-     */
-    public void setCompetitionsRegisteredList(ArrayList<Integer> competitionsRegisteredList) {
-        this.competitionsRegisteredList = competitionsRegisteredList;
     }
 
     //----------------------------------------------------------------------------------------------

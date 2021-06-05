@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.rutillastoby.zoria.dao.CompeticionDao;
 import com.rutillastoby.zoria.dao.UsuarioDao;
 import com.rutillastoby.zoria.dao.competicion.Hora;
+import com.rutillastoby.zoria.dao.competicion.Jugador;
 import com.rutillastoby.zoria.dao.competicion.Pregunta;
 import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
 import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
@@ -608,11 +609,17 @@ public class GeneralActivity extends AppCompatActivity {
                             checkFragmentCurrent();
                         }
 
-                        //Llamada al metodo para establecer las competiciones en las que el usuario esta registrado.
-                        // Dentro del fragmento de competicions
-                        if(u.getCompeticiones()!=null) {
-                            compF.setCompetitionsRegisteredList(new ArrayList<>(u.getCompeticiones().values()));
+                        //Obtener las competiciones en las que el usuario esta registrado
+                        ArrayList<Integer> competitionsRegistered = new ArrayList<Integer>();
+                        for (int i =0 ; i<competitionsList.size(); i++){
+                            for (Map.Entry<String, Jugador> player : competitionsList.get(i).getJugadores().entrySet()) {
+                                if(player.getKey().equals(u.getUid())){
+                                    competitionsRegistered.add(competitionsList.get(i).getId());
+                                }
+                            }
                         }
+                        u.setCompetitionsRegistered(competitionsRegistered);
+
                         //Guardar usuario en la variable del fragmento profile
                         profF.setMyUser(u);
                     }
@@ -697,6 +704,9 @@ public class GeneralActivity extends AppCompatActivity {
                     sendResponseQuestion(quest.getValue().getId(),0,false); //El 0 indica que no esta contestada
                 }
             }
+        //Si es la bandera final marcar la competicion como finalizada para el usuario
+        }else if(level == 5){
+            sendGetFlag();
         }
     }
 
