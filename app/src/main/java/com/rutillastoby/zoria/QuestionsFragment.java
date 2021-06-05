@@ -56,7 +56,7 @@ public class QuestionsFragment extends Fragment{
         ivBackQuestions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ga.showPrincActivityNotChange();
+                ga.returnToPrincFrag();
             }
         });
     }

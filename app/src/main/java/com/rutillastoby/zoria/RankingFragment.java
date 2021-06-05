@@ -63,7 +63,7 @@ public class RankingFragment extends Fragment {
         ivBackRanking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ga.showPrincActivityNotChange();
+                ga.returnToPrincFrag();
             }
         });
 

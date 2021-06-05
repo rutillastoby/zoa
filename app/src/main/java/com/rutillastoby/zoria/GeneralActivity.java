@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Debug;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -72,7 +73,6 @@ public class GeneralActivity extends AppCompatActivity {
     private static ArrayList<UsuarioDao> usersList;
     private int currentCompeId=-1; //Id de la competicion que esta como activa para el usuario (Accesible desde el boton current del menu inferior)
     private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
-    private long currentMilliseconds;
     private CompeticionDao competitionShow = new CompeticionDao(); //Datos de la competicion que se esta visualizando en este momento
     private UsuarioDao myUser;
     private boolean getCompetitions=false, getUsers=false, initExecute=true; //Variables para determinar cuando se han recuperado los datos
@@ -123,10 +123,6 @@ public class GeneralActivity extends AppCompatActivity {
         mapF = (MapFragment) mapFragment;
         rankF = (RankingFragment) rankingFragment;
 
-        //Obtener hora actual del intent
-        currentMilliseconds = getIntent().getLongExtra("currentTime", 0);
-        if(currentMilliseconds==0) onBackPressed(); //Cerrar si no se obtiene correctamente
-
         //Obtener usuario y base de datos
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
@@ -140,7 +136,8 @@ public class GeneralActivity extends AppCompatActivity {
         //Inicializar escucha de datos
         getCompetitions();
         getUsers();
-        currentTimer();
+
+        System.out.println(System.currentTimeMillis()+"La hora");
     }
 
     //----------------------------------------------------------------------------------------------
@@ -166,7 +163,7 @@ public class GeneralActivity extends AppCompatActivity {
                     //Ocultar boton cerrar sesison
                     ivLogout.setVisibility(View.GONE);
                     //Llamada al metodo que mostrará el fragmento current
-                    checkFragmentCurrent();
+                    showFragmentCurrent();
                     return true;
 
                 case R.id.navigation_profile:
@@ -248,9 +245,10 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA APLICAR UNA TRANSICION ENTRE FRAGMENTOS Y MOSTRAR EL PRINCIPAL SIN CAMBIAR DE COMPETICION
+     * METODO PARA APLICAR UNA TRANSICION ENTRE FRAGMENTOS Y MOSTRAR EL PRINCIPAL SIN CAMBIAR DE
+     * COMPETICION NI OPCION EN EL TOOLBAR (Usado para retroceder desde otros fragmentos)
      */
-    public void showPrincActivityNotChange(){
+    public void returnToPrincFrag(){
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
         //Ocultar botones toolbar
@@ -263,7 +261,7 @@ public class GeneralActivity extends AppCompatActivity {
      *  METODO PARA MOSTRAR LA COMPETICIÓN QUE SE ESTÁ DISPUTANDO
      *  SE EJECUTA AL HACER CLIC EN LA OPCION CURRENT DEL MENU INFERIOR
      */
-    public void checkFragmentCurrent(){
+    public void showFragmentCurrent(){
         //Marcar opcion del menu como activa
         navigation.getMenu().findItem(R.id.navigation_current).setChecked(true);
         fm.beginTransaction().hide(active).show(principalFrag).commit();
@@ -277,10 +275,9 @@ public class GeneralActivity extends AppCompatActivity {
             if(currentCompeId!=-1){
                 showMainViewCompetition(currentCompeId);
             }else{
-                prinF.setViewNotRegister();
+                prinF.setViewNoneCompetition();
             }
         }
-
     }
 
     //----------------------------------------------------------------------------------------------
@@ -294,14 +291,16 @@ public class GeneralActivity extends AppCompatActivity {
         //Mostrar el fragmento principal de la competicion
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
-        //Enviar los datos de la competicion
-        for(int i=0; i<competitionsList.size();i++){
-            if(competitionsList.get(i).getId() == id) {
+
+        //Establecer los datos de la competicion si el usuario esta registrado
+        for (int i = 0; i < competitionsList.size(); i++) {
+            if (competitionsList.get(i).getId() == id) {
                 competitionShow = competitionsList.get(i); //Establecer los datos de la competicion que se está visualizando
                 prinF.setDataCompetition(competitionsList.get(i), questF, mapF, myUser);
                 rankF.loadRanking(competitionsList.get(i), usersList);
             }
         }
+
         //Ocultar iconos toolbar
         hideToolbarButtons();
     }
@@ -387,7 +386,7 @@ public class GeneralActivity extends AppCompatActivity {
         //Ocultar paneles de carga
         changeVisibilityLoad(false);
         //Cargar el fragment con la competición marcada como activa
-        checkFragmentCurrent();
+        showFragmentCurrent();
         //Cargar el historial de competiciones en el fragmento del perfil
         profF.loadRecordCompetition(competitionsList);
     }
@@ -487,7 +486,7 @@ public class GeneralActivity extends AppCompatActivity {
             case "7":
             case "4":
                 //Volver al fragmento principal sin hacer cambios
-                showPrincActivityNotChange();
+                returnToPrincFrag();
                 break;
             //SCANNER FRAGMENT
             case "5":
@@ -498,24 +497,6 @@ public class GeneralActivity extends AppCompatActivity {
                 //finish(); //Cerrar aplicacion directamente
                 break;
         }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    //                              OBTENER HORA DEL SERVIDOR                                     //
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * METODO PARA MANTENER LA HORA ACTUAL ACTUALIZADA
-     */
-    private void currentTimer(){
-        new CountDownTimer(Long.MAX_VALUE,1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                currentMilliseconds +=1000;
-            }
-            @Override
-            public void onFinish() {}
-        }.start();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -542,8 +523,8 @@ public class GeneralActivity extends AppCompatActivity {
                     //Si es el tutorial, cambiamos las fechas
                     if(c.getId()==1){
                         Hora hour = new Hora();
-                        hour.setInicio(currentMilliseconds-1200000); //Hora actual menos 20 minutos
-                        hour.setFin(currentMilliseconds+28800000); //Hora actual mas 8 horas
+                        hour.setInicio(System.currentTimeMillis()-1200000); //Hora actual menos 20 minutos
+                        hour.setFin(System.currentTimeMillis()+10000); //Hora actual mas 8 horas
                         c.setHora(hour);
                     }
 
@@ -603,12 +584,6 @@ public class GeneralActivity extends AppCompatActivity {
                         //Guardar los datos de mi usuario
                         myUser = u;
 
-                        //Si cambia el current compe id, mostrar la nueva competicion en el fragmento principal
-                        if(currentCompeId!=u.getCompeActiva()){
-                            currentCompeId = u.getCompeActiva();
-                            checkFragmentCurrent();
-                        }
-
                         //Obtener las competiciones en las que el usuario esta registrado
                         ArrayList<Integer> competitionsRegistered = new ArrayList<Integer>();
                         for (int i =0 ; i<competitionsList.size(); i++){
@@ -619,6 +594,13 @@ public class GeneralActivity extends AppCompatActivity {
                             }
                         }
                         u.setCompetitionsRegistered(competitionsRegistered);
+
+                        //Si ha cambiado el current compe id, mostrar la nueva competicion en el fragmento principal
+                        if(currentCompeId!=u.getCompeActiva()){
+                            //Controlar que la competicion activa corresponde con una en la que se esta registrado
+                            currentCompeId = competitionsRegistered.contains(u.getCompeActiva())? u.getCompeActiva() : -1;
+                            showFragmentCurrent();
+                        }
 
                         //Guardar usuario en la variable del fragmento profile
                         profF.setMyUser(u);
@@ -678,7 +660,7 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public void sendPointScann(String idPoint, int level, int points) {
         final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint;
-        final String value = points + "-" + currentMilliseconds;
+        final String value = points + "-" + System.currentTimeMillis();
 
         //Guardar datos en fichero local indicado el tipo de value 0->texto, 1->int
         final int idInserted = saveDataOnLocal(path, value, 0);
@@ -858,14 +840,6 @@ public class GeneralActivity extends AppCompatActivity {
     //                                      GETS + SETS                                           //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * METODO PARA OBTENER LOS MILISEGUNDOS DE LA HORA ACTUAL
-     * @return
-     */
-    public long getCurrentMilliseconds() {
-        return currentMilliseconds;
-    }
-
     //----------------------------------------------------------------------------------------------
 
     /**
@@ -923,6 +897,27 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public PrincipalFragment getPrinF() {
         return prinF;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER LA CLASE CORRESPONDIENTE CON EL FRAGMENTO DE ESCANEO
+     * @return
+     */
+
+    public ScannerFragment getScanF(){
+        return scanF;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA OBTENER LA CLASE CORRESPONDIENTE CON EL FRAGMENTO DE PREGUNTAS
+     * @return
+     */
+    public QuestionsFragment getQuestF(){
+        return questF;
     }
 
     //----------------------------------------------------------------------------------------------

@@ -272,21 +272,9 @@ public class LoginActivity extends AppCompatActivity {
 
                 //Cargamos la activity correspondiente segun si es un usuario nuevo o no
                 if(registerInDB){
-                    //Obtener la hora de la base de datos para pasarla a la activity general
-                    FirebaseFunctions.getInstance("europe-west1").getHttpsCallable("getTime")
-                            .call().addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                        @Override
-                        public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                            //Datos obtenidos
-                            long currentMilliseconds = (long) httpsCallableResult.getData();
-
-                            //Abrir activity general
-                            Intent i = new Intent(context, GeneralActivity.class);
-                            i.putExtra("currentTime", currentMilliseconds);
-                            startActivity(i);
-                            finish();
-                        }
-                    });
+                    //Abrir activity general
+                    startActivity(new Intent(context, GeneralActivity.class));
+                    finish();
 
                 }else{
                     //Abrir activity nuevo usuario

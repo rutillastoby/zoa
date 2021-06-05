@@ -92,7 +92,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
                 //Volver a la vista de la competicion
-                ga.showPrincActivityNotChange();
+                ga.returnToPrincFrag();
             }
         });
 
@@ -346,7 +346,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                    ga.checkFragmentCurrent(); //Volver a la vista de competicion
+                    ga.showFragmentCurrent(); //Volver a la vista de competicion
                     }
                 });
 

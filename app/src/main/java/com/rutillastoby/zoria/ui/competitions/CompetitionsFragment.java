@@ -77,7 +77,7 @@ public class CompetitionsFragment extends Fragment{
         competitionsList.remove(competitionsList.size()-1);
 
         //Asignar listado al recyclerview
-        adapter = new CompetitionElement(competitionsList, thisClass, ((GeneralActivity)getActivity()).getCurrentMilliseconds());
+        adapter = new CompetitionElement(competitionsList, thisClass, System.currentTimeMillis());
         rvCompetitions.setLayoutManager(new LinearLayoutManager(getContext()));
         rvCompetitions.setAdapter(adapter);
     }
@@ -108,14 +108,14 @@ public class CompetitionsFragment extends Fragment{
 
                 // Si la competicion presionada es la que esta activa mostramos directamente el panel
                 if(id==ga.getCurrentCompeId()){
-                    ga.checkFragmentCurrent();
+                    ga.showFragmentCurrent();
 
                 // Si es diferente al tutorial y la competicion no ha finalizado
                 // la marcamos como competicion activa y la abrimos en seccion current
                 } else if((id!=1 && !ga.competitionFinish(id))) {
                     String myUid = ((GeneralActivity) getActivity()).getMyUser().getUid();
                     db.getReference("usuarios/" + myUid + "/compeActiva").setValue(id);
-                    ga.checkFragmentCurrent();
+                    ga.showFragmentCurrent();
 
                 }else{
                     //En otro caso mostramos directamente la competicion en el fragmento actual sin cambiar de menu
@@ -213,7 +213,7 @@ public class CompetitionsFragment extends Fragment{
                     if (databaseError == null) {
                         //Abrir la competicion en la ventana de competicion activa (current)
                         ga.setCurrentCompeId(id);
-                        ga.checkFragmentCurrent();
+                        ga.showFragmentCurrent();
                         //Ocultar panel de carga al completar el registro en la nueva competicion
                         lyLoadCompe.setVisibility(View.GONE);
                     }

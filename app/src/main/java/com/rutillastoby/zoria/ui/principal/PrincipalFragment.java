@@ -2,6 +2,7 @@ package com.rutillastoby.zoria.ui.principal;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,15 +39,19 @@ public class PrincipalFragment extends Fragment {
     private GeneralActivity ga;
 
     //Variables
-    CountDownTimer countCompe=null;
+    private CompeticionDao currentCompetition;
+    private boolean userFinish;
+    private final Handler handler = new Handler();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_principal, container, false);
 
-        //Llamada al metodo para
+        //Llamada al metodo para inicializar varibales
         initVar(view);
+        //Llamada al metodo para verificar continuamente la hora actual y actuar sobre la competicion segun esta
+        timeUpdate();
 
         return view;
     }
@@ -128,7 +133,7 @@ public class PrincipalFragment extends Fragment {
     /**
      * METODO PARA MOSTRAR EL PANEL INICIAL INDICANDO QUE NO SE ESTA REGISTRADO EN NINGUNA COMPETICION
      */
-    public void setViewNotRegister() {
+    public void setViewNoneCompetition() {
         //Mostrar layout correspondiente
         lyInProgress.setVisibility(View.GONE);
         lyToStart.setVisibility(View.GONE);
@@ -144,6 +149,8 @@ public class PrincipalFragment extends Fragment {
      */
     public void setDataCompetition(CompeticionDao competition, QuestionsFragment questF, MapFragment mapF,
                                    UsuarioDao myUser){
+        currentCompetition = competition;
+
         //Inicializar layouts
         lyInProgress.setVisibility(View.GONE);
         lyToStart.setVisibility(View.GONE);
@@ -160,6 +167,8 @@ public class PrincipalFragment extends Fragment {
 
         //Establecer datos al fragmento de preguntas para crear listado con las preguntas de la competicion
         //(Indicando si el boton de enviar respuesta estará habilitado)
+        System.out.println(competition.getJugadores().get(myUser.getUid()));
+
         questF.loadQuestions(competition.getPreguntas(), competition.getJugadores().get(myUser.getUid()).getPreguntas(),
                 competition.getRes()==1);
 
@@ -167,106 +176,109 @@ public class PrincipalFragment extends Fragment {
         mapF.loadPoints(competition.getPuntos(), competition.getJugadores().get(myUser.getUid()).getPuntos());
         mapF.changeProperties(competition.getMapa());
 
-        //Comprobar si el jugador ha atrapado la bandera
-        boolean userFinish=false;
+        //Comprobar si el jugador ha atrapado la bandera (Competicion finalizada para el)
+        userFinish = false;
         for (Map.Entry<String, Jugador> player : competition.getJugadores().entrySet()) {
             if(myUser.getUid().equals(player.getKey()) && player.getValue().getFin()==1){
                 userFinish=true;
             }
         }
 
-        //Comprobar si la partida ha finalizado para el usuario (Atrapada la bandera)
-        if(userFinish && competition.getRes()==0) {
-            //Mostrar panel de final de competicion
-            lyFinishPrin.setVisibility(View.VISIBLE);
-
-        //Comprobar si la competición está en estado de visualización de resultados (FINALIZADA y ENTREGADOS PREMIOS)
-        }else if(competition.getRes()==1){
-            //Visualizar resultados competición sin poder hacer cambios (registrar puntos/Contestar preguntas)
-            tvFinishCompetitionPrin.setVisibility(View.VISIBLE); //Mostrar mensaje
-            lyClockCurrent.setVisibility(View.GONE); //Ocultar marcador
-            ga.getMapF().setActiveFloatButtons(false); //Deshabilitar boton de escaneo
-            lyInProgress.setVisibility(View.VISIBLE); //Reutilizamos la vista
-
-        }else {
-            //Llamada al metodo para actuar en funcion de la hora actual y la de la competicion
-            checkTime(competition.getHora().getInicio(), competition.getHora().getFin());
-        }
+        //Actualizar la vista
+        updateView();
     }
 
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA COMPARAR LA HORA ACTUAL CON LA DE INICIO/FIN DE LA
-     * COMPETICION Y ACTUAR EN FUNCION DE ELLO
+     * VERIFICAR CONTINUAMENTE A TRAVES DE UN HILO LA HORA ACTUAL PARA APLICAR CAMBIOS EN LA VISTA
      */
-    private void checkTime(final long startTime, final long finishTime){
-        long currentTime = ga.getCurrentMilliseconds();
-        //Comprobar si no ha comenzado, si ha finalizado o si esta en curso
-        if(currentTime>=finishTime){
-            //COMPETICION POR TIEMPO FINALIZADA
+    private void timeUpdate(){
 
-            //Mostrar panel de finalizacion
-            lyFinishPrin.setVisibility(View.VISIBLE);
-            //Mostrar fragment principal
-            ga.showPrincActivityNotChange();
+        //Creacion del hilo
+        final Runnable r = new Runnable() {
+            public void run() {
 
-        }else{
-            //COMPETICION NO INICIADA O EN CURSO
+                //Actualizar la vista si esta activa
+                updateView();
 
-            //0. Saber si ha comenzado o si esta en curso
-            final int statusCompe = currentTime<startTime? 0:1; //0->No iniciada | 1->Iniciada
-            //1. Resetear valores
-            if(countCompe!=null) countCompe.cancel();
-            //2. Calcular tiempo restante
-            final long remainingTime;
-            if(statusCompe==0) {
-
-                //Competicion no iniciada
-                remainingTime = startTime - currentTime;//Tiempo restante
-                updateCountToStart(remainingTime); //Llamada inicial para establecer valores
-                lyToStart.setVisibility(View.VISIBLE);
-            }else {
-                //Competicion en curso
-                remainingTime = finishTime - currentTime;//Tiempo restante
-                updateCount(remainingTime); //Llamada inicial para establecer valores
-                lyInProgress.setVisibility(View.VISIBLE);
+                //Actualizacion cada 500ms
+                handler.postDelayed(this, 500);
             }
-            //3.Iniciar contador regresivo
-            countCompe = new CountDownTimer(remainingTime,1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    if(statusCompe==0) {
-                        //Competicion no iniciada
-                        updateCountToStart(millisUntilFinished);
-                    }else{
-                        //Competicion en curso
-                        updateCount(millisUntilFinished);
+        };
 
-                        //Cerrar la clasificación 30 minutos antes de que finalice la competicion
-                        if (millisUntilFinished<1800000){
-                            lyRankingPrin.setEnabled(false);
-                            dividerRanking.setVisibility(View.GONE);
-                            lyShowRankingPrin.setVisibility(View.GONE);
-                            if(ga.getActive().getTag().equals("7")){ //Si esta mostrandose el fragmento lo ocultamos
-                                ga.showPrincActivityNotChange();
-                            }
-                        }else{
-                            lyRankingPrin.setEnabled(true);
-                            dividerRanking.setVisibility(View.VISIBLE);
-                            lyShowRankingPrin.setVisibility(View.VISIBLE);
-                        }
+        handler.postDelayed(r, 500);
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * APLICAR CAMBIOS EN LAS VISTAS TENIENDO EN CUENTA EL ESTADO DE LA COMPETICION Y LA HORA ACTUAL
+     */
+    public void updateView(){
+        //Hora actual
+        long currentTime =System.currentTimeMillis();
+
+        if(currentCompetition!=null){
+
+            //Estado inicial
+            lyInProgress.setVisibility(View.GONE);
+            lyFinishPrin.setVisibility(View.GONE);
+            lyToStart.setVisibility(View.GONE);
+
+            //COMPETICION FINALIZADA
+            if (currentTime >= currentCompetition.getHora().getFin() || userFinish) {
+
+                //Competicion en estado de visualizacion de resultados (FINALIZADA y ENTREGADOS PREMIOS)
+                if(currentCompetition.getRes()==1){
+                    tvFinishCompetitionPrin.setVisibility(View.VISIBLE); //Mostrar mensaje
+                    lyClockCurrent.setVisibility(View.GONE); //Ocultar marcador de cuenta atras
+                    ga.getMapF().setActiveFloatButtons(false); //Deshabilitar boton de escaneo
+                    lyInProgress.setVisibility(View.VISIBLE); //Reutilizamos la vista
+
+                //Competicion esperando resultados
+                }else{
+                    lyFinishPrin.setVisibility(View.VISIBLE);
+                }
+
+                //Cerrar el fragmento si alguno de la competicion esta activo
+                if(ga.getActive() == ga.getQuestF() || ga.getActive() == ga.getRankF()
+                    || ga.getActive() == ga.getMapF() ||ga.getActive() == ga.getScanF() ){
+                    ga.returnToPrincFrag();
+                }
+
+            //COMPETICION SIN COMENZAR
+            } else if (currentTime < currentCompetition.getHora().getInicio()) {
+                System.out.println("sin comenzar");
+                //Calcular tiempo restante para inicio
+                long remainingTime = currentCompetition.getHora().getInicio() - currentTime;
+                updateCountToStart(remainingTime);
+                lyToStart.setVisibility(View.VISIBLE);
+
+            //COMPETICION EN CURSO
+            } else {
+                System.out.println("en curso");
+                //Tiempo restante para final
+                long remainingTime = currentCompetition.getHora().getFin() - currentTime;
+                updateCount(remainingTime);
+                lyInProgress.setVisibility(View.VISIBLE);
+                tvFinishCompetitionPrin.setVisibility(View.GONE); //Mostrar mensaje
+                lyClockCurrent.setVisibility(View.VISIBLE); //Ocultar marcador de cuenta atras
+
+                //Cerrar la clasificación 30 minutos antes de que finalice la competicion
+                if (remainingTime < 4000) {
+                    lyRankingPrin.setEnabled(false);
+                    dividerRanking.setVisibility(View.GONE);
+                    lyShowRankingPrin.setVisibility(View.GONE);
+                    if (ga.getActive()== ga.getRankF()) { //Si esta mostrandose el fragmento lo ocultamos
+                        ga.returnToPrincFrag();
                     }
+                } else {
+                    lyRankingPrin.setEnabled(true);
+                    dividerRanking.setVisibility(View.VISIBLE);
+                    lyShowRankingPrin.setVisibility(View.VISIBLE);
                 }
-                @Override
-                public void onFinish() {
-                    //Resetear layout
-                    lyInProgress.setVisibility(View.GONE);
-                    lyToStart.setVisibility(View.GONE);
-                    //Rellamar a la funcion para actuar
-                    checkTime(startTime, finishTime);
-                }
-            }.start();
+            }
         }
     }
 

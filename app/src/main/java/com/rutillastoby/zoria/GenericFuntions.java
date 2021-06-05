@@ -103,7 +103,6 @@ public class GenericFuntions {
         View snackBarView = snackbar.getView();
         snackBarView.setBackgroundColor(Color.BLACK);
         snackbar.show();
-
     }
 
     //----------------------------------------------------------------------------------------------
