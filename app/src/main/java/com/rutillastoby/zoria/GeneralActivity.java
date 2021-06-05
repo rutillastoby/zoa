@@ -1,14 +1,20 @@
 package com.rutillastoby.zoria;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Debug;
+import android.provider.Settings;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -79,6 +86,7 @@ public class GeneralActivity extends AppCompatActivity {
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
     private CountDownTimer countOffApp=null; //Variable para contabilizar un tiempo máximo de funcionamiento de la aplicacion en suspensión
     private boolean isInitLoad=false; //Variable para establecer cuando se carga la informacion de las vistas inicialmente
+    private AlertDialog dialogTimeSettingsError;
 
     //----------------------------------------------------------------------------------------------
 
@@ -136,8 +144,6 @@ public class GeneralActivity extends AppCompatActivity {
         //Inicializar escucha de datos
         getCompetitions();
         getUsers();
-
-        System.out.println(System.currentTimeMillis()+"La hora");
     }
 
     //----------------------------------------------------------------------------------------------
@@ -441,6 +447,7 @@ public class GeneralActivity extends AppCompatActivity {
      */
     @Override
     protected void onPause() {
+        /*
         countOffApp = new CountDownTimer(1200000,1000) {
             @Override
             public void onTick(long millisUntilFinished) { }
@@ -450,7 +457,7 @@ public class GeneralActivity extends AppCompatActivity {
                 finish();
             }
         }.start();
-
+*/
         super.onPause();
     }
 
@@ -462,10 +469,40 @@ public class GeneralActivity extends AppCompatActivity {
      */
     @Override
     protected void onResume() {
+        /*
         if(countOffApp!=null){
             countOffApp.cancel();
             countOffApp=null;
         }
+        */
+
+        //Comprobar que los ajustes de hora se encuentren marcados como automaticos
+        if(Settings.Global.getInt(getContentResolver(), Settings.Global.AUTO_TIME, 0) == 0 ||
+           Settings.Global.getInt(getContentResolver(), Settings.Global.AUTO_TIME_ZONE, 0) == 0){
+
+            //Crear ventana modal de notificacion error de configuracion de hora
+            LayoutInflater inflater = LayoutInflater.from(this);
+            View dialog = inflater.inflate(R.layout.dialog_time_settings, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            //Funcionalidad boton para abrir la configuracion
+            Button bOpenSettings = dialog.findViewById(R.id.bOpenSettings);
+            bOpenSettings.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivityForResult(new Intent(Settings.ACTION_DATE_SETTINGS), 0);
+                }
+            });
+
+            //Mostrar alert dialog error
+            dialogTimeSettingsError = builder.setView(dialog)
+                                        .setCancelable(false)
+                                        .show();
+
+        }else if(dialogTimeSettingsError != null){
+            //Ocultar alert dialog
+            dialogTimeSettingsError.dismiss();
+        }
+
         super.onResume();
     }
 

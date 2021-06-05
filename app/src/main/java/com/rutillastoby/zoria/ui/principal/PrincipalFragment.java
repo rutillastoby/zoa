@@ -3,6 +3,7 @@ package com.rutillastoby.zoria.ui.principal;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -199,7 +200,7 @@ public class PrincipalFragment extends Fragment {
         final Runnable r = new Runnable() {
             public void run() {
 
-                //Actualizar la vista si esta activa
+                //Actualizar la vista
                 updateView();
 
                 //Actualizacion cada 500ms

@@ -1,7 +1,7 @@
 <resources>
 
     <string name="versionDB">7</string>
-    <string name="version">ZOA© 2019-2020 | Versión: 2.0.2</string>
+    <string name="version">ZOA© 2019-2021 | Versión: 2.1.0</string>
     <string name="app_name">ZOA</string>
     <string name="rutillasToby">Rutillas Toby</string>
     <string name="bLogin">ACCEDER</string>
@@ -46,6 +46,9 @@
     <string name="redRankingInfo"><b>3 puntos.</b></string>
     <string name="questRankingInfo"><b>6 puntos.</b><i>\n(Pregunta correcta)</i></string>
     <string name="flagRankingInfo"><b>10 puntos.</b><i>\n(Bandera final)</i></string>
+    <string name="errorSettingTimeTitle">Configuración de hora invalida</string>
+    <string name="errorSettingTimeText">Para usar ZOA debes tener la obtención de hora y zona en modo automático.</string>
+    <string name="errorSettingTimeButton">Configurar</string>
     <string name="infoTitle">Aplicación desarrollada por</string>
     <string name="rateApp1">¿TE GUSTA ZOA?</string>
     <string name="rateApp2">Puedes ayudarnos valorando la aplicación en Google Play.</string>
