@@ -3,13 +3,18 @@ package com.rutillastoby.zoria;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Debug;
+import android.os.Handler;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -42,6 +47,11 @@ import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
 import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
 import com.rutillastoby.zoria.ui.profile.ProfileFragment;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -82,10 +92,10 @@ public class GeneralActivity extends AppCompatActivity {
     private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
     private CompeticionDao competitionShow = new CompeticionDao(); //Datos de la competicion que se esta visualizando en este momento
     private UsuarioDao myUser;
-    private boolean getCompetitions=false, getUsers=false, initExecute=true; //Variables para determinar cuando se han recuperado los datos
+    private boolean getCompetitions=false, getUsers=false, initLoad=false; //Variables para determinar cuando se han recuperado los datos
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
-    private boolean isInitLoad=false; //Variable para establecer cuando se carga la informacion de las vistas inicialmente
     private AlertDialog dialogTimeSettingsError;
+    private final Handler handler = new Handler();
 
     //----------------------------------------------------------------------------------------------
 
@@ -143,6 +153,11 @@ public class GeneralActivity extends AppCompatActivity {
         //Inicializar escucha de datos
         getCompetitions();
         getUsers();
+
+        //Inicializar hilo de comprobacion de conexion
+        checkConnection();
+        //Forzar el volcado de datos inicialmente por si hay algunos almacenados en local
+        localDataToDB();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -268,6 +283,7 @@ public class GeneralActivity extends AppCompatActivity {
      *  SE EJECUTA AL HACER CLIC EN LA OPCION CURRENT DEL MENU INFERIOR
      */
     public void showFragmentCurrent(){
+
         //Marcar opcion del menu como activa
         navigation.getMenu().findItem(R.id.navigation_current).setChecked(true);
         fm.beginTransaction().hide(active).show(principalFrag).commit();
@@ -282,7 +298,7 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Mostrar la vista de la competicion activa, si no hay ninguna mostramos panel de no registrado
         //Comprobando si se han cargado los datos iniciales
-        if(isInitLoad){
+        if(initLoad){
             if(currentCompeId!=-1){
                 showMainViewCompetition(currentCompeId);
             }else{
@@ -323,67 +339,9 @@ public class GeneralActivity extends AppCompatActivity {
      * A LA RECUPERACION DE LOS DATOS (PUNTOS + USUARIOS)
      */
     public void initLoadPointsMap(){
-        //Cargar siempre y cuando el mapa se inicie despues de cargar todos los datos, si no es así
-        // el metodo @chargeAll se encargará de cargarlos de forma explicita a traves del metodo @checkFragmentCurrent
-        if(!initExecute && currentCompeId!=-1){
+        if(initLoad && currentCompeId!=-1){
             //A traves de este metodo se cargan los puntos
             prinF.setDataCompetition(competitionShow, questF, mapF, myUser);
-        }
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
-     * METODO QUE SE EJECUTA AL RECUPERAR TODOS LOS DATOS, SE ENCARGA DEL RESPALDO DE DATOS GUARDADOS EN LOCAL
-     */
-    public void chargeAll(){
-        initExecute=false; //Marcar como ejecutado
-
-        //Reproducir sonido de acceso
-        GenericFuntions.playSound(this, R.raw.login);
-
-        //Comprobar si quedan elementos en local por subir a la base de datos
-        if(countRowsData()>0){
-
-            //Declarar base de datos y tabla con la que utilizar
-            AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
-            SQLiteDatabase dbLocal = asoh.getReadableDatabase();
-            Cursor cursor = dbLocal.rawQuery("select * from data",null);
-
-            if (cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-                    final int id = cursor.getInt(cursor.getColumnIndex("id"));
-                    String path = cursor.getString(cursor.getColumnIndex("path"));
-                    String value = cursor.getString(cursor.getColumnIndex("value"));
-                    //Obtener el tipo de dato 0->texto, 1->int.
-                    int typeValue  = cursor.getInt(cursor.getColumnIndex("typevalue"));
-
-                    //Resubir datos como texto o numero en funcion del tipo de dato guardado en local
-                    db.getReference(path)
-                        .setValue(typeValue==1?Integer.parseInt(value):value, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
-                                if (databaseError == null) {
-                                    removeALine(id);
-                                    //En el momento en el que no quede ningun dato por respaldar cargamos la informacion inicial
-                                    if(countRowsData()==0){
-                                        initLoad();
-                                    }
-                                }
-                            }
-                        });
-                    cursor.moveToNext();
-                }
-            }
-
-            //Cerrar conexiones
-            dbLocal.close();
-            cursor.close();
-
-        }else{
-           //Si no hay datos que reespaldar directamente cargamos la informacion en la vistas
-           initLoad();
         }
     }
 
@@ -393,7 +351,10 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA CARGAR LA INFORMACION INICIAL EN LAS VISTAS
      */
     public void initLoad(){
-        isInitLoad = true;
+        initLoad = true;
+
+        //Reproducir sonido de acceso
+        GenericFuntions.playSound(this, R.raw.login);
         //Cargar el fragment con la competición marcada como activa
         showFragmentCurrent();
         //Cargar el historial de competiciones en el fragmento del perfil
@@ -568,7 +529,7 @@ public class GeneralActivity extends AppCompatActivity {
 
                     //Comprobar si la competicion que ha cambiado es la que se esta mostrando en fragment para actualizar los cambios
                     //Si es la primera ejecucion no actuamos
-                    if(c.getId()==showingCompeId && !initExecute) {
+                    if(c.getId()==showingCompeId && initLoad) {
                         competitionShow = c; //Establecer los datos de la competicion que se está visualizando
                         prinF.setDataCompetition(c, questF, mapF,myUser); //Establecemos los datos al fragmento principal de la competicion
                         rankF.loadRanking(c, usersList); //Actualizar datos del ranking
@@ -586,8 +547,8 @@ public class GeneralActivity extends AppCompatActivity {
                 getCompetitions=true;
                 if(getUsers) {
                     loadingAllFragments(false);
-                    if(initExecute){
-                        chargeAll();
+                    if(initLoad==false){
+                        initLoad();
                     }
                 }
             }
@@ -654,8 +615,8 @@ public class GeneralActivity extends AppCompatActivity {
 
                 if(getCompetitions){
                     loadingAllFragments(false);
-                    if(initExecute){
-                        chargeAll();
+                    if(!initLoad){
+                        initLoad();
                     }
                 }
             }
@@ -676,8 +637,8 @@ public class GeneralActivity extends AppCompatActivity {
     public void sendResponseQuestion(String idQuestion, int idResponse, boolean correct){
         final String path = "competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion;
 
-        //Guardar datos en fichero local indicado el tipo de value 0->texto, 1->int
-        final int idInserted = saveDataOnLocal(path, idResponse+"", 1);
+        //Guardar datos en fichero local indicado el tipo de valor
+        final int idInserted = saveDataOnLocal(path, idResponse+"", intType);
 
         //Guardar datos en base de datos local
         db.getReference(path)
@@ -708,10 +669,10 @@ public class GeneralActivity extends AppCompatActivity {
         final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint;
         final String value = points + "-" + System.currentTimeMillis();
 
-        //Guardar datos en fichero local indicado el tipo de value 0->texto, 1->int
-        final int idInserted = saveDataOnLocal(path, value, 0);
+        //Guardar datos en base de datos local indicado el tipo de valor
+        final int idInserted = saveDataOnLocal(path, value, textType);
 
-        //Guardar datos en base de datos
+        //Guardar datos en base de datos online
         db.getReference(path)
             .setValue(value, new DatabaseReference.CompletionListener() {
                 @Override
@@ -719,7 +680,7 @@ public class GeneralActivity extends AppCompatActivity {
                     //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
                     if (databaseError == null) {
                         //Llamada al metodo para eliminar la linea previamente introducida
-                        boolean correct = removeALine(idInserted);
+                        removeALine(idInserted);
                     }
                 }
             });
@@ -747,8 +708,8 @@ public class GeneralActivity extends AppCompatActivity {
     public void sendGetFlag(){
         final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/fin";
 
-        //Guardar datos en fichero local para respaldar problemas de conexion indicado el tipo de value 0->texto, 1->int
-        final int idInserted = saveDataOnLocal(path, "1", 1);
+        //Guardar datos en fichero local para respaldar problemas de conexion indicado el tipo de valor
+        final int idInserted = saveDataOnLocal(path, "1", intType);
 
         //Almacenar datos en la base de datos
         db.getReference(path)
@@ -761,6 +722,37 @@ public class GeneralActivity extends AppCompatActivity {
                     }
                 }
             });
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * COMPROBAR CONTINUAMENTE LA CONEXION A INTERNET Y VOLCAR LA INFORMACION RESTANTE
+     * LOCAL SOBRE LA BASE DE DATOS AL RECUPERLA
+     */
+    private void checkConnection(){
+
+        //Creacion del hilo
+        final Context context = getBaseContext();
+
+        final Runnable r = new Runnable() {
+            public void run() {
+                //Comprobar conexion
+                ConnectivityManager cm =(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo netInfo = cm.getActiveNetworkInfo();
+                boolean isConnected = netInfo != null && netInfo.isConnectedOrConnecting();
+
+                //Comprobar si queda informacion sin subir a la base de datos
+                if(isConnected && countRowsData()!=0){
+                    localDataToDB();
+                }
+
+                //Verificacion cada 15 segundos
+                handler.postDelayed(this, 15000);
+            }
+        };
+
+        handler.postDelayed(r, 15000);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -784,6 +776,8 @@ public class GeneralActivity extends AppCompatActivity {
     //              GUARDAR INFORMACION DE FORMA LOCAL COMO RESPALDO ANTE DESCONEXION             //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public final int textType = 0;
+    public final int intType = 1;
 
     /**
      * METODO PARA ALMACENAR INFORMACIÓN EN FICHERO LOCAL Y NO PERDER DATOS EN CASO DE DESCONEXIÓN
@@ -846,6 +840,46 @@ public class GeneralActivity extends AppCompatActivity {
         cursor.close();
         //Devolver numero de elementos en la tabla data
         return count;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA VOLCAR LOS DATOS ALMACENADOS EN LOCAL SOBRE LA BASE DE DATOS
+     */
+    public void localDataToDB(){
+
+        //Declarar base de datoslocal y tabla con la que utilizar
+        AdminSQLiteOpenHelper asoh = new AdminSQLiteOpenHelper(this, "localdata", null, 1);
+        SQLiteDatabase dbLocal = asoh.getReadableDatabase();
+        Cursor cursor = dbLocal.rawQuery("select * from data",null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                final int id = cursor.getInt(cursor.getColumnIndex("id"));
+                String path = cursor.getString(cursor.getColumnIndex("path"));
+                String value = cursor.getString(cursor.getColumnIndex("value"));
+                //Obtener el tipo de dato 0->texto, 1->int.
+                int typeValue  = cursor.getInt(cursor.getColumnIndex("typevalue"));
+
+                //Resubir datos como texto o numero en funcion del tipo de dato guardado en local
+                db.getReference(path)
+                        .setValue(typeValue==1?Integer.parseInt(value):value, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                //Si se ha guardado correctamente el valor, eliminamos el dato del fichero
+                                if (databaseError == null) {
+                                    removeALine(id);
+                                }
+                            }
+                        });
+                cursor.moveToNext();
+            }
+        }
+
+        //Cerrar conexiones
+        dbLocal.close();
+        cursor.close();
     }
 
     //----------------------------------------------------------------------------------------------
