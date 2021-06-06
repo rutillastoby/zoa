@@ -45,8 +45,9 @@ public class CompetitionsFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_competitions, container, false);
         //Iniciar variables
         initVar(view);
-
+        //Carga inicial
         lyLoadCompe.setVisibility(View.VISIBLE);
+
         return view;
     }
 

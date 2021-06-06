@@ -53,8 +53,9 @@ public class PrincipalFragment extends Fragment {
         initVar(view);
         //Llamada al metodo para verificar continuamente la hora actual y actuar sobre la competicion segun esta
         timeUpdate();
-
+        //Carga inicial
         lyLoadPrin.setVisibility(View.VISIBLE);
+
         return view;
     }
 

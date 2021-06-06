@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -55,6 +56,7 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private FirebaseUser user;
     private FirebaseDatabase db;
+
     //Variables
     private UsuarioDao myUser;
     private String nickUser;
@@ -69,7 +71,7 @@ public class ProfileFragment extends Fragment {
 
         //Iniciar variables
         initVar(view);
-
+        //Carga inicial
         lyLoadProfile.setVisibility(View.VISIBLE);
 
         return view;
@@ -107,54 +109,37 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        ////// Funcionalidad para cambiar nombre de usuario al pulsar done del teclado
+        //Ejecucion al perder el foco del cuadro de texto
+        etNickNameProfile.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    //Actualizar el nick
+                    checkUpdateNick();
+                }
+            }
+        });
+
+        //Ejecucion al pulsar el boton DONE del teclado con el cuadro de texto de nick activo
         etNickNameProfile.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                //Si es diferente que el actual lo cambiamos
-                final String newNick = etNickNameProfile.getText().toString();
-
-                if (!newNick.equals(nickUser)) {
-                    pbNickProfile.setVisibility(View.VISIBLE);//Activar la barra de progreso
-                    //Obtener los nombre de usuario
-                    db.getReference("usuarios").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            //Listado
-                            ArrayList<String> nombresUsados = new ArrayList<String>();
-
-                            //Obtener datos de nombres
-                            for(DataSnapshot usu : dataSnapshot.getChildren()) {
-                                for(DataSnapshot dato : usu.getChildren()){
-                                    if(dato.getKey().equalsIgnoreCase("nombre")){
-                                        nombresUsados.add(dato.getValue().toString().toLowerCase());
-                                    }
-                                }
-                            }
-
-                            //Comprobar si el usuario es valido
-                            if(GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados).equals("true")){
-                                updateName(view, newNick);
-                            }else{
-                                GenericFuntions.errorSnack(view,GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados),getContext());
-                                //Ocultar barra de progreso
-                                pbNickProfile.setVisibility(View.GONE);
-                            }
-
-                            //Cerrar teclado
-                            final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                            nickUser = newNick;
-                            imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
-                            etNickNameProfile.clearFocus();
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    etNickNameProfile.clearFocus();
                 }
+                return false; //Cerrar teclado
             }
-            return true; //El true deja el teclado abierto
+        });
+
+        //Ejecucion al pulsar fuera del cuadro de texto, limpiar foco para actualizar nick
+        getActivity().findViewById(R.id.container_fragment).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                //Cerrar teclado
+                final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+                etNickNameProfile.clearFocus();
+                return true;
             }
         });
 
@@ -182,12 +167,62 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * VERIFICAR SI LOS CAMBION EN EL NICK SON VALIDOS
+     */
+    public void checkUpdateNick(){
+        final String newNick = etNickNameProfile.getText().toString();
+
+        //Si es diferente que el actual lo cambiamos
+        if (!newNick.equals(nickUser)) {
+            pbNickProfile.setVisibility(View.VISIBLE);//Activar la barra de progreso
+
+            //Obtener los nombre de usuario
+            db.getReference("usuarios").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    ArrayList<String> nombresUsados = new ArrayList<String>();
+
+                    //Obtener datos de nombres
+                    for(DataSnapshot usu : dataSnapshot.getChildren()) {
+                        for(DataSnapshot dato : usu.getChildren()){
+                            if(dato.getKey().equalsIgnoreCase("nombre")){
+                                nombresUsados.add(dato.getValue().toString().toLowerCase());
+                            }
+                        }
+                    }
+
+                    //El usuario es valido
+                    if(GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados).equals("true")){
+                        updateNick(getView(), newNick);
+
+                    //Nombre de usuario no valido
+                    }else{
+                        GenericFuntions.errorSnack(getView(),GenericFuntions.checkNick(newNick.toLowerCase(), nombresUsados),getContext());
+                        etNickNameProfile.setText(nickUser);
+                        //Ocultar barra de progreso
+                        pbNickProfile.setVisibility(View.GONE);
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+    }
+
+
+
     //----------------------------------------------------------------------------------------------
 
     /**
      * METODO PARA ALMACENAR EN LA BASE DE DATOS EL NUEVO NOMBRE DE USUARIO
      */
-    private void updateName(View v, final String newNick){
+    private void updateNick(View v, final String newNick){
         final View view = v;
         //Guardar el nuevo valor
         db.getReference("usuarios/"+user.getUid()+"/nombre")
@@ -197,9 +232,9 @@ public class ProfileFragment extends Fragment {
                 if (databaseError != null) {
                     //Error al guardar
                     GenericFuntions.errorSnack(view,"Error al guardar", getContext());
+                    etNickNameProfile.setText(nickUser);
                 } else {
                     //Cambios guardados
-
                     GenericFuntions.snack(view, "Nombre actualizado");
                 }
 
