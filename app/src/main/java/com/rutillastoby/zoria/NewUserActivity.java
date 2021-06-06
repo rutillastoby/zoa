@@ -3,6 +3,7 @@ package com.rutillastoby.zoria;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +41,7 @@ public class NewUserActivity extends AppCompatActivity {
     private Button bOkNewUser, bCancelNewUser;
     private ImageView ivPhotoProfileNewUser;
     private ProgressBar pbNickNewUser;
+    private ConstraintLayout lyNewUser;
 
     //Variables
     String nick;
@@ -76,6 +79,7 @@ public class NewUserActivity extends AppCompatActivity {
         bCancelNewUser = findViewById(R.id.bCancelNewUser);
         ivPhotoProfileNewUser = findViewById(R.id.ivPhotoProfileNewUser);
         pbNickNewUser = findViewById(R.id.pbNickNewUser);
+        lyNewUser = findViewById(R.id.lyNewUser);
 
         //Ocultar botones toolbar
         findViewById(R.id.ivLogout).setVisibility(View.GONE);
@@ -111,6 +115,17 @@ public class NewUserActivity extends AppCompatActivity {
             }
         });
 
+        //Ejecucion al pulsar fuera del cuadro de texto cerrar teclado y limpiar foco
+        lyNewUser.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                //Cerrar teclado
+                final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                etNickNewUser.clearFocus();
+                return true;
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------------------
