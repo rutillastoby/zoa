@@ -70,6 +70,8 @@ public class ProfileFragment extends Fragment {
         //Iniciar variables
         initVar(view);
 
+        lyLoadProfile.setVisibility(View.VISIBLE);
+
         return view;
     }
 
@@ -96,9 +98,6 @@ public class ProfileFragment extends Fragment {
         ivLogout = getActivity().findViewById(R.id.ivLogout);
         ivInfoGeneral = getActivity().findViewById(R.id.ivInfoGeneral);
         lyLoadProfile = view.findViewById(R.id.lyLoadProfile);
-
-        //Estado inicial
-        lyLoadProfile.setVisibility(View.VISIBLE);
 
         //Onclick boton cerrar sesion
         ivLogout.setOnClickListener(new View.OnClickListener() {
@@ -313,15 +312,14 @@ public class ProfileFragment extends Fragment {
     }
 
     //----------------------------------------------------------------------------------------------
+    // GETs + Sets
+    //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA ESTABLECER VISIBILIDAD DEL PANEL DE CARGA DEL FRAGMENTO
+     * Obtener el layout con icono de carga del fragmento
+     * @return
      */
-    public void visibilityLyLoad(boolean status) {
-        if(status){
-            lyLoadProfile.setVisibility(View.VISIBLE);
-        }else {
-            lyLoadProfile.setVisibility(View.GONE);
-        }
+    public ConstraintLayout getLyLoadProfile(){
+        return lyLoadProfile;
     }
 }

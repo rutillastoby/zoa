@@ -160,7 +160,7 @@ public class GeneralActivity extends AppCompatActivity {
                 case R.id.navigation_competitions:
                     fm.beginTransaction().hide(active).show(competitionsFrag).commit();
                     active = competitionsFrag;
-                    
+
                     //Ocultar botones toolbar
                     hideToolbarButtons();
                     return true;
@@ -275,6 +275,11 @@ public class GeneralActivity extends AppCompatActivity {
         //Ocultar botones toolbar
         hideToolbarButtons();
 
+        //Si la competicion activa ha finalizado y se muestran sus resultado desmarcarla de activa
+        if(competitionFinishShowingResults(currentCompeId)){
+            db.getReference("usuarios/" + myUser.getUid() + "/compeActiva").setValue(-1);
+        }
+
         //Mostrar la vista de la competicion activa, si no hay ninguna mostramos panel de no registrado
         //Comprobando si se han cargado los datos iniciales
         if(isInitLoad){
@@ -298,7 +303,7 @@ public class GeneralActivity extends AppCompatActivity {
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
 
-        //Establecer los datos de la competicion si el usuario esta registrado
+        //Establecer los datos de la competicion
         for (int i = 0; i < competitionsList.size(); i++) {
             if (competitionsList.get(i).getId() == id) {
                 competitionShow = competitionsList.get(i); //Establecer los datos de la competicion que se está visualizando
@@ -389,12 +394,12 @@ public class GeneralActivity extends AppCompatActivity {
      */
     public void initLoad(){
         isInitLoad = true;
-        //Ocultar paneles de carga
-        changeVisibilityLoad(false);
         //Cargar el fragment con la competición marcada como activa
         showFragmentCurrent();
         //Cargar el historial de competiciones en el fragmento del perfil
         profF.loadRecordCompetition(competitionsList);
+
+
     }
 
     //----------------------------------------------------------------------------------------------
@@ -403,10 +408,11 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA ACTIVAR / DESACTIVAR LA VISTA DE CARGA DE LOS 3 FRAGMENTOS DE LA APLICACION
      * @param status
      */
-    public void changeVisibilityLoad(boolean status){
-        prinF.visibilityLyLoad(status);
-        compF.visibilityLyLoad(status);
-        profF.visibilityLyLoad(status);
+    public void loadingAllFragments(boolean status){
+        int visibility = status? View.VISIBLE: View.GONE;
+        prinF.getLyLoadPrin().setVisibility(visibility);
+        compF.getLyLoadCompe().setVisibility(visibility);
+        profF.getLyLoadProfile().setVisibility(visibility);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -416,11 +422,30 @@ public class GeneralActivity extends AppCompatActivity {
      * @param id
      * @return
      */
-    public boolean competitionFinish(int id){
+    public boolean competitionFinishShowingResults(int id){
         for(int i=0; i<competitionsList.size();i++){
             if(competitionsList.get(i).getId() == id){
                 if(competitionsList.get(i).getRes()==1){
                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA COMPROBAR SI UNA COMPETICION HA FINALIZADO POR TIEMPO
+     * @param id
+     * @return
+     */
+    public boolean competitionFinishTime(int id){
+        for(int i=0; i<competitionsList.size();i++){
+            if(competitionsList.get(i).getId() == id){
+                if(System.currentTimeMillis() > competitionsList.get(i).getHora().getFin()){
+                    return true;
                 }
                 return false;
             }
@@ -559,8 +584,11 @@ public class GeneralActivity extends AppCompatActivity {
 
                 //Obtener el ranking tras cargar estos datos y los de usuario ya que necesita ambos
                 getCompetitions=true;
-                if(getUsers && initExecute) {
-                    chargeAll();
+                if(getUsers) {
+                    loadingAllFragments(false);
+                    if(initExecute){
+                        chargeAll();
+                    }
                 }
             }
 
@@ -607,8 +635,12 @@ public class GeneralActivity extends AppCompatActivity {
 
                         //Si ha cambiado el current compe id, mostrar la nueva competicion en el fragmento principal
                         if(currentCompeId!=u.getCompeActiva()){
-                            //Controlar que la competicion activa corresponde con una en la que se esta registrado
-                            currentCompeId = competitionsRegistered.contains(u.getCompeActiva())? u.getCompeActiva() : -1;
+                            if(competitionsRegistered.contains((u.getCompeActiva()))){
+                                currentCompeId = u.getCompeActiva();
+                            }else{
+                                currentCompeId = -1;
+                                db.getReference("usuarios/" + myUser.getUid() + "/compeActiva").setValue(-1);
+                            }
                             showFragmentCurrent();
                         }
 
@@ -619,8 +651,12 @@ public class GeneralActivity extends AppCompatActivity {
 
                 //Cargar datos del ranking al recuperar los usuarios y competiciones ya que necesita ambos
                 getUsers=true;
-                if(getCompetitions && initExecute) {
-                    chargeAll();
+
+                if(getCompetitions){
+                    loadingAllFragments(false);
+                    if(initExecute){
+                        chargeAll();
+                    }
                 }
             }
 

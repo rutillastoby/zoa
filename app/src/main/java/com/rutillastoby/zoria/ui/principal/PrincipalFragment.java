@@ -54,6 +54,7 @@ public class PrincipalFragment extends Fragment {
         //Llamada al metodo para verificar continuamente la hora actual y actuar sobre la competicion segun esta
         timeUpdate();
 
+        lyLoadPrin.setVisibility(View.VISIBLE);
         return view;
     }
 
@@ -92,9 +93,6 @@ public class PrincipalFragment extends Fragment {
         dividerRanking = view.findViewById(R.id.dividerRanking);
         bAllCompetitions = view.findViewById(R.id.bAllCompetitions);
         tvNameToFinishCompe = view.findViewById(R.id.tvNameToFinishCompe);
-
-        //Estado inicial
-        visibilityLyLoad(true);
 
         //Boton mapa en fragmento principal
         bMapPrin.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +135,6 @@ public class PrincipalFragment extends Fragment {
         lyInProgress.setVisibility(View.GONE);
         lyToStart.setVisibility(View.GONE);
         lyFinishPrin.setVisibility(View.GONE);
-        lyLoadPrin.setVisibility(View.GONE);
         lyNotRegisPrin.setVisibility(View.VISIBLE);
     }
 
@@ -155,7 +152,7 @@ public class PrincipalFragment extends Fragment {
         lyToStart.setVisibility(View.GONE);
         lyFinishPrin.setVisibility(View.GONE);
         lyNotRegisPrin.setVisibility(View.GONE);
-        lyLoadPrin.setVisibility(View.GONE);
+
         //Estado inicial vista
         tvFinishCompetitionPrin.setVisibility(View.GONE);
         lyClockCurrent.setVisibility(View.VISIBLE);
@@ -244,7 +241,6 @@ public class PrincipalFragment extends Fragment {
                         ga.returnToPrincFrag();
                     }
                 }
-                visibilityLyLoad(false);
 
             //COMPETICION SIN COMENZAR
             } else if (currentTime < currentCompetition.getHora().getInicio()) {
@@ -324,15 +320,14 @@ public class PrincipalFragment extends Fragment {
     }
 
     //----------------------------------------------------------------------------------------------
+    // SETs + GETs
+    //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA ESTABLECER VISIBILIDAD DEL PANEL DE CARGA DEL FRAGMENTO
+     * Obtener el layout de carga del fragmento
+     * @return
      */
-    public void visibilityLyLoad(boolean status) {
-        if(status){
-            lyLoadPrin.setVisibility(View.VISIBLE);
-        }else {
-            lyLoadPrin.setVisibility(View.GONE);
-        }
+    public ConstraintLayout getLyLoadPrin() {
+        return  lyLoadPrin;
     }
 }

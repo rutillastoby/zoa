@@ -45,6 +45,8 @@ public class CompetitionsFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_competitions, container, false);
         //Iniciar variables
         initVar(view);
+
+        lyLoadCompe.setVisibility(View.VISIBLE);
         return view;
     }
 
@@ -60,9 +62,6 @@ public class CompetitionsFragment extends Fragment{
         //Referencias
         rvCompetitions = view.findViewById(R.id.rvCompetitions);
         lyLoadCompe = view.findViewById(R.id.lyLoadCompe);
-
-        //Estado inicial
-        lyLoadCompe.setVisibility(View.VISIBLE);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -105,7 +104,7 @@ public class CompetitionsFragment extends Fragment{
 
                 // Si es diferente al tutorial y la competicion no ha finalizado
                 // la marcamos como competicion activa y la abrimos en seccion current
-                } else if((id!=1 && !ga.competitionFinish(id))) {
+                } else if((id!=1 && !ga.competitionFinishShowingResults(id))) {
                     String myUid = ((GeneralActivity) getActivity()).getMyUser().getUid();
                     db.getReference("usuarios/" + myUid + "/compeActiva").setValue(id);
                     ga.showFragmentCurrent();
@@ -115,7 +114,7 @@ public class CompetitionsFragment extends Fragment{
                     ga.showMainViewCompetition(id);
                 }
 
-            } else if(!ga.competitionFinish(id)){
+            } else if(!ga.competitionFinishShowingResults(id) && !ga.competitionFinishTime(id)){
 
                 ///////////// SOLICITAR ACCESO SI NO ES UNA COMPETICION FINALIZADA /////////////////
 
@@ -158,9 +157,6 @@ public class CompetitionsFragment extends Fragment{
                         if(answer==pwd){
                             //Registrarse en competicion
                             final String myUid = ((GeneralActivity)getActivity()).getMyUser().getUid();
-
-                            //Mostrar panel de carga
-                            lyLoadCompe.setVisibility(View.VISIBLE);
 
                             //Entrada jugador en la competicion
                             db.getReference("competiciones/" + compeId + "/jugadores/" + myUid + "/fin").setValue(0, new DatabaseReference.CompletionListener() {
@@ -207,18 +203,12 @@ public class CompetitionsFragment extends Fragment{
                     if (databaseError == null) {
                         //Abrir la competicion en la ventana de competicion activa (current)
                         ga.showFragmentCurrent();
-                        //Ocultar panel de carga al completar el registro en la nueva competicion
-                        lyLoadCompe.setVisibility(View.GONE);
-                        ga.getPrinF().visibilityLyLoad(false);
                     }
                 }
             });
         }else {
             //En caso contrario directamente mostramos la competicion en el fragmento en el que nos encontramos
             ga.showMainViewCompetition(id);
-            //Ocultar panel de carga al completar el registro en la nueva competicion
-            lyLoadCompe.setVisibility(View.GONE);
-            ga.getPrinF().visibilityLyLoad(false);
         }
     }
 
@@ -231,20 +221,18 @@ public class CompetitionsFragment extends Fragment{
     public void setCompetitionsList(ArrayList<CompeticionDao> competitionsList) {
         this.competitionsList = competitionsList;
         loadCompetitions();
-        System.out.println("AAAAAAAAAAAAa");
     }
 
     //----------------------------------------------------------------------------------------------
+    // SETs + GETs
+    //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA ESTABLECER VISIBILIDAD DEL PANEL DE CARGA DEL FRAGMENTO
+     * Obtener el layout de carga del fragmento
+     * @return
      */
-    public void visibilityLyLoad(boolean status) {
-        if(status){
-            lyLoadCompe.setVisibility(View.VISIBLE);
-        }else {
-            lyLoadCompe.setVisibility(View.GONE);
-        }
+    public ConstraintLayout getLyLoadCompe() {
+        return  lyLoadCompe;
     }
 
 
