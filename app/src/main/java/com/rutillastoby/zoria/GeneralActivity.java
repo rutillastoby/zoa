@@ -473,8 +473,6 @@ public class GeneralActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        //Enviar ubicación nula
-        sendLocation(null);
         //En funcion del fragmento activo actuaremos
         switch (active.getTag()){
             //MAP FRAGMENT, QUESTIONS FRAGMENT, RANKING FRAGMENT
@@ -763,11 +761,12 @@ public class GeneralActivity extends AppCompatActivity {
     public void sendLocation(Location location){
         //Comprobar si esta seleccionado el envio de ubicacion
         if(competitionShow.getUbi()==1 && location!=null){
-            db.getReference("usuarios/" + user.getUid() + "/ubi/lat").setValue(location.getLatitude());
-            db.getReference("usuarios/" + user.getUid() + "/ubi/lon").setValue(location.getLongitude());
-        }else{
-            db.getReference("usuarios/" + user.getUid() + "/ubi/lat").setValue(0);
-            db.getReference("usuarios/" + user.getUid() + "/ubi/lon").setValue(0);
+            long currentTime = System.currentTimeMillis();
+
+            String basePath =  "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/ubis/"+currentTime;
+            System.out.println(basePath);
+            db.getReference(basePath+"/lat").setValue(location.getLatitude());
+            db.getReference(basePath+"/lon").setValue(location.getLongitude());
         }
     }
 

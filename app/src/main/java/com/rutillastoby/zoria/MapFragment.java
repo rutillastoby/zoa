@@ -115,7 +115,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             @Override
             public void onProviderDisabled(String provider) {
-                ga.sendLocation(null);
                 //Mostrar mensaje de gps desactivado
                 lyWarningGPS.setVisibility(View.VISIBLE);
                 fabCurrentPosition.hide();
@@ -138,7 +137,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         //Suscribir el escuchador previamente instanciado para que actualice posicion cada 30 segundos y 450 metros
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 450, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 50, locationListener);
     }
 
     //----------------------------------------------------------------------------------------------

@@ -41,8 +41,6 @@
 
     </application>
 
-
-
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.camera" />
 
