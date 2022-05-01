@@ -1,5 +1,6 @@
 package com.rutillastoby.zoria;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,7 +64,10 @@ public class CompetitionElement extends RecyclerView.Adapter<CompetitionElement.
     public void onBindViewHolder(@NonNull final CompetitionInstance instance, final int i) {
         //1. Obtener los datos del array y agregarlos a los elementos del elemento de competicion
         instance.tvNombre.setText(competitionsList.get(i).getNombre());
-        Picasso.get().load(competitionsList.get(i).getFoto()).error(R.color.colorPrimaryDark).into(instance.ivCompe);
+        Picasso.get().load(competitionsList.get(i).getFoto().replace("http:", "https:"))
+                .error(R.drawable.portada)
+                .into(instance.ivCompe);
+
         //2. Segun si la competicion ha finalizado o no mostramos un elemento u otro
         if(System.currentTimeMillis()<competitionsList.get(i).getHora().getFin()){
             instance.lyDateFinish.setVisibility(View.GONE); //Ocultar finalizado

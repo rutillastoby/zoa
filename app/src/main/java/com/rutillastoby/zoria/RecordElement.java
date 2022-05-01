@@ -65,7 +65,9 @@ public class RecordElement extends RecyclerView.Adapter<RecordElement.Competitio
         //1. Obtener nombre de la competicion
         instance.tvNameRecord.setText(competitionsList.get(i).getNombre());
         //2. Establecer imagen de fondo
-        Picasso.get().load(competitionsList.get(i).getFoto()).error(R.color.colorPrimaryDark).into(instance.ivBackRecord);
+        Picasso.get().load(competitionsList.get(i).getFoto())
+                .error(R.drawable.portada)
+                .into(instance.ivBackRecord);
         //3. Establecer fecha de competicion
         Date now = new Date(competitionsList.get(i).getHora().getInicio());
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));

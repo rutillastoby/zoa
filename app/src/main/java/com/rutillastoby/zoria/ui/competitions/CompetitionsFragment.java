@@ -3,6 +3,7 @@ package com.rutillastoby.zoria.ui.competitions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.rutillastoby.zoria.GeneralActivity;
 import com.rutillastoby.zoria.GenericFuntions;
 import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.dao.CompeticionDao;
+import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;

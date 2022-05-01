@@ -16,10 +16,12 @@ import android.os.CountDownTimer;
 import android.os.Debug;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -29,6 +31,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -104,15 +107,12 @@ public class GeneralActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true); //Soporte SVG api 19
 
-        //Establecer vita
-        setContentView(R.layout.activity_general);
+        //Eliminar fragmentos si existian previamente
+        for(int i=0; i<fm.getFragments().size(); i++){
+            fm.beginTransaction().remove(fm.getFragments().get(i)).commit();
+        }
 
-        //Obtener menu inferior
-        navigation = findViewById(R.id.nav_view);
-        //Escucha para los botones del menu
-        navigation.setOnNavigationItemSelectedListener(onClickMenuItem);
-
-        //Ocultar fragmentos inicialmente
+        //Crear fragmentos
         fm.beginTransaction().add(R.id.container_fragment, rankingFragment, "7").hide(rankingFragment).commit();
         fm.beginTransaction().add(R.id.container_fragment, questionsFragment, "6").hide(questionsFragment).commit();
         fm.beginTransaction().add(R.id.container_fragment, scannerFragment, "5").hide(scannerFragment).commit();
@@ -121,10 +121,23 @@ public class GeneralActivity extends AppCompatActivity {
         fm.beginTransaction().add(R.id.container_fragment, profileFrag, "3").hide(profileFrag).commit();
         fm.beginTransaction().add(R.id.container_fragment, competitionsFrag, "2").hide(competitionsFrag).commit();
         fm.beginTransaction().add(R.id.container_fragment, principalFrag, "1").commit();
+
+        //Marcar el fragmento activo por defecto
         active= principalFrag;
+
+        //Establecer vita
+        setContentView(R.layout.activity_general);
+
+        //Obtener menu inferior
+        navigation = findViewById(R.id.nav_view);
+
+        //Escucha para los botones del menu
+        navigation.setOnNavigationItemSelectedListener(onClickMenuItem);
+
+        //Marcar la opcion activa
         navigation.getMenu().findItem(R.id.navigation_current).setChecked(true);
 
-        //Establecer barra personalizada
+        //Establecer toolbar personalizado
         toolbar = findViewById(R.id.custom_toolbar);
         setSupportActionBar(toolbar);
 
@@ -156,6 +169,7 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Inicializar hilo de comprobacion de conexion
         checkConnection();
+
         //Forzar el volcado de datos inicialmente por si hay algunos almacenados en local
         localDataToDB();
     }
@@ -354,7 +368,7 @@ public class GeneralActivity extends AppCompatActivity {
         initLoad = true;
 
         //Reproducir sonido de acceso
-        GenericFuntions.playSound(this, R.raw.login);
+        //GenericFuntions.playSound(this, R.raw.login);
         //Cargar el fragment con la competición marcada como activa
         showFragmentCurrent();
         //Cargar el historial de competiciones en el fragmento del perfil
@@ -429,7 +443,6 @@ public class GeneralActivity extends AppCompatActivity {
 
     /**
      * METODO QUE SE EJECUTA AL VOLVER DEL ESTADO DE PAUSE
-     * DESACTIVAREMOS EL CONTADOR DE CIERRE POR SUSPENSION
      */
     @Override
     protected void onResume() {

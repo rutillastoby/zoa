@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,7 @@ public class PrincipalFragment extends Fragment {
         //Llamada al metodo para verificar continuamente la hora actual y actuar sobre la competicion segun esta
         timeUpdate();
         //Carga inicial
+        Log.d("aaa", "primero");
         lyLoadPrin.setVisibility(View.VISIBLE);
 
         return view;
