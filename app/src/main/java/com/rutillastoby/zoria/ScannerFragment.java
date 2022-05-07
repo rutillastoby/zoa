@@ -76,7 +76,7 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         scanner.setResultHandler(this);
         scanner.startCamera();
         //Si la competicion es nocturna encendemos el falsh
-        if(ga.getCompetitionShow().getTipo()==1){
+        if(ga.getShowingCompetition().getTipo()==1){
             scanner.setFlash(true);
         }else{
             scanner.setFlash(false);
@@ -150,13 +150,13 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
 
         //Interpretar respuesta
         String code = rawResult.getText();
-        HashMap<String, String> myPoints = ga.getCompetitionShow().getJugadores().get(ga.getMyUser().getUid()).getPuntos();
+        HashMap<String, String> myPoints = ga.getShowingCompetition().getJugadores().get(ga.getMyUser().getUid()).getPuntos();
         boolean exist=false, escaned=false;
         int level=-1;
         String namePoint="";
 
         //Recorrer todos los puntos para comprobar si el punto escaneado existe
-        for (Map.Entry<String, Punto> point : ga.getCompetitionShow().getPuntos().entrySet()) {
+        for (Map.Entry<String, Punto> point : ga.getShowingCompetition().getPuntos().entrySet()) {
             if(point.getKey().equals(code)){
                 exist = true;
                 level= point.getValue().getNivel();

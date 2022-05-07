@@ -1,19 +1,17 @@
 package com.rutillastoby.zoria;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Debug;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
@@ -21,17 +19,16 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,15 +47,12 @@ import com.rutillastoby.zoria.ui.competitions.CompetitionsFragment;
 import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
 import com.rutillastoby.zoria.ui.profile.ProfileFragment;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class GeneralActivity extends AppCompatActivity {
+
+    public static GeneralActivity singleton;
 
     //Fragmentos para mostrar con el menu
     final Fragment competitionsFrag = new CompetitionsFragment();
@@ -91,14 +85,16 @@ public class GeneralActivity extends AppCompatActivity {
     //Variables
     private static ArrayList<CompeticionDao> competitionsList;
     private static ArrayList<UsuarioDao> usersList;
-    private int currentCompeId=-1; //Id de la competicion que esta como activa para el usuario (Accesible desde el boton current del menu inferior)
+    private int activeCompeId =-1; //Id de la competicion que esta como activa para el usuario (Accesible desde el boton current del menu inferior)
     private int showingCompeId=-1; //Id de la competicion que se esta mostrando en el fragmento principal y para la que hay que recargar al recibir nuevos datos
-    private CompeticionDao competitionShow = new CompeticionDao(); //Datos de la competicion que se esta visualizando en este momento
+    private CompeticionDao showingCompetition = new CompeticionDao(); //Datos de la competicion que se esta visualizando en este momento
+    private CompeticionDao activeCompetition = null;
     private UsuarioDao myUser;
     private boolean getCompetitions=false, getUsers=false, initLoad=false; //Variables para determinar cuando se han recuperado los datos
     private int posMyUserRanking=0; //Variable para indicar en que posicion del recyclerview del rankig esta mi usuario
     private AlertDialog dialogTimeSettingsError;
     private final Handler handler = new Handler();
+    private Intent backgroundLocationService;
 
     //----------------------------------------------------------------------------------------------
 
@@ -106,6 +102,7 @@ public class GeneralActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true); //Soporte SVG api 19
+        singleton = this;
 
         //Eliminar fragmentos si existian previamente
         for(int i=0; i<fm.getFragments().size(); i++){
@@ -172,6 +169,19 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Forzar el volcado de datos inicialmente por si hay algunos almacenados en local
         localDataToDB();
+
+        //Crear servicio de obtencion de localizacion
+        backgroundLocationService = new Intent(this, BackgroundLocation.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ContextCompat.startForegroundService(this, backgroundLocationService);
+        }else{
+            startService(backgroundLocationService);
+        }
+
+        //Comprobar permisos
+        if(!Permissions.hasPermissions(this)){
+            ActivityCompat.requestPermissions(this, Permissions.getPermissions(), Permissions.PERMISSION_ALL);
+        }
     }
 
     //----------------------------------------------------------------------------------------------
@@ -306,15 +316,15 @@ public class GeneralActivity extends AppCompatActivity {
         hideToolbarButtons();
 
         //Si la competicion activa ha finalizado y se muestran sus resultado desmarcarla de activa
-        if(competitionFinishShowingResults(currentCompeId)){
+        if(competitionFinishShowingResults(activeCompeId)){
             db.getReference("usuarios/" + myUser.getUid() + "/compeActiva").setValue(-1);
         }
 
         //Mostrar la vista de la competicion activa, si no hay ninguna mostramos panel de no registrado
         //Comprobando si se han cargado los datos iniciales
         if(initLoad){
-            if(currentCompeId!=-1){
-                showMainViewCompetition(currentCompeId);
+            if(activeCompeId !=-1){
+                showMainViewCompetition(activeCompeId);
             }else{
                 prinF.setViewNoneCompetition();
             }
@@ -333,14 +343,11 @@ public class GeneralActivity extends AppCompatActivity {
         fm.beginTransaction().hide(active).show(principalFrag).commit();
         active = principalFrag;
 
-        //Establecer los datos de la competicion
-        for (int i = 0; i < competitionsList.size(); i++) {
-            if (competitionsList.get(i).getId() == id) {
-                competitionShow = competitionsList.get(i); //Establecer los datos de la competicion que se está visualizando
-                prinF.setDataCompetition(competitionsList.get(i), questF, mapF, myUser);
-                rankF.loadRanking(competitionsList.get(i), usersList);
-            }
-        }
+        //Establecer los datos de la competicion a visualizar
+        showingCompetition = findCompetitionDataById(id); //Establecer los datos de la competicion que se está visualizando
+        prinF.setDataCompetition(showingCompetition, questF, mapF, myUser);
+        rankF.loadRanking(showingCompetition, usersList);
+
 
         //Ocultar iconos toolbar
         hideToolbarButtons();
@@ -353,9 +360,9 @@ public class GeneralActivity extends AppCompatActivity {
      * A LA RECUPERACION DE LOS DATOS (PUNTOS + USUARIOS)
      */
     public void initLoadPointsMap(){
-        if(initLoad && currentCompeId!=-1){
+        if(initLoad && activeCompeId !=-1){
             //A traves de este metodo se cargan los puntos
-            prinF.setDataCompetition(competitionShow, questF, mapF, myUser);
+            prinF.setDataCompetition(showingCompetition, questF, mapF, myUser);
         }
     }
 
@@ -426,6 +433,18 @@ public class GeneralActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    private CompeticionDao findCompetitionDataById(int id){
+        //Establecer los datos de la competicion
+        for (int i = 0; i < competitionsList.size(); i++) {
+            if (competitionsList.get(i).getId() == id) {
+                return competitionsList.get(i);
+            }
+        }
+        return  null;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -541,9 +560,14 @@ public class GeneralActivity extends AppCompatActivity {
                     //Comprobar si la competicion que ha cambiado es la que se esta mostrando en fragment para actualizar los cambios
                     //Si es la primera ejecucion no actuamos
                     if(c.getId()==showingCompeId && initLoad) {
-                        competitionShow = c; //Establecer los datos de la competicion que se está visualizando
+                        showingCompetition = c; //Establecer los datos de la competicion que se está visualizando
                         prinF.setDataCompetition(c, questF, mapF,myUser); //Establecemos los datos al fragmento principal de la competicion
                         rankF.loadRanking(c, usersList); //Actualizar datos del ranking
+                    }
+
+                    //Si la competicion que ha cambiado es la activa para actualizar los datos
+                    if(c.getId() == activeCompeId){
+                        activeCompetition = c;
                     }
                 }
 
@@ -606,11 +630,11 @@ public class GeneralActivity extends AppCompatActivity {
                         u.setCompetitionsRegistered(competitionsRegistered);
 
                         //Si ha cambiado el current compe id, mostrar la nueva competicion en el fragmento principal
-                        if(currentCompeId!=u.getCompeActiva()){
-                            if(competitionsRegistered.contains((u.getCompeActiva()))){
-                                currentCompeId = u.getCompeActiva();
-                            }else{
-                                currentCompeId = -1;
+                        if(activeCompeId !=u.getCompeActiva()) {
+                            if (competitionsRegistered.contains((u.getCompeActiva()))) {
+                                activeCompeId = u.getCompeActiva();
+                            } else {
+                                activeCompeId = -1;
                                 db.getReference("usuarios/" + myUser.getUid() + "/compeActiva").setValue(-1);
                             }
                             showFragmentCurrent();
@@ -629,6 +653,11 @@ public class GeneralActivity extends AppCompatActivity {
                     if(!initLoad){
                         initLoad();
                     }
+
+                    //Almacenar la informacion de la competicion activa si no esta establecida
+                    if(activeCompetition == null){
+                        activeCompetition = findCompetitionDataById(myUser.getCompeActiva());
+                    }
                 }
             }
 
@@ -646,7 +675,7 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA ALMACENAR LA RESPUESTA A UNA PREGUNTA EN LA BASE DE DATOS
      */
     public void sendResponseQuestion(String idQuestion, int idResponse, boolean correct){
-        final String path = "competiciones/"+showingCompeId+"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion;
+        final String path = "competiciones/"+ activeCompeId +"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion;
 
         //Guardar datos en fichero local indicado el tipo de valor
         final int idInserted = saveDataOnLocal(path, idResponse+"", intType);
@@ -666,7 +695,7 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Establecer la puntuación obtenida al resolver la pregunta
         if(correct){
-            String idPointAssociated = competitionShow.getPreguntas().get(idQuestion).getIdPunto();
+            String idPointAssociated = showingCompetition.getPreguntas().get(idQuestion).getIdPunto();
             sendPointScann(idPointAssociated, -1, 6); //El nivel lo establecemos en -1 para no resetear de nuevo la pregunta
         }
     }
@@ -677,7 +706,7 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA ALMACENAR EL REGISTRO DE UN CODIGO EN LA BASE DE DATOS
      */
     public void sendPointScann(String idPoint, int level, int points) {
-        final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint;
+        final String path = "competiciones/" + activeCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint;
         final String value = points + "-" + System.currentTimeMillis();
 
         //Guardar datos en base de datos local indicado el tipo de valor
@@ -698,7 +727,7 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Si es un codigo de pregunta buscar la pregunta para desbloquearla
         if(level==4){
-            for (Map.Entry<String, Pregunta> quest : competitionShow.getPreguntas().entrySet()) {
+            for (Map.Entry<String, Pregunta> quest : showingCompetition.getPreguntas().entrySet()) {
                 //Al encontrar la pregunta asociada al punto la desbloqueamos
                 if(quest.getValue().getIdPunto().equals(idPoint)){
                     sendResponseQuestion(quest.getValue().getId(),0,false); //El 0 indica que no esta contestada
@@ -717,7 +746,7 @@ public class GeneralActivity extends AppCompatActivity {
      * COMPETICION FINALIZADA PARA EL USUARIO
      */
     public void sendGetFlag(){
-        final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/fin";
+        final String path = "competiciones/" + activeCompeId + "/jugadores/" + user.getUid() + "/fin";
 
         //Guardar datos en fichero local para respaldar problemas de conexion indicado el tipo de valor
         final int idInserted = saveDataOnLocal(path, "1", intType);
@@ -744,8 +773,6 @@ public class GeneralActivity extends AppCompatActivity {
     private void checkConnection(){
 
         //Creacion del hilo
-        final Context context = getBaseContext();
-
         final Runnable r = new Runnable() {
             public void run() {
                 //Comprobar conexion
@@ -769,17 +796,21 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     /**
-     * METODO PARA ENVIAR MI UBICACIÓN A LA BASE DE DATOS
+     * METODO PARA GUARDAR MI UBICACIÓN A LA BASE DE DATOS
      */
     public void sendLocation(Location location){
-        //Comprobar si esta seleccionado el envio de ubicacion
-        if(competitionShow.getUbi()==1 && location!=null){
-            long currentTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
 
-            String basePath =  "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/ubis/"+currentTime;
-            System.out.println(basePath);
+        //Comprobar si esta seleccionado el envio de ubicacion
+        if(activeCompetition.getUbi()==1 && currentTime < activeCompetition.getHora().getFin() && location!=null){
+
+            String basePath =  "competiciones/" + activeCompeId + "/jugadores/" + user.getUid() + "/ubis/"+currentTime;
             db.getReference(basePath+"/lat").setValue(location.getLatitude());
             db.getReference(basePath+"/lon").setValue(location.getLongitude());
+            Log.d("aba", "guardando: " + basePath);
+
+        }else{
+            Log.d("aba", "imposible guardar: " + location);
         }
     }
 
@@ -928,6 +959,33 @@ public class GeneralActivity extends AppCompatActivity {
     }
     */
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                         PERMISOS                                           //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * METODO PARA OBTENER LA RESPUESTA A LA SOLICITUD DE PERMISOS
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //Comprobar si se han concedido los permisos
+        boolean grant = true;
+        for (int grantResult : grantResults) {
+            if (grantResult == PackageManager.PERMISSION_DENIED) {
+                grant = false;
+            }
+        }
+
+        //Si se deniegan los permisos, se cierra la aplicacion
+        if(!grant) {
+            finishAffinity();
+        }
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                      GETS + SETS                                           //
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -948,8 +1006,8 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA OBTENER EL VALOR DE LA COMPETICION MARCADA COMO ACTIVA
      * @return
      */
-    public int getCurrentCompeId() {
-        return currentCompeId;
+    public int getActiveCompeId() {
+        return activeCompeId;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -957,8 +1015,8 @@ public class GeneralActivity extends AppCompatActivity {
     /**
      * METODO PARA OBTENER LOS DATOS DE LA COMPETICION QUE SE ESTÁ VISUALIZANDO EN ESTE INSTANTE
      */
-    public CompeticionDao getCompetitionShow() {
-        return competitionShow;
+    public CompeticionDao getShowingCompetition() {
+        return showingCompetition;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -1047,6 +1105,6 @@ public class GeneralActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     public int getTypeMapCompe(){
-        return competitionShow.getMapa();
+        return showingCompetition.getMapa();
     }
 }

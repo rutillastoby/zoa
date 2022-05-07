@@ -54,4 +54,7 @@
     <string name="close">CERRAR</string>
     <string name="oldVersion"><b>Oh vaya!</b>\nEstas usando una versión antigua. Actualiza la aplicación para continuar... </string>
     <string name="update">ACTUALIZAR</string>
+    <string name="getLocation">Obteniendo ubicación</string>
+    <string name="noCompetitionAccess">No tienes acceso a esa competición</string>
+
 </resources>

@@ -41,10 +41,6 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
 
-    // Permisos =================================================
-    private boolean hasPermissions=true;
-    int PERMISSION_ALL = 333;
-
     // Base de datos ============================================
     private FirebaseDatabase db;
 
@@ -95,22 +91,14 @@ public class LoginActivity extends AppCompatActivity {
         //Referencia al objeto de autenticacion de firebase
         firebaseAuth = FirebaseAuth.getInstance();
 
-
-        /////////////////////////// Permisos ///////////////////////////////
-        //Declarar permisos necesarios
-        String[] PERMISSIONS = {
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.CAMERA
-        };
-        //Comprobar si se tienen los permisos adecuados
-        if(!hasPermissions(this, PERMISSIONS)){
-            //Si no se tienen los permisos, los solicitamos de nuevo
-            hasPermissions=false;
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
-        }else{
+        //Comprobar permisos
+        if(!Permissions.hasPermissions(this)){
+            ActivityCompat.requestPermissions(this, Permissions.getPermissions(), Permissions.PERMISSION_ALL);
+        }else {
             //Comprobar version de la base de datos
             checkVersionDB();
         }
+
 
         //////////////////////////// Botones //////////////////////////////
         lyUpdateApp.setOnClickListener(new View.OnClickListener() {
@@ -293,25 +281,6 @@ public class LoginActivity extends AppCompatActivity {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * METODO PARA COMPROBAR SI SE TIENEN PERMISOS ACTIVADOS PASANDO EL LISTADO DE LOS MISMOS
-     * @param context
-     * @param permissions
-     * @return
-     */
-    public static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    /**
      * METODO PARA OBTENER LA RESPUESTA A LA SOLICITUD DE PERMISOS
      * @param requestCode
      * @param permissions
@@ -327,14 +296,13 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
-        if(grant){
-            //Comprobar version de la aplicacion
+        if(grant) {
+            //Comprobar version de la base de datos
             checkVersionDB();
-        }else {
+        }else{
             //Si se deniegan los permisos, se cierra la aplicacion
             finishAffinity();
         }
-
     }
 
 

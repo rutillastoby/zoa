@@ -2,12 +2,15 @@ package com.rutillastoby.zoria;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -35,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback{
     //Referencias
     private FloatingActionButton fabScanner, fabCurrentPosition;
     private ImageView ivBackMap;
@@ -43,7 +47,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ConstraintLayout lyWarningGPS;
 
     //Variables
-    private LocationListener locationListener;
     private SupportMapFragment mMapFragment;
     private GoogleMap map;
     private ArrayList<Marker> instanciatedMarker = new ArrayList<Marker>(); //Variable para almacenar los puntos instanciados en mapa
@@ -103,41 +106,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 moveViewMap();
             }
         });
-
-        //Escuchador de ubicacion
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(getContext().LOCATION_SERVICE);
-        //Clase declarada al vuelo que actuará ante los cambios de ubicacion
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                ga.sendLocation(location);
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-                //Mostrar mensaje de gps desactivado
-                lyWarningGPS.setVisibility(View.VISIBLE);
-                fabCurrentPosition.hide();
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                //Ocultar mensaje de gps desactivado
-                lyWarningGPS.setVisibility(View.GONE);
-                fabCurrentPosition.show(); //Mostrar boton de ir a mi ubicacion
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-        };
-        //Comprobar permisos de localizacion
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        //Suscribir el escuchador previamente instanciado para que actualice posicion cada 30 segundos y 450 metros
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 50, locationListener);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -394,4 +362,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             fabScanner.setBackgroundTintList(getContext().getResources().getColorStateList(R.color.gray));
         }
     }
-}
+
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * METODO PARA HABILITAR O DESHABILITAR ELEMENTOS GRAFICOS CORRESPONDIENTES CON EL ESTADO DEL
+     * PROVEEDOR DE LOCALIZACION
+     * @param status
+     */
+    public void setStatusLocationProvider(boolean status){
+        if(status) {
+            lyWarningGPS.setVisibility(View.GONE);
+            fabCurrentPosition.show(); //Mostrar boton de ir a mi ubicacion
+        }else {
+            lyWarningGPS.setVisibility(View.VISIBLE);
+            fabCurrentPosition.hide(); //Ocultar boton de ir a mi ubicacion
+        }
+    }}

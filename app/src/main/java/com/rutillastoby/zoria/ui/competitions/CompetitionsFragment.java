@@ -3,7 +3,6 @@ package com.rutillastoby.zoria.ui.competitions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ import com.rutillastoby.zoria.GeneralActivity;
 import com.rutillastoby.zoria.GenericFuntions;
 import com.rutillastoby.zoria.R;
 import com.rutillastoby.zoria.dao.CompeticionDao;
-import com.rutillastoby.zoria.ui.principal.PrincipalFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +100,7 @@ public class CompetitionsFragment extends Fragment{
                 ///////////// ACCEDER A COMPETICION ////////////////
 
                 // Si la competicion presionada es la que esta activa mostramos directamente el panel
-                if(id==ga.getCurrentCompeId()){
+                if(id==ga.getActiveCompeId()){
                     ga.showFragmentCurrent();
 
                 // Si es diferente al tutorial y la competicion no ha finalizado
@@ -127,6 +125,9 @@ public class CompetitionsFragment extends Fragment{
                         inputPwd(competitionsList.get(i).getPwd(), id);
                     }
                 }
+            }else{
+                //Sin acceso a la competicion
+                GenericFuntions.snack(getView(), getString(R.string.noCompetitionAccess));
             }
         }
     }
@@ -199,7 +200,7 @@ public class CompetitionsFragment extends Fragment{
 
         //Marcar como competicion activa si no nos estamos registrando en el tutorial de forma posterior al registro ya de una
         //competicion cualquiera (evitamos sobreescribir la competicion actual con el tutorial si el registro en este es posterior)
-        if(id!=1 || ga.getCurrentCompeId()==-1) {
+        if(id!=1 || ga.getActiveCompeId()==-1) {
             db.getReference("usuarios/" + myUid + "/compeActiva").setValue(id, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
