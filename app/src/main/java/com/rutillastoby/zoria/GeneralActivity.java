@@ -437,6 +437,11 @@ public class GeneralActivity extends AppCompatActivity {
 
     //----------------------------------------------------------------------------------------------
 
+    /**
+     * Buscar una competicion a traves de su id
+     * @param id
+     * @return
+     */
     private CompeticionDao findCompetitionDataById(int id){
         //Establecer los datos de la competicion
         for (int i = 0; i < competitionsList.size(); i++) {
@@ -803,14 +808,10 @@ public class GeneralActivity extends AppCompatActivity {
 
         //Comprobar si esta seleccionado el envio de ubicacion
         if(activeCompetition.getUbi()==1 && currentTime < activeCompetition.getHora().getFin() && location!=null){
-
             String basePath =  "competiciones/" + activeCompeId + "/jugadores/" + user.getUid() + "/ubis/"+currentTime;
             db.getReference(basePath+"/lat").setValue(location.getLatitude());
             db.getReference(basePath+"/lon").setValue(location.getLongitude());
             Log.d("aba", "guardando: " + basePath);
-
-        }else{
-            Log.d("aba", "imposible guardar: " + location);
         }
     }
 
@@ -1107,4 +1108,8 @@ public class GeneralActivity extends AppCompatActivity {
     public int getTypeMapCompe(){
         return showingCompetition.getMapa();
     }
+
+    //----------------------------------------------------------------------------------------------
+
+    public CompeticionDao getActiveCompetition(){return activeCompetition;}
 }

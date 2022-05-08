@@ -16,6 +16,7 @@ public class CompeticionDao {
     private int res; //Resultados: 0 no mostrar resultados, 1 si mostrar resultados
     private int ubi; //0 No obtener ubicaciones usuarios, 1 Obtener ubicaciones usuarios
     private int mapa; //Indica el tipo de mapa a utilizar: 4 Satelite, 3 Relieve
+    private float ubiFreq = 100; //Determina frecuencia con la que se actualiza la ubicacion en db (distacia en metros)
     private HashMap<String, Pregunta> preguntas;
     private HashMap<String, Jugador> jugadores;
     private HashMap<String, Punto> puntos;
@@ -122,4 +123,5 @@ public class CompeticionDao {
     public void setUbi(int ubi) {
         this.ubi = ubi;
     }
+    public float getUbiFreq(){return ubiFreq;}
 }

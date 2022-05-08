@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -24,6 +25,7 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -186,5 +188,17 @@ public class GenericFuntions {
             e.printStackTrace();
         }
 
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * Calcular la distancia en metros entre 2 ubicaciones
+     * @param first
+     * @param second
+     * @return
+     */
+    public static float distanceBetween(Location first, Location second) {
+        return first.distanceTo(second);
     }
 }

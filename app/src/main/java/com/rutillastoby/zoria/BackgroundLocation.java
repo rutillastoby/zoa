@@ -19,11 +19,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class BackgroundLocation extends Service {
 
     //Const ========================================================================================
-    private static final int LOCATION_INTERVAL = 3000;
-    private static final float LOCATION_DISTANCE = 1f;
+    private static final int LOCATION_INTERVAL = 4000;
+    private static final float LOCATION_DISTANCE = 3f;
 
     //Variables ====================================================================================
     private LocationManager locationManager = null;
@@ -32,28 +34,49 @@ public class BackgroundLocation extends Service {
     //----------------------------------------------------------------------------------------------
 
     private class LocationListener implements android.location.LocationListener {
+        Location lastLocation = null;
 
         @Override
         public void onLocationChanged(Location location) {
             Log.d("aba", "onLocationChanged: " + location);
-            GeneralActivity.singleton.sendLocation(location);
+
+            //Obtener la frecuencia con la que se actualiza la ubicacion, por defecto 100 metros
+            float locationFrequencyDistance = 100f;
+            if(GeneralActivity.singleton != null){
+                locationFrequencyDistance = GeneralActivity.singleton.getActiveCompetition().getUbiFreq();
+            }
+
+            //Inicializacion
+            if(lastLocation == null){
+                lastLocation = location;
+            }
+
+            //Actuar si se alcanza la distancia de frecuencia de actualizacion
+            if(GenericFuntions.distanceBetween(location, lastLocation) > locationFrequencyDistance) {
+                if(GeneralActivity.singleton != null) {
+                    GeneralActivity.singleton.sendLocation(location);
+                }
+                lastLocation = location;
+                Log.d("aba", "Alcanzada la distancia de actualizacion");
+            }
         }
+
 
         @Override
         public void onProviderDisabled(String provider) {
             Log.d("aba", "onProviderDisabled: " + provider);
             //Cambiar estado de los elementos del fragmento del mapa
             GeneralActivity.singleton.getMapF().setStatusLocationProvider(false);
-
         }
+
 
         @Override
         public void onProviderEnabled(String provider) {
             Log.d("aba", "onProviderEnabled: " + provider);
             //Cambiar estado de los elementos del fragmento de mapa
             GeneralActivity.singleton.getMapF().setStatusLocationProvider(true);
-
         }
+
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {}
