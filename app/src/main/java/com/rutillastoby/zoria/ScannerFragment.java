@@ -83,7 +83,7 @@ public class ScannerFragment extends Fragment implements ZXingScannerView.Result
         }
 
         //Reproducir sonido abrir escaner
-        GenericFuntions.playSound(getContext(), R.raw.open_scan);
+        GenericFuntions.playSound(getContext(), R.raw.pop);
     }
 
     //----------------------------------------------------------------------------------------------

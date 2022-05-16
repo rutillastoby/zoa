@@ -3,6 +3,7 @@ package com.rutillastoby.zoria;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,6 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -101,6 +105,10 @@ public class NewUserActivity extends AppCompatActivity {
                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(findViewById(R.id.lyNewUser).getWindowToken(), 0);
                 etNickNewUser.clearFocus();
+
+                //Deshabilitar los botones
+                bOkNewUser.setEnabled(false);
+                bCancelNewUser.setEnabled(false);
             }
         });
 
@@ -109,7 +117,12 @@ public class NewUserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Cerrar sesion
+                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build();
+                GoogleSignInClient googleSignInClient= GoogleSignIn.getClient(context,gso);
+                googleSignInClient.signOut();
+
                 FirebaseAuth.getInstance().signOut();
+
                 //Cerrar aplicacion
                 finishAffinity();
             }
@@ -163,6 +176,9 @@ public class NewUserActivity extends AppCompatActivity {
                     GenericFuntions.errorSnack(findViewById(R.id.lyNewUser), GenericFuntions.checkNick(username, nombresUsados), context);
                     //Ocultar barra de progreso
                     pbNickNewUser.setVisibility(View.GONE);
+                    //Habilitar los botones
+                    bOkNewUser.setEnabled(true);
+                    bCancelNewUser.setEnabled(true);
                 }
             }
 
@@ -225,24 +241,15 @@ public class NewUserActivity extends AppCompatActivity {
      * (REGISTRO INICIAL), ESTE ABRIRA LA SIGUIENTE ACTIVITY
      */
     public void loadGeneralActivity(){
+        Log.d("aaa", "1"+saveName+" 2"+savePhoto+" 3"+saveCompeEnab);
         if(saveName && savePhoto && saveCompeEnab){
             //Cargar activity general tras el registro
             final Context context = this;
 
-            //Obtener la hora de la base de datos para la General Activity
-            FirebaseFunctions.getInstance("europe-west1").getHttpsCallable("getTime")
-                    .call().addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                @Override
-                public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                    long currentMilliseconds = (long) httpsCallableResult.getData();
-
-                    //Abrir activity general
-                    Intent i = new Intent(context, GeneralActivity.class);
-                    i.putExtra("currentTime", currentMilliseconds);
-                    startActivity(i);
-                    finish();
-                }
-            });
+            //Abrir activity general
+            Intent i = new Intent(this, GeneralActivity.class);
+            startActivity(i);
+            finish();
         }
     }
 }

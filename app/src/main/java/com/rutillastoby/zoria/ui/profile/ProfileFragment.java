@@ -344,6 +344,8 @@ public class ProfileFragment extends Fragment {
         String bigPhoto = user.getPhotoUrl().toString().replace("s96-c", "s320-c");
         if(!myUser.getFoto().equals(bigPhoto)){
             db.getReference("/usuarios/"+user.getUid()+"/foto").setValue(bigPhoto);
+
+
         }
     }
 

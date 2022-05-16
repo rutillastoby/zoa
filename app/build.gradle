@@ -10,11 +10,11 @@ android {
             keyPassword 'p1W2d3'
         }
     }
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.rutillastoby.zoria"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 7
         multiDexEnabled true
         versionName "2.0.3"

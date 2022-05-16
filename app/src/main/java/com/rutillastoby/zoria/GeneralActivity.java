@@ -375,7 +375,7 @@ public class GeneralActivity extends AppCompatActivity {
         initLoad = true;
 
         //Reproducir sonido de acceso
-        //GenericFuntions.playSound(this, R.raw.login);
+        GenericFuntions.playSound(this, R.raw.login);
         //Cargar el fragment con la competición marcada como activa
         showFragmentCurrent();
         //Cargar el historial de competiciones en el fragmento del perfil
@@ -680,7 +680,7 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA ALMACENAR LA RESPUESTA A UNA PREGUNTA EN LA BASE DE DATOS
      */
     public void sendResponseQuestion(String idQuestion, int idResponse, boolean correct){
-        final String path = "competiciones/"+ activeCompeId +"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion;
+        final String path = "competiciones/"+ showingCompeId +"/jugadores/"+user.getUid()+"/preguntas/"+idQuestion;
 
         //Guardar datos en fichero local indicado el tipo de valor
         final int idInserted = saveDataOnLocal(path, idResponse+"", intType);
@@ -711,7 +711,7 @@ public class GeneralActivity extends AppCompatActivity {
      * METODO PARA ALMACENAR EL REGISTRO DE UN CODIGO EN LA BASE DE DATOS
      */
     public void sendPointScann(String idPoint, int level, int points) {
-        final String path = "competiciones/" + activeCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint;
+        final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/puntos/" + idPoint;
         final String value = points + "-" + System.currentTimeMillis();
 
         //Guardar datos en base de datos local indicado el tipo de valor
@@ -751,7 +751,7 @@ public class GeneralActivity extends AppCompatActivity {
      * COMPETICION FINALIZADA PARA EL USUARIO
      */
     public void sendGetFlag(){
-        final String path = "competiciones/" + activeCompeId + "/jugadores/" + user.getUid() + "/fin";
+        final String path = "competiciones/" + showingCompeId + "/jugadores/" + user.getUid() + "/fin";
 
         //Guardar datos en fichero local para respaldar problemas de conexion indicado el tipo de valor
         final int idInserted = saveDataOnLocal(path, "1", intType);
@@ -807,7 +807,7 @@ public class GeneralActivity extends AppCompatActivity {
         long currentTime = System.currentTimeMillis();
 
         //Comprobar si esta seleccionado el envio de ubicacion
-        if(activeCompetition.getUbi()==1 && currentTime < activeCompetition.getHora().getFin() && location!=null){
+        if(activeCompetition!=null && activeCompetition.getUbi()==1 && currentTime < activeCompetition.getHora().getFin() && location!=null){
             String basePath =  "competiciones/" + activeCompeId + "/jugadores/" + user.getUid() + "/ubis/"+currentTime;
             db.getReference(basePath+"/lat").setValue(location.getLatitude());
             db.getReference(basePath+"/lon").setValue(location.getLongitude());
