@@ -4,7 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
     signingConfigs {
         debugrutillastoby {
-            storeFile file('C:\\Dev\\debugrutillastoby.jks')
+            storeFile file('E:\\Desarrollo\\debugrutillastoby.jks')
             storePassword 'Debug2020'
             keyAlias = 'rutillastoby'
             keyPassword 'p1W2d3'
