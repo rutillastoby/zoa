@@ -21,7 +21,8 @@
     <string name="pwdFail">Contraseña incorrecta :(</string>
     <string name="myPointsCurrent">Mi puntuación</string>
     <string name="titleQuestions">PREGUNTAS</string>
-    <string name="acept">Aceptar</string>
+    <string name="accept">Aceptar</string>
+    <string name="deny">Denegar</string>
     <string name="sendResponse">¿Enviar Respuesta?</string>
     <string name="gpsDisabled">GPS Deshabilitado\nActívalo para ver tu ubicación</string>
     <string name="titleMap">MAPA</string>
@@ -58,5 +59,7 @@
     <string name="update">ACTUALIZAR</string>
     <string name="getLocation">Obteniendo ubicación</string>
     <string name="noCompetitionAccess">No tienes acceso a esa competición</string>
+    <string name="prominentDisclosure">ZOA recopila datos de ubicación para conocer la posición en tiempo real de los jugadores durante las competiciones por motivos de seguridad. La ubicación es obtenida en <b>segundo plano</b> incluso cuando la aplicación está cerrada o no está en uso.</string>
+    <string name="prominentDisclosureTitle">Acceso a la ubicación</string>
 
 </resources>

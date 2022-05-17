@@ -1,15 +1,18 @@
 package com.rutillastoby.zoria;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -92,7 +95,37 @@ public class LoginActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         //Comprobar permisos
-        if(!Permissions.hasPermissions(this)){
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            //Si faltan permisos de ubicación mostrar prominent disclosure
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View dialog = inflater.inflate(R.layout.dialog_location_access, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+            //Funcionalidad boton de aceptar del dialogo. Solicitar todos los permisos necesarios
+            Button bAllowLocation = dialog.findViewById(R.id.bAllowLocation);
+            bAllowLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ActivityCompat.requestPermissions((Activity) context, Permissions.getPermissions(), Permissions.PERMISSION_ALL);
+                }
+            });
+
+            //Funcionalidad boton de cancelar del dialogo. Cerrar app
+            Button bDenyLocation = dialog.findViewById(R.id.bDenyLocation);
+            bDenyLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finishAffinity();
+                }
+            });
+
+            builder.setView(dialog)
+                    .show();
+
+        }else if(!Permissions.hasPermissions(this)){
+            //Si falta cualquier otro permiso abrir directamente la solicitud de los mismos
             ActivityCompat.requestPermissions(this, Permissions.getPermissions(), Permissions.PERMISSION_ALL);
         }else {
             //Comprobar version de la base de datos
