@@ -38,7 +38,6 @@ public class BackgroundLocation extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            Log.d("aba", "onLocationChanged: " + location);
 
             //Obtener la frecuencia con la que se actualiza la ubicacion, por defecto 100 metros
             float locationFrequencyDistance = 100f;
@@ -99,7 +98,7 @@ public class BackgroundLocation extends Service {
 
             startForeground(1, notification);
         }
-        Log.d("aba", "hola");
+
         //Crear el location manager
         if (locationManager == null) {
             locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
@@ -139,7 +138,6 @@ public class BackgroundLocation extends Service {
      */
     @Override
     public void onDestroy() {
-        Log.e("aba", "onDestroy");
         //Desactivar la deteccion de actualizacion de gps
         if (locationManager != null) {
             locationManager.removeUpdates(locationListener);

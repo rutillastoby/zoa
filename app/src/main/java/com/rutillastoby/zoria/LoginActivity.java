@@ -3,6 +3,7 @@ package com.rutillastoby.zoria;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -100,20 +101,26 @@ public class LoginActivity extends AppCompatActivity {
 
             //Si faltan permisos de ubicación mostrar prominent disclosure
             LayoutInflater inflater = LayoutInflater.from(context);
-            View dialog = inflater.inflate(R.layout.dialog_location_access, null);
+            View alertView = inflater.inflate(R.layout.dialog_location_access, null);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
+            AlertDialog dialog = builder.setView(alertView)
+                                    .setCancelable(false)
+                                    .create();
+            dialog.show();
+
             //Funcionalidad boton de aceptar del dialogo. Solicitar todos los permisos necesarios
-            Button bAllowLocation = dialog.findViewById(R.id.bAllowLocation);
+            Button bAllowLocation = alertView.findViewById(R.id.bAllowLocation);
             bAllowLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ActivityCompat.requestPermissions((Activity) context, Permissions.getPermissions(), Permissions.PERMISSION_ALL);
+                    dialog.dismiss();
                 }
             });
 
             //Funcionalidad boton de cancelar del dialogo. Cerrar app
-            Button bDenyLocation = dialog.findViewById(R.id.bDenyLocation);
+            Button bDenyLocation = alertView.findViewById(R.id.bDenyLocation);
             bDenyLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -121,8 +128,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
-            builder.setView(dialog)
-                    .show();
 
         }else if(!Permissions.hasPermissions(this)){
             //Si falta cualquier otro permiso abrir directamente la solicitud de los mismos

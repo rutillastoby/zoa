@@ -299,10 +299,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                             ga.showQuestionsFragment();
                         }
                     }).setNegativeButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
 
         } else if (level == 5){
             //CODIGO BANDERA
