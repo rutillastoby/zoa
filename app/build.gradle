@@ -4,7 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
     signingConfigs {
         debugrutillastoby {
-            storeFile file('E:\\Desarrollo\\debugrutillastoby.jks')
+            storeFile file('C:\\Dev\\debugrutillastoby.jks')
             storePassword 'Debug2020'
             keyAlias = 'rutillastoby'
             keyPassword 'p1W2d3'
@@ -15,9 +15,9 @@ android {
         applicationId "com.rutillastoby.zoria"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 9
+        versionCode 10
         multiDexEnabled true
-        versionName "2.1.1"
+        versionName "2.1.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true
     }
